@@ -20,7 +20,7 @@ import equation
 #include "config.hpp"
 #include "unit_vec.hpp"
 #include "equation.hpp"	
-
+#include "conn.hpp"
 
 class Face: public LocalCoor {
 	Face(Patch* patch, int normal, array<real,2> const & ext, real pos_z, array<int,1> n): LocalCoor(normal) {
@@ -72,31 +72,33 @@ class Face: public LocalCoor {
 		equs_[name] = new Equation(name, this, equ_prob);
 	}
 	int		get_loc_pos_par_index(Face* nbr) {
-		OL = nbr_to_loc(nbr)
+		int OL = nbr_to_loc(nbr);
 		
-		PL = abs(cross(3, OL))
+		int PL = abs(cross(3, OL));
 		
-		PG = loc_to_glo(PL)
-		return PG
+		int PG = loc_to_glo(PL);
+		return PG;
 	}	
 	real		x(int i) {
-		return (i + 0.5) * d_[0]
+		return (i + 0.5) * d_.get(0);
 	}
 	real		y(int j) {
-		return (j + 0.5) * d_[1]
+		return (j + 0.5) * d_.get(1);
 	}
 	real		area() {
-		return (ext_[0,1] - ext_[0,0]) * (ext_[1,1] - ext_[1,0])
+		return (ext_.get(0,1) - ext_.get(0,0)) * (ext_.get(1,1) - ext_.get(1,0));
 	}
-	IS		nbr_to_loc(Face* nbr) {
+	int		nbr_to_loc(Face* nbr) {
 		//if(not nbr) raise ValueError('nbr is None')
 		
-		for i in range(2) {
-			for j in range(2) {
-				conn = conns_[i,j]
-				if conn:
-					if nbr == conn.twin.face:
-						return is2v(i,2*j-1)
+		for(int i = 0; i < 2; ++i) {
+			for(int j = 0; j < 2; ++j) {
+				Conn* conn = conns_[i][j];
+				if(conn) {
+					if(nbr == conn->twin_->face_) {
+						return IS(i,2*j-1).v();
+					}
+				}
 			}
 		}
 		//print [conn.nbr if conn else conn for conn in conns_.flatten()]
@@ -105,8 +107,8 @@ class Face: public LocalCoor {
 		throw 0;
 	}
 	Conn*		loc_to_conn(int V) {
-		v,sv = v2is(V)
-		return conns_[v, (sv+1)/2]
+		IS v(V);
+		return conns_[v.i][(v.s+1)/2];
 	}
 	int		index_lambda(Face* nbr) {
 		// returns lambda:
@@ -114,24 +116,24 @@ class Face: public LocalCoor {
 		// returns the index of my cell
 				
 		// PG global index of neighbor's positive parallel local index
-		PG = nbr.get_loc_pos_par_index()
+		int PG = nbr.get_loc_pos_par_index();
 		
-		PL = glo_to_loc(PG)
-		OL = nbr_to_loc(nbr)
+		int PL = glo_to_loc(PG);
+		int OL = nbr_to_loc(nbr);
 		
-		pl,spl = v2is(PL)
-		ol,sol = v2is(OL)
+		IS pl(PL);//pl,spl = v2is(PL);
+		IS ol(OL);//ol,sol = v2is(OL);
 		
-		d = d_[ol]
+		d = d_[ol];
 		
-		l = [None,None]
-		l[pl] = lambda p, pl=pl, spl=spl: p if (spl > 0) else n_[pl] - p - 1
-		l[ol] = lambda p, ol=ol, sol=sol: 0 if (sol < 0) else (n_[ol] - 1)
+		l = [None,None];
+		l[pl] = lambda p, pl=pl, spl=spl: p if (spl > 0) else n_[pl] - p - 1;
+		l[ol] = lambda p, ol=ol, sol=sol: 0 if (sol < 0) else (n_[ol] - 1);
 		
 		//print inspect.getsource(i)
 		//print inspect.getsource(j)
 		//print l
-
+		
 		return l[0],l[1],d
 	}
 	void		send_array(Equation* equ, Conn* conn) {
@@ -235,19 +237,12 @@ class Face: public LocalCoor {
 	}
 	real		step(std::string equ_name) {
 		equ = equs_[equ_name]
-
 		// solve diffusion equation for equ
-		
 		R = 0.0
 		
 		ver1 = False
-		//ver1 = True
-		
 		ver2 = False
-		
-		
 		// solve equation
-
 		step_pre(equ)
 
 		g = patch_.group
@@ -281,7 +276,6 @@ class Face: public LocalCoor {
 				//if s < 0:
 				//debug_s()
 				
-				
 				num = aW*yW + aE*yE + aS*yS + aN*yN + s
 				ys = num / (aW + aE + aS + aN)
 				
@@ -301,10 +295,8 @@ class Face: public LocalCoor {
 				}
 
 				if (ver1) debug();
-
-				if math.isnan(yo) {
-					throw 0;
-				}
+				if (math.isnan(yo)) throw 0;
+				
 				if math.isnan(ys) or math.isinf(ys) {
 					debug();
 					throw 0;
@@ -350,6 +342,7 @@ class Face: public LocalCoor {
 	array<real,3>				d_;
 	array<real,1>				l_;
 	std::map<std::string, Equation*>	equs_;
+	Conn*					conns_[2][2];
 };
 
 
