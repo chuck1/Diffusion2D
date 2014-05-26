@@ -1,3 +1,5 @@
+#ifndef UNIT_VEC_HPP
+#define UNIT_VEC_HPP
 
 
 struct IS {
@@ -119,6 +121,9 @@ class LocalCoor {
 
 
 
+
+
+#endif
 
 
 

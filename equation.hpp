@@ -1,7 +1,7 @@
 #ifndef EQUATION_HPP
 #define EQUATION_HPP
 
-
+#include <memory>
 #include <string>
 
 #include "config.hpp"
@@ -35,10 +35,12 @@ class Equation {
 		real			grad_max();
 		real			mean();
 
-		std::string		name_;
-		Face*			face_;
-		Equation_Prob*		equ_prob_;
-		array<real,2>		v_;
+		std::string						name_;
+		Face*							face_;
+		Equation_Prob*						equ_prob_;
+		array<real,2>						v_;
+		unsigned int						flag_;
+		std::vector< std::vector< array<real,1> > >		v_bou_;
 };
 
 #endif

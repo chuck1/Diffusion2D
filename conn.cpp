@@ -1,6 +1,7 @@
 #include <map>
 
 #include "face.hpp"
+#include "conn.hpp"
 
 // information concerning connection between face and conn
 // from perspective of face
@@ -16,11 +17,11 @@ void		Conn::refresh() {
 	ol_, sol_ = v2is(OL_);
 
 	PL_ = abs(cross(3, OL_));
-	pl_,_ = v2is(PL_);
-
+	pl_ = IS(PL_);
+	
 	PG_ = face_.loc_to_glo(PL_);
-
-	li_, lj_, d_ = face_.index_lambda(twin_.face);
+	
+	il_ = face_.index_lambda(twin_.face);
 
 	////printinfo()
 }

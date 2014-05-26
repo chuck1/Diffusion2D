@@ -15,8 +15,10 @@ import equation
 */
 
 #include <map>
+#include <memory>
 
 #include "face.hpp"
+#include "index_lambda.hpp"
 
 class Conn {
 	public:
@@ -25,9 +27,13 @@ class Conn {
 		Conn(Face* face, void* conns);
 		void					refresh();
 		void					printinfo();
-		void					send(std::string name, array<real,2>* v);
-		void					recv(std::string name);
+		void					send(std::string name, array<real,1> v);
+		array<real,1>				recv(std::string name);
 
+		IS					pl_;
+		IS					ol_;
+		Index_Lambda				il_;
+		
 		Face*					face_;
 		Conn*					twin_;
 		void*					conns_;
