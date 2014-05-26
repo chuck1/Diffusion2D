@@ -14,9 +14,9 @@ int main() {
 	
 	std::map<std::string, array< array<int,1>, 2> > a2;
 
-	auto a = make_array<double,3>();
+	auto a = make_uninit<double,3>({2,3,4});
 	
-	a->alloc(2,2,3);
+	a->alloc({2,2,3});
 	
 	a->get(0,0,0) = 1.0;
 	a->get(1,0,0) = 2.0;

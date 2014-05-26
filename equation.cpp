@@ -1,5 +1,7 @@
+#include "array.hpp"
 #include "equation.hpp"
 #include "face.hpp"
+
 
 Equation_Prob::Equation_Prob(Prob* prob, std::string name, real k, real alpha, real alpha_source) {
 	prob_ = prob;
@@ -10,7 +12,7 @@ Equation_Prob::Equation_Prob(Prob* prob, std::string name, real k, real alpha, r
 }
 
 
-Equ::Equ(std::string name, Face* face, Equation_Prob* equ_prob) {
+Equation::Equation(std::string name, Face* face, Equation_Prob* equ_prob) {
 	name_ = name;
 	face_ = face;
 
@@ -18,34 +20,42 @@ Equ::Equ(std::string name, Face* face, Equation_Prob* equ_prob) {
 
 	//v_0_ = v_0
 
-	array<int,1> n_extended = face_->n + np.array([2, 2]);
-
-	v_ = np.ones(n_extended) * face_->patch.group.v_0[name_];
-
-	s_ = np.ones(face.n);
+	array<int,1> n_extended = face_->n_->add(make_array<int,1>({2, 2}));
+	
+	v_->ones(n_extended);
+	
+	v_->multiply_self(face_->patch_->group_->v_0_[name_]);
+	
+	s_->ones(face->n_);
 
 	flag_ = 0;
-}	
-array<real,2>		Equ::grad() {
+}
+array<real,2>		Equation::grad() {
 	//return np.gradient(v_[:-2,:-2], face_->d[0,0,0], face_.d[0,0,1])
-	return v_.sub(0,0,-2,-2).gradient(face_->d_);
+	return v_->sub({0,0},{-2,-2})->gradient(face_->d_);
 }
-real			Equ::grad_mag() {
-	return sqrt(grad().square().sum());
+real			Equation::grad_mag() {
+	return sqrt(grad()->square()->sum());
 }
-real		Equ::min() {
-	return v_.sub({0,0},{-2,-2}).min();
+real			Equation::min() {
+	return v_->sub({0,0},{-2,-2})->min();
 }
-real		Equ::max() {
-	return v_.sub({0,0},{-2,-2}).max();
+real			Equation::max() {
+	return v_->sub({0,0},{-2,-2})->max();
 }
-real		Equ::grad_min() {
-	return np.min(grad_mag()[:-2,:-2]);
+real			Equation::grad_min() {
+	return v_->sub({0,0},{-2,-2})->gradient(face_->d_)->min();
 }
-real		Equ::grad_max() {
-	return np.max(grad_mag()[:-2,:-2]);
+real			Equation::grad_max() {
+	return v_->sub({0,0},{-2,-2})->gradient(face_->d_)->max();
 }
-real		Equ::mean() {
-	return np.mean(v_[:-2,:-2]);
+real			Equation::mean() {
+	return v_->sub({0,0},{-2,-2})->max();
 }
+
+
+
+
+
+
 

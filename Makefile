@@ -3,7 +3,7 @@ CPP_FILES = equation.cpp face.cpp
 O_FILES = $(patsubst %.cpp, %.o, $(CPP_FILES))
 
 
-all: $(O_FILES)
+all: test $(O_FILES)
 
 $(O_FILES): %.o: %.cpp
 	g++ $^ -c -o $@ -std=c++0x -fno-deduce-init-list

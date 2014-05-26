@@ -9,9 +9,9 @@
 
 class Equation_Prob {
 	public:
-		Equation_Prob(Prob* prob, std::string name, real k, real alpha, real alpha_source);
+		Equation_Prob(Prob_s prob, std::string name, real k, real alpha, real alpha_source);
 
-		Prob*		prob_;
+		Prob_s		prob_;
 		std::string	name_;
 		real		k_;
 		real		alpha_;
@@ -26,19 +26,22 @@ class Equation {
 			ONLY_PARALLEL_FACES = 1 << 0
 		};
 
-		Equation(std::string name, Face* face, Equation_Prob* equ_prob);
-		array<real,2>		grad();
-		real			grad_mag();
-		real			min();
-		real			max();
-		real			grad_min();
-		real			grad_max();
-		real			mean();
+		Equation(std::string name, Face_s face, Equation_Prob_s equ_prob);
+		array<real,2>						grad();
+		real							grad_mag();
+		real							min();
+		real							max();
+		real							grad_min();
+		real							grad_max();
+		real							mean();
 
 		std::string						name_;
-		Face*							face_;
-		Equation_Prob*						equ_prob_;
+		Face_s							face_;
+		Equation_Prob_s						equ_prob_;
+		
+		array<real,2>						s_;
 		array<real,2>						v_;
+
 		unsigned int						flag_;
 		std::vector< std::vector< array<real,1> > >		v_bou_;
 };

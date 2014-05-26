@@ -34,8 +34,8 @@ class Conn {
 		IS					ol_;
 		Index_Lambda				il_;
 		
-		Face*					face_;
-		Conn*					twin_;
+		Face_s					face_;
+		Conn_s					twin_;
 		void*					conns_;
 		bool					parallel_;
 		std::map<std::string, array<real,2> >	equs_;
