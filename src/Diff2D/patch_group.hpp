@@ -19,7 +19,9 @@ class Patch_Group: public std::enable_shared_from_this<Patch_Group> {
 		Patch_s				create_patch(
 				std::string name,
 				int normal,
-				std::vector< std::vector<int> > indices,
+				std::vector<int> indicesx,
+				std::vector<int> indicesy,
+				std::vector<int> indicesz,
 				v_bou_type v_bou);
 
 		real		reset_s(std::string equ_name);

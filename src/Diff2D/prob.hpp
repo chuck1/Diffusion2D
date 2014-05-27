@@ -6,14 +6,15 @@
 #include <Diff2D/array.hpp>
 #include <Diff2D/config.hh>
 #include <Diff2D/prob.hpp>
+#include <Diff2D/types.hpp>
 
 
 class Prob: public std::enable_shared_from_this<Prob> {
 	public:
 		Prob(
 				std::string name,
-				std::vector< array<real,1> > x,
-				std::vector< array<int,1> > nx,
+				coor_type x,
+				cell_count_type nx,
 				int it_max_1,
 				int it_max_2);
 		Equation_Prob_s			create_equation(std::string name, real k, real alpha, real alpha_source);

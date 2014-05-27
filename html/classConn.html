@@ -97,15 +97,15 @@ Collaboration diagram for Conn:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ac40aeea0b86744e9e6a8634c1a2ccbe7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac40aeea0b86744e9e6a8634c1a2ccbe7"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Conn</b> (<a class="el" href="classFace.html">Face</a> *face, void *conns)</td></tr>
+<tr class="memitem:ab0ba4fbd67bc99991f2110c3ca80ca3d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab0ba4fbd67bc99991f2110c3ca80ca3d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Conn</b> (Face_s face, void *conns)</td></tr>
 <tr class="memitem:af3776731e374e856bb5eac3faea03ae3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af3776731e374e856bb5eac3faea03ae3"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>refresh</b> ()</td></tr>
 <tr class="memitem:add96cc92a7575634f44220cb6e2e2421"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="add96cc92a7575634f44220cb6e2e2421"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>printinfo</b> ()</td></tr>
 <tr class="memitem:ace36b6085ceadcfa9654b5950e7719c0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ace36b6085ceadcfa9654b5950e7719c0"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>send</b> (std::string name, array&lt; real, 1 &gt; v)</td></tr>
-<tr class="memitem:ad0ba346867084d28da983b5785934df5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad0ba346867084d28da983b5785934df5"></a>
+<tr class="memitem:a5f149a3217d7cf6227b48571638cadf8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f149a3217d7cf6227b48571638cadf8"></a>
 array&lt; real, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>recv</b> (std::string name)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
@@ -114,6 +114,8 @@ Public Attributes</h2></td></tr>
 <a class="el" href="structIS.html">IS</a>&#160;</td><td class="memItemRight" valign="bottom"><b>pl_</b></td></tr>
 <tr class="memitem:a949773005bd6449b09e355e8f78dee47"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a949773005bd6449b09e355e8f78dee47"></a>
 <a class="el" href="structIS.html">IS</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ol_</b></td></tr>
+<tr class="memitem:a8550bde616100c5f9cc23bc7ae267a18"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8550bde616100c5f9cc23bc7ae267a18"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>PG_</b></td></tr>
 <tr class="memitem:a659caee9d9a125f24d7eb054ca2e5879"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a659caee9d9a125f24d7eb054ca2e5879"></a>
 <a class="el" href="structIndex__Lambda.html">Index_Lambda</a>&#160;</td><td class="memItemRight" valign="bottom"><b>il_</b></td></tr>
 <tr class="memitem:a893abc608e559f12c5368edbd6da7b54"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a893abc608e559f12c5368edbd6da7b54"></a>
@@ -124,9 +126,9 @@ Conn_s&#160;</td><td class="memItemRight" valign="bottom"><b>twin_</b></td></tr>
 void *&#160;</td><td class="memItemRight" valign="bottom"><b>conns_</b></td></tr>
 <tr class="memitem:aae3bc6691f2e065bf44e8f1a2cd4e31f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aae3bc6691f2e065bf44e8f1a2cd4e31f"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>parallel_</b></td></tr>
-<tr class="memitem:a445b27273bf4f8eb45f22739736fb66c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a445b27273bf4f8eb45f22739736fb66c"></a>
+<tr class="memitem:a425d7d5713a82acbfa9a69adcc0c1c25"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a425d7d5713a82acbfa9a69adcc0c1c25"></a>
 std::map&lt; std::string, array<br class="typebreak"/>
-&lt; real, 2 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>equs_</b></td></tr>
+&lt; real, 1 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>equs_</b></td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/Diff2D/<a class="el" href="conn_8hpp_source.html">conn.hpp</a></li>
@@ -135,7 +137,7 @@ std::map&lt; std::string, array<br class="typebreak"/>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 26 2014 13:23:19 for Diff2D by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 26 2014 17:50:37 for Diff2D by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

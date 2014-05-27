@@ -7,11 +7,9 @@
 #include <Diff2D/config.hh>
 #include <Diff2D/unit_vec.hpp>
 #include <Diff2D/array.hpp>
+#include <Diff2D/types.hpp>
 
 
-typedef multivec< 3, array<real,1> >				v_bou_vec_type;
-
-typedef std::map< std::string, v_bou_vec_type >			v_bou_type;
 
 
 class Patch: public LocalCoor, public std::enable_shared_from_this<Patch> {

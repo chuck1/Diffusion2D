@@ -1,45 +1,50 @@
-/*
-import profile
-import pylab as pl
 
-//from solver import *
-import solver.prob
-from solver.patch import stitch
-*/
+#include <Diff2D/prob.hpp>
+#include <Diff2D/patch_group.hpp>
+#include <Diff2D/stitch.hpp>
 
 int main() {
 
-	n = 10;
+	int n = 10;
+	
+	coor_type x;
+	cell_count_type N;
 
-	x = [[0.0, 1.0, 2.0, 3.0], [0.0, 1.0, 2.0, 3.0], [0.0, 1.0, 2.0, 3.0]];
-	n = [[n+0]*2,[n+2]*2,[n+4]*2];
+	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));
+	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));
+	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));
+	
+	N.push_back(make_array_1<int,1>({n+0,n+0}));
+	N.push_back(make_array_1<int,1>({n+2,n+2}));
+	N.push_back(make_array_1<int,1>({n+4,n+4}));
+	
+	
+	auto prob = std::make_shared<Prob>("test4", x, N, 1000, 1000);
 
-	prob = solver.prob.Problem('test4', x, n, it_max_1 = 1000, it_max_2 = 1000);
-
-	prob.create_equation('T', 10.0, 1.5, 1.5);
-	prob.create_equation('s', 10.0, 1.5, 1.5);
+	prob->create_equation("T", 10.0, 1.5, 1.5);
+	prob->create_equation("s", 10.0, 1.5, 1.5);
 
 	//prob.get_3d_axes()
 	//sys.exit(0)
+	
+	Patch_s	p0, p1, p2, p3, p4, p5;
+	
+	auto g2 = prob->create_patch_group("2", {{"T",10.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}});
+	auto g3 = prob->create_patch_group("3", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}});
+	auto g4 = prob->create_patch_group("4", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}});
+	auto g5 = prob->create_patch_group("5", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}});
 
-	p0 = None;
-	p1 = None;
-	p2 = None;
-	p3 = None;
-	p4 = None;
-	p5 = None;
-
-	g2 = prob.create_patch_group('2', v_0 = {'T':10.0,'s':2.0}, S = {'T':0.0,'s':10.0});
-	g3 = prob.create_patch_group('3', v_0 = {'T': 0.0,'s':2.0}, S = {'T':0.0,'s':10.0});
-	g4 = prob.create_patch_group('4', v_0 = {'T': 0.0,'s':2.0}, S = {'T':0.0,'s':10.0});
-	g5 = prob.create_patch_group('5', v_0 = {'T': 0.0,'s':2.0}, S = {'T':0.0,'s':10.0});
-
+	v_bou_type v_bou_def;
+	// = {"T":[[30.0,30.0],[30.0,30.0]],"s":[[1.0,1.0],[1.0,1.0]]}
+	
 	//p0 = prob.createPatch(1,	[1,	[0,1],	[0,1]])
 	//p1 = prob.createPatch(2,	[[0,1],	1,	[0,1]])
-	p2 = g2.create_patch('2',3,	[[0,1,2],	[0,1,2],	2],		v_bou = {'T':[[30.0,30.0],[30.0,30.0]],'s':[[1.0,1.0],[1.0,1.0]]});
-	p3 = g3.create_patch('3',-1,	[0,		[2,1,0],	[2,1,0]],	v_bou = {'T':[[30.0,30.0],[30.0,30.0]],'s':[[1.0,1.0],[1.0,1.0]]});
-	p4 = g4.create_patch('4',-2,	[[2,1,0],	0,		[2,1,0]],	v_bou = {'T':[[30.0,30.0],[30.0,30.0]],'s':[[1.0,1.0],[1.0,1.0]]});
-	p5 = g5.create_patch('5',-3,	[[2,1,0],	[2,1,0],	0],		v_bou = {'T':[[30.0,30.0],[30.0,30.0]],'s':[[1.0,1.0],[1.0,1.0]]});
+	
+	p2 = g2->create_patch("2",3,	{0,1,2},	{0,1,2},	{2},		v_bou_def);
+
+	p3 = g3->create_patch("3",-1,	{0},		{2,1,0},	{2,1,0},	v_bou_def);
+	p4 = g4->create_patch("4",-2,	{2,1,0},	{0},		{2,1,0},	v_bou_def);
+	p5 = g5->create_patch("5",-3,	{2,1,0},	{2,1,0},	{0},		v_bou_def);
 
 
 	stitch(p0,p1);

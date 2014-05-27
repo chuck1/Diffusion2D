@@ -17,6 +17,6 @@ project(Diff2D)
 include($ENV{HOME}/usr/lib/cmake/CMakeHelper/static/library.cmake)
 
 
-#add_subdirectory(test)
+add_subdirectory(test)
 
 

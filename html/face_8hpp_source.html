@@ -122,45 +122,58 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        real    y;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;};</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="code" href="classFace.html">   38</a></span>&#160;<span class="keyword">class </span><a class="code" href="classFace.html">Face</a>: <span class="keyword">public</span> <a class="code" href="classLocalCoor.html">LocalCoor</a>, <span class="keyword">public</span> std::enable_shared_from_this&lt;Face&gt; {</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <a class="code" href="classFace.html">Face</a>(Patch_s patch, <span class="keywordtype">int</span> normal, array&lt;real,2&gt; <span class="keyword">const</span> &amp; ext, real pos_z, array&lt;int,1&gt; n);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keywordtype">void</span>                    create_equ(std::string name, Equation_Prob_s equ_prob);</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordtype">int</span>                     get_loc_pos_par_index(Face_s nbr);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        real                    x(<span class="keywordtype">int</span> i);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        real                    y(<span class="keywordtype">int</span> j);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        real                    area();</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keywordtype">int</span>                     nbr_to_loc(Face_s nbr);</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        Conn_s                  loc_to_conn(<span class="keywordtype">int</span> V);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <a class="code" href="structIndex__Lambda.html">Index_Lambda</a>            index_lambda(Face_s nbr);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keywordtype">void</span>                    send_array(Equation_s equ, Conn_s conn);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keywordtype">void</span>                    recv_array(Equation_s equ, Conn_s conn);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <a class="code" href="structTerm.html">Term</a>                    term(Equation_s equ, std::vector&lt;int&gt; ind, <span class="keywordtype">int</span> v, <span class="keywordtype">int</span> sv, real To);</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keywordtype">void</span>                    step_pre_cell(Equation_s equ, std::vector&lt;int&gt; ind, <span class="keywordtype">int</span> V);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keywordtype">void</span>                    step_pre_cell_open_bou(Equation_s equ, std::vector&lt;int&gt; ind, <span class="keywordtype">int</span> V);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordtype">void</span>                    step_pre(Equation_s equ);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        real                    step(std::string equ_name);</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordtype">void</span>                    send(std::string equ_name);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordtype">void</span>                    recv(std::string equ_name);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">//typedef std::tuple&lt; std::vector&lt;real&gt;, std::vector&lt;real&gt;, std::vector&lt;real&gt;, std::vector&lt;real&gt; &gt;              grid_tup;</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">typedef</span> std::tuple&lt; array&lt;real,2&gt;, array&lt;real,2&gt;, array&lt;real,2&gt;, array&lt;real,2&gt; &gt;                grid_tup;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="code" href="classFace.html">   41</a></span>&#160;<span class="keyword">class </span><a class="code" href="classFace.html">Face</a>: <span class="keyword">public</span> <a class="code" href="classLocalCoor.html">LocalCoor</a>, <span class="keyword">public</span> std::enable_shared_from_this&lt;Face&gt; {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                <a class="code" href="classFace.html">Face</a>(Patch_s patch, <span class="keywordtype">int</span> normal, array&lt;real,2&gt; <span class="keyword">const</span> &amp; ext, real pos_z, array&lt;int,1&gt; n);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;                <span class="keywordtype">void</span>                    create_equ(std::string name, Equation_Prob_s equ_prob);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                <span class="keywordtype">int</span>                     get_loc_pos_par_index(Face_s nbr);</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;                real                    x(<span class="keywordtype">int</span> i);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;                real                    y(<span class="keywordtype">int</span> j);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                real                    area();</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;                <span class="keywordtype">int</span>                     nbr_to_loc(Face_s nbr);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;                Conn_s                  loc_to_conn(<span class="keywordtype">int</span> V);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                <a class="code" href="structIndex__Lambda.html">Index_Lambda</a>            index_lambda(Face_s nbr);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                <span class="keywordtype">void</span>                    send_array(Equation_s equ, Conn_s conn);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                <span class="keywordtype">void</span>                    recv_array(Equation_s equ, Conn_s conn);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        Patch_s                                         patch_;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        array&lt;real,2&gt;                                   ext_;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        real                                            pos_z_;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        array&lt;int,1&gt;                                    n_;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        array&lt;real,3&gt;                                   d_;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        array&lt;real,1&gt;                                   l_;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        std::map&lt; std::string, Equation_s &gt;             equs_;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        std::vector&lt; std::vector&lt;Conn_s&gt; &gt;              conns_;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        std::map&lt;std::string, array&lt;real,1&gt;[2][2]&gt;      v_bou_;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;};</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                <a class="code" href="structTerm.html">Term</a>                    term(Equation_s equ, std::vector&lt;int&gt; ind, <span class="keywordtype">int</span> v, <span class="keywordtype">int</span> sv, real To);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                <span class="keywordtype">void</span>                    step_pre_cell(Equation_s equ, std::vector&lt;int&gt; ind, <span class="keywordtype">int</span> V);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                <span class="keywordtype">void</span>                    step_pre_cell_open_bou(Equation_s equ, std::vector&lt;int&gt; ind, <span class="keywordtype">int</span> V);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                <span class="keywordtype">void</span>                    step_pre(Equation_s equ);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                real                    step(std::string equ_name);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                <span class="keywordtype">void</span>                    send(std::string equ_name);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                <span class="keywordtype">void</span>                    recv(std::string equ_name);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                grid_tup                grid(std::string equ_name);</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;                Patch_s                                         patch_;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;                array&lt;real,2&gt;                                   ext_;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                real                                            pos_z_;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                array&lt;int,1&gt;                                    n_;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                array&lt;real,3&gt;                                   d_;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;                array&lt;real,1&gt;                                   l_;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                std::map&lt; std::string, Equation_s &gt;             equs_;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;                std::vector&lt; std::vector&lt;Conn_s&gt; &gt;              conns_;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;                std::map&lt;std::string, array&lt;real,1&gt;[2][2]&gt;      v_bou_;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;};</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 26 2014 13:23:19 for Diff2D by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 26 2014 17:50:37 for Diff2D by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

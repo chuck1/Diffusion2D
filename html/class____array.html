@@ -107,28 +107,34 @@ typedef <a class="el" href="structInitializer__list.html">Initializer_list</a>&l
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ac3443fee161fd3f8ccb1290980a4190d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac3443fee161fd3f8ccb1290980a4190d"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>__array</b> (<a class="el" href="class____array.html">__array</a>&lt; T, N &gt; const &amp;rhs)</td></tr>
+<tr class="memitem:a8a0f0e9f3af8384c29ddd21d3451b65e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8a0f0e9f3af8384c29ddd21d3451b65e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>alloc</b> (array&lt; int, 1 &gt; shape_arr)</td></tr>
 <tr class="memitem:a0ffa8a127e271c2ae60c705e5baaf6d1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ffa8a127e271c2ae60c705e5baaf6d1"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>alloc</b> (std::vector&lt; int &gt; n)</td></tr>
-<tr class="memitem:aa96312fd6a92af3661cfe7c4c96768d6"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa96312fd6a92af3661cfe7c4c96768d6"></a>
-template&lt;typename... I&gt; </td></tr>
-<tr class="memitem:aa96312fd6a92af3661cfe7c4c96768d6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>zeros</b> ()</td></tr>
-<tr class="memitem:a4a69efe5b113660c08fd598932836272"><td class="memTemplParams" colspan="2"><a class="anchor" id="a4a69efe5b113660c08fd598932836272"></a>
-template&lt;typename... I&gt; </td></tr>
-<tr class="memitem:a4a69efe5b113660c08fd598932836272"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>ones</b> ()</td></tr>
+<tr class="memitem:a1072f5c538102121515000a4ef521303"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1072f5c538102121515000a4ef521303"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>zeros</b> ()</td></tr>
+<tr class="memitem:ad1fd7d5c46fb341f54cab916b78be561"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1fd7d5c46fb341f54cab916b78be561"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>ones</b> ()</td></tr>
+<tr class="memitem:ae6a7f942aeb5857504e9db83f7cfac57"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae6a7f942aeb5857504e9db83f7cfac57"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set</b> (std::initializer_list&lt; T &gt; src)</td></tr>
+<tr class="memitem:a483485b393733908c01c2cb2e74d08e0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a483485b393733908c01c2cb2e74d08e0"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set</b> (std::vector&lt; int &gt; i, std::initializer_list&lt; T &gt; src)</td></tr>
+<tr class="memitem:af9523af4f7911a07f54d8fce750e3332"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af9523af4f7911a07f54d8fce750e3332"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>__set</b> (T *dst, std::initializer_list&lt; T &gt; src)</td></tr>
+<tr class="memitem:a272fe82c6f31832970e123ac4ca66b08"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a272fe82c6f31832970e123ac4ca66b08"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>set</b> (std::vector&lt; int &gt; i, T *src, int len)</td></tr>
+<tr class="memitem:ac1c5c3051c03e39b9715903ee0fb202d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac1c5c3051c03e39b9715903ee0fb202d"></a>
+shared&#160;</td><td class="memItemRight" valign="bottom"><b>transpose_self</b> ()</td></tr>
+<tr class="memitem:a0f127aa40d72c1087c538619e5cd6ef9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f127aa40d72c1087c538619e5cd6ef9"></a>
+shared&#160;</td><td class="memItemRight" valign="bottom"><b>rot90_self</b> (int i)</td></tr>
+<tr class="memitem:a9de6105d23a33b20a4b0cc02b923edb4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9de6105d23a33b20a4b0cc02b923edb4"></a>
+shared&#160;</td><td class="memItemRight" valign="bottom"><b>fliplr_self</b> ()</td></tr>
+<tr class="memitem:a07f72930f0260b81df31b991f4c7e97d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a07f72930f0260b81df31b991f4c7e97d"></a>
+std::vector&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>ravel</b> ()</td></tr>
 <tr class="memitem:accc02e65ce775d472554778825ebdeda"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="accc02e65ce775d472554778825ebdeda"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>equal_size</b> (<a class="el" href="class____array.html">__array</a>&lt; T, N &gt; const &amp;rhs)</td></tr>
 <tr class="memitem:a435566ff4cab00684e41335595b4c60c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a435566ff4cab00684e41335595b4c60c"></a>
 <a class="el" href="class____array.html">__array</a>&lt; T, N &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>operator+</b> (<a class="el" href="class____array.html">__array</a>&lt; T, N &gt; const &amp;rhs)</td></tr>
-<tr class="memitem:aa34252173164544a96d1f2e0fa2875e3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa34252173164544a96d1f2e0fa2875e3"></a>
-shared&#160;</td><td class="memItemRight" valign="bottom"><b>gradient</b> (array&lt; T, N+1 &gt; d)</td></tr>
-<tr class="memitem:a9e073ed33e0fad10acbbb001af3c10b1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e073ed33e0fad10acbbb001af3c10b1"></a>
-T *&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> ()</td></tr>
-<tr class="memitem:a0e7f0ce953b4d180a940c14e34b503db"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0e7f0ce953b4d180a940c14e34b503db"></a>
-T *&#160;</td><td class="memItemRight" valign="bottom"><b>end</b> ()</td></tr>
-<tr class="memitem:a0a736891406c46548f11a8707508d7c1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a736891406c46548f11a8707508d7c1"></a>
-shared&#160;</td><td class="memItemRight" valign="bottom"><b>sub</b> (std::vector&lt; int &gt; beg, std::vector&lt; int &gt; end)</td></tr>
-<tr class="memitem:abbc3e2f4041747fdb3de9b224db7cb1e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abbc3e2f4041747fdb3de9b224db7cb1e"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> ()</td></tr>
 <tr><td colspan="2"><div class="groupHeader">access</div></td></tr>
 <tr class="memitem:a2640e620004e448f2c9d70e2d048c91e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2640e620004e448f2c9d70e2d048c91e"></a>
 T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator()</b> (int i)</td></tr>
@@ -140,6 +146,8 @@ T *&#160;</td><td class="memItemRight" valign="bottom"><b>__get</b> (T *t, int *
 T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get</b> (std::vector&lt; int &gt; i)</td></tr>
 <tr class="memitem:a848bc4f4f32da2e95eecd3dd0e375a30"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a848bc4f4f32da2e95eecd3dd0e375a30"></a>
 T *&#160;</td><td class="memItemRight" valign="bottom"><b>__get1</b> (T *t, std::vector&lt; int &gt; c, std::vector&lt; int &gt; i)</td></tr>
+<tr class="memitem:a27570ec7189428efe483aba5c10de726"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a27570ec7189428efe483aba5c10de726"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>copy</b> (T *src, T *dst, std::vector&lt; int &gt; vec_i_src_b, std::vector&lt; int &gt; vec_i_src_e, std::vector&lt; int &gt; vec_i_dst_b, std::vector&lt; int &gt; vec_i_dst_e, std::vector&lt; int &gt; vec_c_src, std::vector&lt; int &gt; vec_c_dst)</td></tr>
 <tr class="memitem:a718b8009c814b7cfac99e4b36178cc87"><td class="memTemplParams" colspan="2"><a class="anchor" id="a718b8009c814b7cfac99e4b36178cc87"></a>
 template&lt;typename... I&gt; </td></tr>
 <tr class="memitem:a718b8009c814b7cfac99e4b36178cc87"><td class="memTemplItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>get</b> (I...b)</td></tr>
@@ -161,15 +169,18 @@ template&lt;typename A , typename... B&gt; </td></tr>
 <a class="el" href="class____array.html">__array</a>&lt; T, N &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator*=</b> (T const &amp;rhs)</td></tr>
 <tr class="memitem:ad0a349749a91dc7379c626dc13b6f26c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad0a349749a91dc7379c626dc13b6f26c"></a>
 <a class="el" href="class____array.html">__array</a>&lt; T, N &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator/=</b> (T const &amp;rhs)</td></tr>
-<tr><td colspan="2"><div class="groupHeader">shared self @{</div></td></tr>
+<tr><td colspan="2"><div class="groupHeader">shared self arithmetic</div></td></tr>
 <tr class="memitem:ab98796270b9e65a78d5d9eda70c66ef9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab98796270b9e65a78d5d9eda70c66ef9"></a>
 shared&#160;</td><td class="memItemRight" valign="bottom"><b>add_self</b> (std::shared_ptr&lt; <a class="el" href="class____array.html">__array</a>&lt; T, N &gt; &gt; const &amp;rhs)</td></tr>
 <tr class="memitem:a34920f8760f31932fa0b7134ad852fe3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34920f8760f31932fa0b7134ad852fe3"></a>
 shared&#160;</td><td class="memItemRight" valign="bottom"><b>multiply_self</b> (std::shared_ptr&lt; <a class="el" href="class____array.html">__array</a>&lt; T, N &gt; &gt; const &amp;rhs)</td></tr>
 <tr class="memitem:a99892174a079f472bcd3f95621e5b18e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a99892174a079f472bcd3f95621e5b18e"></a>
 shared&#160;</td><td class="memItemRight" valign="bottom"><b>divide_self</b> (std::shared_ptr&lt; <a class="el" href="class____array.html">__array</a>&lt; T, N &gt; &gt; const &amp;rhs)</td></tr>
+<tr><td colspan="2"><div class="groupHeader">shared self scalar arithmetic</div></td></tr>
 <tr class="memitem:a87ee1d56dc650d1cc15fc4a17e29a2ff"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a87ee1d56dc650d1cc15fc4a17e29a2ff"></a>
 shared&#160;</td><td class="memItemRight" valign="bottom"><b>multiply_self</b> (T const &amp;rhs)</td></tr>
+<tr class="memitem:a082fa2c88f43930d0138e9ccd383e59b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a082fa2c88f43930d0138e9ccd383e59b"></a>
+shared&#160;</td><td class="memItemRight" valign="bottom"><b>divide_self</b> (T const &amp;rhs)</td></tr>
 <tr><td colspan="2"><div class="groupHeader">shared @{</div></td></tr>
 <tr class="memitem:ab20b7f53c81ac31b349d31bc58e650f6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab20b7f53c81ac31b349d31bc58e650f6"></a>
 shared&#160;</td><td class="memItemRight" valign="bottom"><b>add</b> (std::shared_ptr&lt; <a class="el" href="class____array.html">__array</a>&lt; T, N &gt; &gt; const &amp;rhs)</td></tr>
@@ -189,6 +200,21 @@ T&#160;</td><td class="memItemRight" valign="bottom"><b>max</b> ()</td></tr>
 <tr><td colspan="2"><div class="groupHeader">indexing @{</div></td></tr>
 <tr class="memitem:ab5755f3be1a48c4c62a12adc512dac16"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab5755f3be1a48c4c62a12adc512dac16"></a>
 std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>offset2index</b> (int o)</td></tr>
+<tr><td colspan="2"><div class="groupHeader">lin alg</div></td></tr>
+<tr class="memitem:a0f07f0f2bfe9a0da0aa3744b0d48d390"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f07f0f2bfe9a0da0aa3744b0d48d390"></a>
+std::shared_ptr&lt; <a class="el" href="class____array.html">__array</a>&lt; T, N+1 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>gradient</b> (array&lt; T, N+1 &gt; d)</td></tr>
+<tr><td colspan="2"><div class="groupHeader">iterating</div></td></tr>
+<tr class="memitem:a9e073ed33e0fad10acbbb001af3c10b1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e073ed33e0fad10acbbb001af3c10b1"></a>
+T *&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> ()</td></tr>
+<tr class="memitem:a0e7f0ce953b4d180a940c14e34b503db"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0e7f0ce953b4d180a940c14e34b503db"></a>
+T *&#160;</td><td class="memItemRight" valign="bottom"><b>end</b> ()</td></tr>
+<tr class="memitem:a0a736891406c46548f11a8707508d7c1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a736891406c46548f11a8707508d7c1"></a>
+shared&#160;</td><td class="memItemRight" valign="bottom"><b>sub</b> (std::vector&lt; int &gt; beg, std::vector&lt; int &gt; end)</td></tr>
+<tr><td colspan="2"><div class="groupHeader">info</div></td></tr>
+<tr class="memitem:abbc3e2f4041747fdb3de9b224db7cb1e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abbc3e2f4041747fdb3de9b224db7cb1e"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> ()</td></tr>
+<tr class="memitem:a71abd72aa867f9a4db2fe228897654df"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a71abd72aa867f9a4db2fe228897654df"></a>
+std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>shape</b> ()</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -207,7 +233,7 @@ T *&#160;</td><td class="memItemRight" valign="bottom"><b>v_</b></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 26 2014 13:23:19 for Diff2D by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 26 2014 17:50:37 for Diff2D by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

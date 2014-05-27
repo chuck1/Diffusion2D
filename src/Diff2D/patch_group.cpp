@@ -40,10 +40,14 @@ Patch_Group::Patch_Group(
 Patch_s			Patch_Group::create_patch(
 		std::string name,
 		int normal,
-		std::vector< std::vector<int> > indices,
+		std::vector<int> indicesx,
+		std::vector<int> indicesy,
+		std::vector<int> indicesz,
 		v_bou_type v_bou) {
 
 	//print 'T_0',T_0
+
+	multivec<2,int> indices({indicesx,indicesy,indicesz});
 
 	auto prob = prob_.lock();
 

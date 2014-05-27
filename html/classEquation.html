@@ -92,6 +92,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Collaboration diagram for Equation:</div>
 <div class="dyncontent">
 <div class="center"><img src="classEquation__coll__graph.png" border="0" usemap="#Equation_coll__map" alt="Collaboration graph"/></div>
+<map name="Equation_coll__map" id="Equation_coll__map">
+</map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-types"></a>
@@ -103,8 +105,8 @@ Public Types</h2></td></tr>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aa828f4c9f7a849e9ae29f2c9491863d6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa828f4c9f7a849e9ae29f2c9491863d6"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Equation</b> (std::string name, Face_s face, Equation_Prob_s equ_prob)</td></tr>
-<tr class="memitem:aaffdf465ebe87ee0c9932e62846f8986"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaffdf465ebe87ee0c9932e62846f8986"></a>
-array&lt; real, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>grad</b> ()</td></tr>
+<tr class="memitem:acda03fc82a1a28ab32f127754bf37aea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acda03fc82a1a28ab32f127754bf37aea"></a>
+array&lt; real, 3 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>grad</b> ()</td></tr>
 <tr class="memitem:ab67fb5e35d95e74756aed668b072c03f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab67fb5e35d95e74756aed668b072c03f"></a>
 real&#160;</td><td class="memItemRight" valign="bottom"><b>grad_mag</b> ()</td></tr>
 <tr class="memitem:a629f1ff3c54e7fcfe597c20ab49c773b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a629f1ff3c54e7fcfe597c20ab49c773b"></a>
@@ -132,6 +134,8 @@ array&lt; real, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>s_<
 array&lt; real, 2 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>v_</b></td></tr>
 <tr class="memitem:a1820f1ab792e83981456fce5dda492b9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1820f1ab792e83981456fce5dda492b9"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>flag_</b></td></tr>
+<tr class="memitem:ab4039b291316d3a42c43330e868b4f50"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab4039b291316d3a42c43330e868b4f50"></a>
+multivec&lt; 2, array&lt; real, 1 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>v_bou_</b></td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/Diff2D/<a class="el" href="equation_8hpp_source.html">equation.hpp</a></li>
@@ -140,7 +144,7 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>flag_</b></td
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 26 2014 13:23:19 for Diff2D by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 26 2014 17:50:37 for Diff2D by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

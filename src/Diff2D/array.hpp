@@ -126,19 +126,47 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			print(n_);
 			print(c_);
 		}
-		template<typename... I> void		zeros() {
+		void					zeros() {
 			for(int i = 0; i < size_; ++i) {
 				v_[i] = 0;
 			}
 		}
-		template<typename... I> void		ones() {
+		void					ones() {
 			for(int i = 0; i < size_; ++i) {
 				v_[i] = 1;
 			}
 		}
+
+		void					set(std::initializer_list<T> src) {
+			__set(v_, src);
+		}
+		void					set(std::vector<int> i, std::initializer_list<T> src) {
+			T* dst = __get(v_, i, c_);
+			__set(dst, src);
+		}
+		void					__set(T* dst, std::initializer_list<T> src) {
+			for(T s : src) {
+				*dst = s;
+				dst++;
+			}
+		}
 		
-		shared					transpose_self() { return shared(); }
-		shared					rot90_self(int i) { return shared(); }
+		void					set(std::vector<int> i, T* src, int len) {
+			T* dst = __get(v_, i, c_);
+			
+			memcpy(dst, src, len * sizeof(T));
+		}
+		
+		
+		
+		shared					transpose_self() {
+			assert(0);
+			return shared();
+		}
+		shared					rot90_self(int i) {
+			assert(0);
+			return shared();
+		}
 		shared					fliplr_self() { return shared(); }
 		std::vector<T>				ravel() {
 			std::vector<T> ret;
@@ -471,9 +499,16 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 /*template<typename T, int N> array<T,N>		make_array() {
   return std::make_shared< __array<T,N> >();
   }*/
-/*template<typename T, int N> array<T,N>		make_array(typename Initializer_list<N,T>::list_type il) {
-  return std::make_shared< __array<T,N> >(il);
-  }*/
+
+template<typename T, int N> array<T,N>		make_array_1(std::initializer_list<T> il) {
+	std::vector<int> n({il.size()});
+	return make_array<T,N>(n, il);
+}
+template<typename T, int N> array<T,N>		make_array(std::vector<int> n, std::initializer_list<T> il) {
+	auto arr = std::make_shared< __array<T,N> >();
+	arr->alloc(n);
+	arr->set(il);
+}
 
 template<typename T, int N> array<T,N>		make_ones(array<int,1> v) {
 	auto arr = std::make_shared< __array<T,N> >();
@@ -508,9 +543,9 @@ template<typename T, int N> array<T,N>		make_zeros(std::vector<int> n) {
 template<typename T> array<T,1>		linspace(T s, T e, int n) {
 
 	auto ret = make_uninit<T,1>({n});
-	
+
 	T step = (e - s) / ((T)(n - 1));
-	
+
 	for(int i : range(n)) {
 		ret->get(i) = s + step * i;
 	}
@@ -520,14 +555,14 @@ template<typename T> array<T,1>		linspace(T s, T e, int n) {
 
 
 template<typename T> std::pair< array<T,2>, array<T,2> >		meshgrid(array<T,1> x, array<T,1> y) {
-	
+
 	int nx = x->n_[0];
 	int ny = y->n_[0];
-	
+
 	auto X = make_uninit<T,2>({nx,ny});
 
 	auto Y = make_uninit<T,2>({nx,ny});
-	
+
 	for(int i : range(nx)) {
 		for(int j : range(ny)) {
 			X->get(i,j) = x->get(i);

@@ -1,31 +1,35 @@
 #ifndef STITCH_HPP
 #define STITCH_HPP
 
-def stitch(patch1, patch2) {
-	if patch1 is None:
-		return
-	if patch2 is None:
-		return
+#include <Diff2D/patch.hpp>
+void		stitch(Patch_s patch1, Patch_s patch2);
+void		stitch_ortho(Patch_s patch1, Patch_s patch2);
 
-	ver = False
+void		stitch(Patch_s patch1, Patch_s patch2) {
+	if(!patch1) return;
+	if(!patch2) return;
+	
+	bool ver = false;
 	//ver = True
 
-	if ver:
-		print "stitch"	
-		print "patch1.Z", patch1.Z
-		print "patch2.Z", patch2.Z
+	if(ver) {
+	//	print "stitch"	
+	//	print "patch1.Z", patch1.Z
+	//	print "patch2.Z", patch2.Z
+	}
+
+	if(patch1->Z_ == patch2->Z_) {
+		stitch_ortho(patch1, patch2);
+		return;
+	}
 	
-	if patch1.Z == patch2.Z:
-		stitch_ortho(patch1, patch2)
-		return
-
 	// global direction parallel to common edge
-	P = cross(patch1.Z, patch2.Z)
+	int P = cross(patch1->Z_, patch2->Z_);
 
-	pg,_ = v2is(P)
-
-	PL1 = patch1.glo_to_loc(P)
-	PL2 = patch2.glo_to_loc(P)
+	IS pg(P);
+	
+	int PL1 = patch1->glo_to_loc(P);
+	int PL2 = patch2->glo_to_loc(P);
 
 	og1 = patch2.z
 	og2 = patch1.z
