@@ -42,7 +42,7 @@ void			Conn::send(std::string name, array<real,1> v) {
 	}
 }
 array<real,1>		Conn::recv(std::string name) {
-	int n = face_->n_->get(pl_.i);
+	size_t n = face_->n_->get(pl_.i);
 	
 	array<real,1> v;
 

@@ -8,7 +8,9 @@
 #include <Diff2D/prob.hpp>
 #include <Diff2D/types.hpp>
 
-
+/** @ingroup group_core
+ * @brief %Problem
+ */
 class Prob: public std::enable_shared_from_this<Prob> {
 	public:
 		Prob(
@@ -23,6 +25,7 @@ class Prob: public std::enable_shared_from_this<Prob> {
 		real				temp_min(std::string equ_name);
 		real				grad_max(std::string equ_name);
 		real				grad_min(std::string equ_name);
+		void				value_add(std::string equ_name, real v);
 		void				value_add(std::string equ_name, array<real,2> v);
 		void				value_normalize(std::string equ_name);
 		void				copy_value_to_source(std::string equ_name_from, std::string equ_name_to);
@@ -39,7 +42,7 @@ class Prob: public std::enable_shared_from_this<Prob> {
 		std::string					name_;
 
 		std::vector< array<real,1> >			x_;
-		std::vector< array<int,1> >			nx_;
+		std::vector< array<size_t,1> >			nx_;
 
 		std::map<std::string, Equation_Prob_s>		equs_;
 
@@ -50,3 +53,5 @@ class Prob: public std::enable_shared_from_this<Prob> {
 };
 
 #endif
+
+

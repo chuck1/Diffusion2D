@@ -21,7 +21,7 @@ int main() {
 	a->get(0,0,0) = 1.0;
 	a->get(1,0,0) = 2.0;
 
-	for(int i = 0; i < a->n_[0]; ++i) {
+	for(size_t i = 0; i < a->n_[0]; ++i) {
 		std::cout << a->get(i,0,0) << std::endl;
 	}
 	

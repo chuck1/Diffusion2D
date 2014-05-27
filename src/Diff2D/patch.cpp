@@ -9,33 +9,30 @@
 
 
 
-
 Patch::Patch(
 		Patch_Group_s group,
 		std::string name,
 		int normal,
-		std::vector< std::vector<int> > indices,
-		std::vector< array<real,1> > x,
-		std::vector< array<int,1> > nx,
+		multivec<2,size_t> indices,
+		coor_type x,
+		cell_count_type nx,
 		v_bou_type v_bou):
-	LocalCoor(normal)
+	LocalCoor(normal),
+	group_(group),
+	name_(name),
+	coor_(x),
+	nx_(nx),
+	v_bou_(v_bou),
+	indices_(indices)
 {
-
-	group_ = group;
-	name_ = name;
-
-	//v_bou_ = v_bou;
-
 	//if not np.shape(v_bou_) == (2,2) {
 	//	print v_bou_
 	//	raise ValueError('')
 
 	//print 'T_0',T_0
 
-	indices_ = indices;
-
-	int NX = indices[x_.i].size() - 1;
-	int NY = indices[y_.i].size() - 1;
+	auto NX = indices[x_.i].size() - 1;
+	auto NY = indices[y_.i].size() - 1;
 
 	// expand scalar v_bou values
 	/*		for k in v_bou.keys() {
@@ -55,16 +52,24 @@ Patch::Patch(
 		std::reverse(indices[y_.i].begin(), indices[y_.i].end());
 	}
 
-	// alloc faces array
-	faces_->alloc({NX,NY});
-	faces_->zeros();
+	npatch_ = make_array_1<size_t,1>({NX,NY});
 
-	for(int i = 0; i < NX; ++i) {
-		for(int j = 0; j < NY; ++j) {
-			int I = indices[x_.i][i];
-			int J = indices[y_.i][j];
-			int M = indices[x_.i][i+1];
-			int N = indices[y_.i][j+1];
+	//faces_ = faces;
+
+}
+void		Patch::create_faces() {
+	// alloc faces array
+	faces_ = make_zeros<Face_s,2>(npatch_->ravel());
+
+	size_t NX = npatch_->get(0);
+	size_t NY = npatch_->get(1);
+
+	for(size_t i = 0; i < NX; ++i) {
+		for(size_t j = 0; j < NY; ++j) {
+			int I = indices_[x_.i][i];
+			int J = indices_[y_.i][j];
+			int M = indices_[x_.i][i+1];
+			int N = indices_[y_.i][j+1];
 
 			int Is = std::min(I,M);
 			int Js = std::min(J,N);
@@ -72,22 +77,22 @@ Patch::Patch(
 			int Ns = std::max(J,N);
 
 			auto ext = make_uninit<real,2>({2,2});
-			ext->get(0,0) = x[x_.i]->get(Is);
-			ext->get(0,1) = x[x_.i]->get(Ms);
-			ext->get(1,0) = x[y_.i]->get(Js);
-			ext->get(1,1) = x[y_.i]->get(Ns);
+			ext->get(0,0) = coor_[x_.i]->get(Is);
+			ext->get(0,1) = coor_[x_.i]->get(Ms);
+			ext->get(1,0) = coor_[y_.i]->get(Js);
+			ext->get(1,1) = coor_[y_.i]->get(Ns);
 
 
-			int numx = nx[x_.i]->get(std::min(I,M));
-			int numy = nx[y_.i]->get(std::min(J,N));
+			auto numx = nx_[x_.i]->get(std::min(I,M));
+			auto numy = nx_[y_.i]->get(std::min(J,N));
 
-			auto numarr = make_array<int,1>({numx, numy});
+			auto numarr = make_array_1<size_t,1>({numx, numy});
 
 			//print "I,J",I,J
 
-			real pos_z = x[z_.i]->get(indices[z_.i]);
+			real pos_z = coor_[z_.i]->get(indices_[z_.i]);
 
-			auto nface = std::make_shared<Face>(shared_from_this(), normal, ext, pos_z, numarr);
+			auto nface = std::make_shared<Face>(shared_from_this(), normal_, ext, pos_z, numarr);
 
 			faces_->get(i,j) = nface;
 
@@ -105,7 +110,7 @@ Patch::Patch(
 			// alloc v_bou dict in face
 			//nface->v_bou = {};
 
-			for(auto it : v_bou) {
+			for(auto it : v_bou_) {
 				// alloc face v_bou list
 				//nface->v_bou_[it.first] = [[0,0],[0,0]];
 
@@ -114,22 +119,17 @@ Patch::Patch(
 
 				std::string k = it.first;
 
-				if(i == 0)	nface->v_bou_[k][0][0] = v_bou[k][0][0][j];
-				if(i == NX-1)	nface->v_bou_[k][0][1] = v_bou[k][0][1][j];
-				if(j == 0)	nface->v_bou_[k][1][0] = v_bou[k][1][0][i];
-				if(j == NY-1)	nface->v_bou_[k][1][1] = v_bou[k][1][1][i];
+				if(i == 0)	nface->v_bou_[k][0][0] = v_bou_[k][0][0][j];
+				if(i == NX-1)	nface->v_bou_[k][0][1] = v_bou_[k][0][1][j];
+				if(j == 0)	nface->v_bou_[k][1][0] = v_bou_[k][1][0][i];
+				if(j == NY-1)	nface->v_bou_[k][1][1] = v_bou_[k][1][1][i];
 
 			}
 		}
 	}			
 
-	npatch_ = make_uninit<int,1>({2});
-	npatch_->get(0) = NX;
-	npatch_->get(0) = NY;
-
-	//faces_ = faces;
-
 	grid_nbrs();
+
 }
 void		Patch::create_equ(std::string name, real v0, std::vector< array<real,1> > v_bou, real k, real al) {
 	auto prob = group_.lock()->prob_.lock();

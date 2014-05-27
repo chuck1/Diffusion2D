@@ -23,7 +23,7 @@ struct EdgeError: std::exception {
 	bool rev_;
 };
 
-std::pair< std::vector<int>, std::vector<int> >		align(std::vector<int> ind1, std::vector<int> ind2);
+std::pair< std::vector<size_t>, std::vector<size_t> >		align(std::vector<size_t> ind1, std::vector<size_t> ind2);
 
 
 

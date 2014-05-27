@@ -1,5 +1,5 @@
-add_executable(Test1 main.cpp)
+add_executable(test1 main.cpp)
 
-target_link_libraries(Test1 Diff2D)
+target_link_libraries(test1 Diff2D)
 
 

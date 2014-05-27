@@ -38,9 +38,12 @@ struct Term {
 //typedef std::tuple< std::vector<real>, std::vector<real>, std::vector<real>, std::vector<real> >		grid_tup;
 typedef std::tuple< array<real,2>, array<real,2>, array<real,2>, array<real,2> >		grid_tup;
 
+/** @ingroup group_core
+ * @brief %Face
+ */
 class Face: public LocalCoor, public std::enable_shared_from_this<Face> {
 	public:
-		Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, array<int,1> n);
+		Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, array<size_t,1> n);
 
 		void			create_equ(std::string name, Equation_Prob_s equ_prob);
 		int			get_loc_pos_par_index(Face_s nbr);
@@ -72,7 +75,7 @@ class Face: public LocalCoor, public std::enable_shared_from_this<Face> {
 		Patch_s						patch_;
 		array<real,2>					ext_;
 		real						pos_z_;
-		array<int,1>					n_;
+		array<size_t,1>					n_;
 		array<real,3>					d_;
 		array<real,1>					l_;
 		std::map< std::string, Equation_s >		equs_;

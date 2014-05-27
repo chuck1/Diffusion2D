@@ -25,13 +25,13 @@ Patch_Group::Patch_Group(
 		Prob_s prob,
 		std::string name,
 		std::map<std::string, real> v_0,
-		std::map<std::string, real> S)
+		std::map<std::string, real> S):
+	prob_(prob)
 {
+	assert(prob);
 
-	prob_ = prob;
 	name_ = name;
 	v_0_ = v_0;
-
 	S_ = S;
 
 	//print "patch_group"
@@ -40,18 +40,25 @@ Patch_Group::Patch_Group(
 Patch_s			Patch_Group::create_patch(
 		std::string name,
 		int normal,
-		std::vector<int> indicesx,
-		std::vector<int> indicesy,
-		std::vector<int> indicesz,
+		std::vector<size_t> indicesx,
+		std::vector<size_t> indicesy,
+		std::vector<size_t> indicesz,
 		v_bou_type v_bou) {
 
 	//print 'T_0',T_0
 
-	multivec<2,int> indices({indicesx,indicesy,indicesz});
+	multivec<2,size_t> indices({indicesx,indicesy,indicesz});
 
+	
 	auto prob = prob_.lock();
+	assert(prob);
 
-	auto p = std::make_shared<Patch>(shared_from_this(), name, normal, indices, prob->x_, prob->nx_, v_bou);
+	auto me = shared_from_this();
+	assert(me);
+
+	auto p = std::make_shared<Patch>(me, name, normal, indices, prob->x_, prob->nx_, v_bou);
+	
+	p->create_faces();
 
 	patches_.push_back(p);
 	return p;

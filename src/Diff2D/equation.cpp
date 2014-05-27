@@ -19,8 +19,8 @@ Equation::Equation(std::string name, Face_s face, Equation_Prob_s equ_prob) {
 	equ_prob_ = equ_prob;
 
 	//v_0_ = v_0
-
-	array<int,1> n_extended = face_->n_->add(make_array<int,1>({2, 2}));
+	
+	auto n_extended = face_->n_->add(make_array_1<size_t,1>({2, 2}));
 	
 	v_->alloc(n_extended);
 	v_->ones();

@@ -5,7 +5,7 @@
 
 int main() {
 
-	int n = 10;
+	size_t n = 10;
 	
 	coor_type x;
 	cell_count_type N;
@@ -14,9 +14,9 @@ int main() {
 	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));
 	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));
 	
-	N.push_back(make_array_1<int,1>({n+0,n+0}));
-	N.push_back(make_array_1<int,1>({n+2,n+2}));
-	N.push_back(make_array_1<int,1>({n+4,n+4}));
+	N.push_back(make_array_1<size_t,1>({n+0,n+0}));
+	N.push_back(make_array_1<size_t,1>({n+2,n+2}));
+	N.push_back(make_array_1<size_t,1>({n+4,n+4}));
 	
 	
 	auto prob = std::make_shared<Prob>("test4", x, N, 1000, 1000);
@@ -64,49 +64,50 @@ int main() {
 
 	stitch(p4,p5);
 
-
+	Face_s f0, f1, f2, f3, f4, f5;
 
 	//f0 = p0.faces[0,0]
 	//f1 = p1.faces[0,0]
-	f2 = p2.faces[0,0];
-	f3 = p3.faces[0,0];
-	f4 = p4.faces[0,0];
-	f5 = p5.faces[0,0];
-
-
-
+/*	f2 = p2->faces_->get(0,0];
+	f3 = p3->faces_[0,0];
+	f4 = p4->faces_[0,0];
+	f5 = p5->faces_[0,0];
+*/
+	
+	
 	//f0.create_equ('T', 0., [[30.,0.],[0.,0.]], k, al)
-
+	
 	//f1.create_equ('T', 0., [[30.,0.],[0.,0.]], k, al)
 
-	f2.equs['T'].v_bou = [[30.,30.],[30.,30.]];
+/*	f2.equs['T'].v_bou = [[30.,30.],[30.,30.]];
 	f3.equs['T'].v_bou = [[30.,30.],[30.,30.]];
 	f4.equs['T'].v_bou = [[30.,30.],[30.,30.]];
 	f5.equs['T'].v_bou = [[10.,10.],[10.,10.]];
-
-
+*/
+	
 	//prob.solve2(1e-2, 1e-4, True)
-
+	
 	//profile.run("prob.solve('s', 1e-1)")
-	prob.solve('s', 1e-3, True);
+	prob->solve("s", 1e-3, true, 0.0);
+	
+	
+	prob->value_add("s", -1.0);
 
-
-	prob.value_add('s',-1.0);
-	prob.value_normalize('s');
+	prob->value_normalize("s");
 
 	//prob.copy_value_to_source('s','T')
 
 	//prob.solve('T', 1e-1, True)
-	prob.solve2('T', 1e-2, 1e-2, True);
+	prob->solve2("T", 1e-2, 1e-2, true);
 
 	//prob.plot3()
 
 	//prob.plot('s')
-	prob.plot('T');
+	//prob->.plot('T');
 
 	//pl.show()
 
-	prob.write('T');
+	prob->write("T");
 
 
 }

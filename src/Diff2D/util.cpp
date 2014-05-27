@@ -19,7 +19,10 @@ struct EdgeError: std::exception {
 	bool rev_;
 };
 
-std::pair< std::vector<int>, std::vector<int> >		align(std::vector<int> ind1, std::vector<int> ind2) {
+typedef std::vector<size_t>			size_t_vec;
+typedef std::pair< size_t_vec, size_t_vec >	align_ret_type;
+
+align_ret_type		align(size_t_vec ind1, size_t_vec ind2) {
 	bool ver = false;
 	//#ver = True
 	
@@ -81,8 +84,8 @@ std::pair< std::vector<int>, std::vector<int> >		align(std::vector<int> ind1, st
 		return *s2 + (i - (d2-1)/2) * d2;
 	};
 	
-	std::vector<int> r1;
-	std::vector<int> r2;
+	std::vector<size_t> r1;
+	std::vector<size_t> r2;
 	
 	for(int i : range(abs(e1-s1))) {
 		if(ver) {

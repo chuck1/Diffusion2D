@@ -14,7 +14,7 @@
 #include <Diff2D/patch_group.hpp>
 #include <Diff2D/face.hpp>
 
-Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, array<int,1> n): LocalCoor(normal) {
+Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, array<size_t,1> n): LocalCoor(normal) {
 
 	patch_ = patch;
 
@@ -25,14 +25,14 @@ Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, arr
 	n_ = n;
 
 	//// the extra 2 rows/cols are for storing neighbor values
-	array<int,1> n_extended = n_->add(make_array<int,1>({2, 2}));
+	array<size_t,1> n_extended = n_->add(make_array_1<size_t,1>({2, 2}));
 	
 	d_->alloc({n_extended->get(0), n_extended->get(1), 2});
 	d_->zeros();
 
-	for(int i = 0; i < n_extended->n_[0]; ++i) {
-		for(int j = 0; j < n_extended->n_[1]; ++j) {
-			for(int k = 0; k < 2; ++k) {
+	for(size_t i = 0; i < n_extended->n_[0]; ++i) {
+		for(size_t j = 0; j < n_extended->n_[1]; ++j) {
+			for(size_t k = 0; k < 2; ++k) {
 				d_->get(i,j,k) = (ext_->get(k,1) - ext_->get(k,0)) / ((real)n_->get(k));
 			}
 		}
@@ -131,7 +131,7 @@ Index_Lambda		Face::index_lambda(Face_s nbr) {
 void		Face::send_array(Equation_s equ, Conn_s conn) {
 	auto v = make_ones<real,1>({n_->get(conn->pl_.i)});
 
-	for(int a = 0; a < n_->get(conn->pl_.i); ++a) {
+	for(size_t a = 0; a < n_->get(conn->pl_.i); ++a) {
 		v->get(a) = equ->v_->get(conn->il_(0,a), conn->il_(1,a));
 	}
 	conn->send(equ->name_, v);
@@ -142,7 +142,7 @@ void		Face::recv_array(Equation_s equ, Conn_s conn) {
 	int ind[] = {0,0};
 	ind[conn->ol_.i] = (conn->ol_.s < 0) ? -1 : n_->get(conn->ol_.i);
 
-	for(int a = 0; a < n_->get(conn->pl_.i); ++a) {
+	for(size_t a = 0; a < n_->get(conn->pl_.i); ++a) {
 		ind[conn->pl_.i] = a;
 		equ->v_->get(ind[0],ind[1]) = v->get(a);
 	}
@@ -221,14 +221,14 @@ void		Face::step_pre_cell_open_bou(Equation_s equ, std::vector<int> ind, int V) 
 void		Face::step_pre(Equation_s equ) {
 	// for boundaries, load boundary temperature cells with proper value
 	// west/east
-	for(int j = 0; j < n_->get(1); ++j) {
-		step_pre_cell(equ, {             0, j}, -1);
-		step_pre_cell(equ, {n_->get(0) - 1, j},  1);
+	for(size_t j = 0; j < n_->get(1); ++j) {
+		step_pre_cell(equ, {                  0, (int)j}, -1);
+		step_pre_cell(equ, {(int)n_->get(0) - 1, (int)j},  1);
 	}
 	// north/south
-	for(int i = 0; i < n_->get(0); ++i) {
-		step_pre_cell(equ, {i,           0}, -2);
-		step_pre_cell(equ, {i, n_->get(1)-1},  2);
+	for(size_t i = 0; i < n_->get(0); ++i) {
+		step_pre_cell(equ, {(int)i,           0}, -2);
+		step_pre_cell(equ, {(int)i, (int)n_->get(1)-1},  2);
 	}
 }
 real		Face::step(std::string equ_name) {

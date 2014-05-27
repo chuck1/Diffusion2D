@@ -9,7 +9,7 @@
 Prob::Prob(
 		std::string name,
 		std::vector< array<real,1> > x,
-		std::vector< array<int,1> > nx,
+		std::vector< array<size_t,1> > nx,
 		int it_max_1,
 		int it_max_2)
 {
@@ -81,6 +81,12 @@ void		Prob::value_add(std::string equ_name, array<real,2> v) {
 		equ->v_->add_self(v);
 	}
 }
+void		Prob::value_add(std::string equ_name, real v) {
+	for(auto f : faces()) {
+		auto equ = f->equs_[equ_name];
+		equ->v_->add_self(v);
+	}
+}
 void		Prob::value_normalize(std::string equ_name) {
 	for(auto g : patch_groups_) {
 		// max value in patch group
@@ -111,8 +117,8 @@ void		Prob::copy_value_to_source(std::string equ_name_from, std::string equ_name
 		e2 = f->equs_[equ_name_to];
 	}
 	
-	std::vector<int> s1;
-	for(int a : e1->v_->shape()) {
+	std::vector<size_t> s1;
+	for(auto a : e1->v_->shape()) {
 		s1.push_back(a-2);
 	}
 
