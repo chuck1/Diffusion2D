@@ -13,15 +13,15 @@ Collaboration diagram for Patch:\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=320pt]{classPatch__coll__graph}
+\includegraphics[width=400pt]{classPatch__coll__graph}
 \end{center}
 \end{figure}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classPatch_a7adac62309652817919b4e508782566d}{
-{\bfseries Patch} (Patch\_\-Group\_\-s group, std::string name, int normal, std::vector$<$ std::vector$<$ int $>$ $>$ indices, std::vector$<$ array$<$ real, 1 $>$ $>$ x, std::vector$<$ array$<$ int, 1 $>$ $>$ nx, v\_\-bou\_\-type v\_\-bou)}
-\label{classPatch_a7adac62309652817919b4e508782566d}
+\hypertarget{classPatch_ae700af2d8c407e31f4ccd3e023f4f50a}{
+{\bfseries Patch} (Patch\_\-Group\_\-s group, std::string name, int normal, multivec$<$ 2, size\_\-t $>$ indices, std::vector$<$ array$<$ real, 1 $>$ $>$ x, std::vector$<$ array$<$ size\_\-t, 1 $>$ $>$ nx, v\_\-bou\_\-type v\_\-bou)}
+\label{classPatch_ae700af2d8c407e31f4ccd3e023f4f50a}
 
 \item 
 \hypertarget{classPatch_ac8352cc930b37975da9627262540cebd}{
@@ -37,6 +37,11 @@ void {\bfseries set\_\-v\_\-bou} (std::string equ\_\-name, std::vector$<$ array$
 \hypertarget{classPatch_aa0a6036ed90bf4a98cc498f925fb530d}{
 real {\bfseries max} (std::string equ\_\-name)}
 \label{classPatch_aa0a6036ed90bf4a98cc498f925fb530d}
+
+\item 
+\hypertarget{classPatch_a2af23d9c0ebbb60d35c24bb3fb582b64}{
+void {\bfseries create\_\-faces} ()}
+\label{classPatch_a2af23d9c0ebbb60d35c24bb3fb582b64}
 
 \item 
 \hypertarget{classPatch_ae57b4223cce6c1ed9dbaaa5080a2501a}{
@@ -57,14 +62,34 @@ std::string {\bfseries name\_\-}}
 \label{classPatch_a133d268d88897aef8b20ca7da98b9cdb}
 
 \item 
-\hypertarget{classPatch_a9cf37e5da9a803692c4ad575ec3ffbb1}{
-std::vector$<$ std::vector$<$ int $>$ $>$ {\bfseries indices\_\-}}
-\label{classPatch_a9cf37e5da9a803692c4ad575ec3ffbb1}
+\hypertarget{classPatch_a01951c7c7aec32d184e11869ab23877d}{
+int {\bfseries normal\_\-}}
+\label{classPatch_a01951c7c7aec32d184e11869ab23877d}
 
 \item 
-\hypertarget{classPatch_a41ac7ad621e3c8c93014e96050985990}{
-array$<$ int, 1 $>$ {\bfseries npatch\_\-}}
-\label{classPatch_a41ac7ad621e3c8c93014e96050985990}
+\hypertarget{classPatch_a3beca2ce16697d8e8097ba92ee6bdc29}{
+coor\_\-type {\bfseries coor\_\-}}
+\label{classPatch_a3beca2ce16697d8e8097ba92ee6bdc29}
+
+\item 
+\hypertarget{classPatch_aa69a7e422610ce91ad4fb60c88cadbf0}{
+cell\_\-count\_\-type {\bfseries nx\_\-}}
+\label{classPatch_aa69a7e422610ce91ad4fb60c88cadbf0}
+
+\item 
+\hypertarget{classPatch_a10f2316309ff37fb1238153527eeab48}{
+v\_\-bou\_\-type {\bfseries v\_\-bou\_\-}}
+\label{classPatch_a10f2316309ff37fb1238153527eeab48}
+
+\item 
+\hypertarget{classPatch_af272c0110d640ddd191492fc9cc62990}{
+multivec$<$ 2, size\_\-t $>$ {\bfseries indices\_\-}}
+\label{classPatch_af272c0110d640ddd191492fc9cc62990}
+
+\item 
+\hypertarget{classPatch_aaa96294c5c204449ca53209b040ae06c}{
+array$<$ size\_\-t, 1 $>$ {\bfseries npatch\_\-}}
+\label{classPatch_aaa96294c5c204449ca53209b040ae06c}
 
 \item 
 \hypertarget{classPatch_a6d0bbabb9b7b1928bda12255b312fedd}{

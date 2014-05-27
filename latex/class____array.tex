@@ -30,16 +30,6 @@ typedef \hyperlink{structInitializer__list}{Initializer\_\-list}$<$ N, T $>$::li
 \label{class____array_ac3443fee161fd3f8ccb1290980a4190d}
 
 \item 
-\hypertarget{class____array_a8a0f0e9f3af8384c29ddd21d3451b65e}{
-void {\bfseries alloc} (array$<$ int, 1 $>$ shape\_\-arr)}
-\label{class____array_a8a0f0e9f3af8384c29ddd21d3451b65e}
-
-\item 
-\hypertarget{class____array_a0ffa8a127e271c2ae60c705e5baaf6d1}{
-void {\bfseries alloc} (std::vector$<$ int $>$ n)}
-\label{class____array_a0ffa8a127e271c2ae60c705e5baaf6d1}
-
-\item 
 \hypertarget{class____array_a1072f5c538102121515000a4ef521303}{
 void {\bfseries zeros} ()}
 \label{class____array_a1072f5c538102121515000a4ef521303}
@@ -100,6 +90,26 @@ bool {\bfseries equal\_\-size} (\hyperlink{class____array}{\_\-\_\-array}$<$ T, 
 \label{class____array_a435566ff4cab00684e41335595b4c60c}
 
 \end{DoxyCompactItemize}
+\begin{Indent}{\bf Allocation}\par
+{\em \label{_amgrp27c0ad7a8ff8f9df8e13bb2d974c95d0}
+ }\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class____array_a8a0f0e9f3af8384c29ddd21d3451b65e}{
+void {\bfseries alloc} (array$<$ int, 1 $>$ shape\_\-arr)}
+\label{class____array_a8a0f0e9f3af8384c29ddd21d3451b65e}
+
+\item 
+\hypertarget{class____array_a5e6bcbf0f6da1f52d3bb40e5671ae249}{
+void {\bfseries alloc} (array$<$ size\_\-t, 1 $>$ shape\_\-arr)}
+\label{class____array_a5e6bcbf0f6da1f52d3bb40e5671ae249}
+
+\item 
+\hypertarget{class____array_a96e39e536340b61efb3c148347ebd4ee}{
+void {\bfseries alloc} (std::vector$<$ size\_\-t $>$ n)}
+\label{class____array_a96e39e536340b61efb3c148347ebd4ee}
+
+\end{DoxyCompactItemize}
+\end{Indent}
 \begin{Indent}{\bf access}\par
 {\em \label{_amgrp9df3b01c60df20d13843841ff0d4482c}
  }\begin{DoxyCompactItemize}
@@ -124,14 +134,19 @@ T \& {\bfseries get} (std::vector$<$ int $>$ i)}
 \label{class____array_ac7d5ddda5112a815aef1b8ac55fb3d87}
 
 \item 
-\hypertarget{class____array_a848bc4f4f32da2e95eecd3dd0e375a30}{
-T $\ast$ {\bfseries \_\-\_\-get1} (T $\ast$t, std::vector$<$ int $>$ c, std::vector$<$ int $>$ i)}
-\label{class____array_a848bc4f4f32da2e95eecd3dd0e375a30}
+\hypertarget{class____array_a6417fe5f1aa72b28ad1fb5b10a0fb9ad}{
+T \& {\bfseries get} (std::vector$<$ size\_\-t $>$ i)}
+\label{class____array_a6417fe5f1aa72b28ad1fb5b10a0fb9ad}
 
 \item 
-\hypertarget{class____array_a27570ec7189428efe483aba5c10de726}{
-void {\bfseries copy} (T $\ast$src, T $\ast$dst, std::vector$<$ int $>$ vec\_\-i\_\-src\_\-b, std::vector$<$ int $>$ vec\_\-i\_\-src\_\-e, std::vector$<$ int $>$ vec\_\-i\_\-dst\_\-b, std::vector$<$ int $>$ vec\_\-i\_\-dst\_\-e, std::vector$<$ int $>$ vec\_\-c\_\-src, std::vector$<$ int $>$ vec\_\-c\_\-dst)}
-\label{class____array_a27570ec7189428efe483aba5c10de726}
+\hypertarget{class____array_a4c097ee9f07cfd581c8d16089a4a6563}{
+T $\ast$ {\bfseries \_\-\_\-get1} (T $\ast$t, std::vector$<$ size\_\-t $>$ c, std::vector$<$ size\_\-t $>$ i)}
+\label{class____array_a4c097ee9f07cfd581c8d16089a4a6563}
+
+\item 
+\hypertarget{class____array_a499808e1977bdb4e3dcb562eb70d67da}{
+void {\bfseries copy} (T $\ast$src, T $\ast$dst, std::vector$<$ size\_\-t $>$ vec\_\-i\_\-src\_\-b, std::vector$<$ size\_\-t $>$ vec\_\-i\_\-src\_\-e, std::vector$<$ size\_\-t $>$ vec\_\-i\_\-dst\_\-b, std::vector$<$ size\_\-t $>$ vec\_\-i\_\-dst\_\-e, std::vector$<$ size\_\-t $>$ vec\_\-c\_\-src, std::vector$<$ size\_\-t $>$ vec\_\-c\_\-dst)}
+\label{class____array_a499808e1977bdb4e3dcb562eb70d67da}
 
 \item 
 \hypertarget{class____array_a7fb64a0fa23884f3178a913ab3a09f58}{
@@ -139,14 +154,14 @@ void {\bfseries copy} (T $\ast$src, T $\ast$dst, std::vector$<$ int $>$ vec\_\-i
 \label{class____array_a7fb64a0fa23884f3178a913ab3a09f58}
 
 \item 
-\hypertarget{class____array_a0373a69cb2d5ff45af2736abd00102ea}{
-{\footnotesize template$<$typename... I$>$ }\\T $\ast$ {\bfseries \_\-\_\-get} (T $\ast$t, std::vector$<$ int $>$ c, I...b)}
-\label{class____array_a0373a69cb2d5ff45af2736abd00102ea}
+\hypertarget{class____array_a8da2e8a8bd0f3edc94deb82640e9ca02}{
+{\footnotesize template$<$typename... I$>$ }\\T $\ast$ {\bfseries \_\-\_\-get} (T $\ast$t, std::vector$<$ size\_\-t $>$ c, I...b)}
+\label{class____array_a8da2e8a8bd0f3edc94deb82640e9ca02}
 
 \item 
-\hypertarget{class____array_a70c1493a9b1be6264cae3e140c4b7644}{
-{\footnotesize template$<$typename A , typename... B$>$ }\\T $\ast$ {\bfseries \_\-\_\-get} (T $\ast$t, std::vector$<$ int $>$ c, A a, B...b)}
-\label{class____array_a70c1493a9b1be6264cae3e140c4b7644}
+\hypertarget{class____array_ad0c867ee0e34df488ee66f8e889b942a}{
+{\footnotesize template$<$typename A , typename... B$>$ }\\T $\ast$ {\bfseries \_\-\_\-get} (T $\ast$t, std::vector$<$ size\_\-t $>$ c, A a, B...b)}
+\label{class____array_ad0c867ee0e34df488ee66f8e889b942a}
 
 \end{DoxyCompactItemize}
 \end{Indent}
@@ -173,6 +188,16 @@ void {\bfseries copy} (T $\ast$src, T $\ast$dst, std::vector$<$ int $>$ vec\_\-i
 \begin{Indent}{\bf scalar self arithmatic @\{}\par
 {\em \label{_amgrp7095cbd4de7cb27ceb837c23324bbb90}
  }\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class____array_ab7e070d91093ec916a8f53724aa4e878}{
+\hyperlink{class____array}{\_\-\_\-array}$<$ T, N $>$ \& {\bfseries operator+=} (T const \&rhs)}
+\label{class____array_ab7e070d91093ec916a8f53724aa4e878}
+
+\item 
+\hypertarget{class____array_a551523046f30647b3591776040c64c50}{
+\hyperlink{class____array}{\_\-\_\-array}$<$ T, N $>$ \& {\bfseries operator-\/=} (T const \&rhs)}
+\label{class____array_a551523046f30647b3591776040c64c50}
+
 \item 
 \hypertarget{class____array_abf242f49019b906d3f846fc185cc38ae}{
 \hyperlink{class____array}{\_\-\_\-array}$<$ T, N $>$ \& {\bfseries operator$\ast$=} (T const \&rhs)}
@@ -208,6 +233,11 @@ shared {\bfseries divide\_\-self} (std::shared\_\-ptr$<$ \hyperlink{class____arr
 \begin{Indent}{\bf shared self scalar arithmetic}\par
 {\em \label{_amgrp39886a4931184ad2091cad99cafe00de}
  }\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class____array_a6ac3f286d87cf856e47b5e3cd4bceaf5}{
+shared {\bfseries add\_\-self} (T const \&rhs)}
+\label{class____array_a6ac3f286d87cf856e47b5e3cd4bceaf5}
+
 \item 
 \hypertarget{class____array_a87ee1d56dc650d1cc15fc4a17e29a2ff}{
 shared {\bfseries multiply\_\-self} (T const \&rhs)}
@@ -299,9 +329,9 @@ T $\ast$ {\bfseries end} ()}
 \label{class____array_a0e7f0ce953b4d180a940c14e34b503db}
 
 \item 
-\hypertarget{class____array_a0a736891406c46548f11a8707508d7c1}{
-shared {\bfseries sub} (std::vector$<$ int $>$ beg, std::vector$<$ int $>$ end)}
-\label{class____array_a0a736891406c46548f11a8707508d7c1}
+\hypertarget{class____array_a00efa91c7d776a4afb2d1334a0d05b83}{
+shared {\bfseries sub} (std::vector$<$ int $>$ beg\_\-s, std::vector$<$ int $>$ end\_\-s)}
+\label{class____array_a00efa91c7d776a4afb2d1334a0d05b83}
 
 \end{DoxyCompactItemize}
 \end{Indent}
@@ -314,23 +344,23 @@ size\_\-t {\bfseries size} ()}
 \label{class____array_abbc3e2f4041747fdb3de9b224db7cb1e}
 
 \item 
-\hypertarget{class____array_a71abd72aa867f9a4db2fe228897654df}{
-std::vector$<$ int $>$ {\bfseries shape} ()}
-\label{class____array_a71abd72aa867f9a4db2fe228897654df}
+\hypertarget{class____array_a0339a0c0f5a858f98bc8c8a3792c73ed}{
+std::vector$<$ size\_\-t $>$ {\bfseries shape} ()}
+\label{class____array_a0339a0c0f5a858f98bc8c8a3792c73ed}
 
 \end{DoxyCompactItemize}
 \end{Indent}
 \subsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class____array_aaca68729c0b849ed2f2b5813d97406b4}{
-std::vector$<$ int $>$ {\bfseries c\_\-}}
-\label{class____array_aaca68729c0b849ed2f2b5813d97406b4}
+\hypertarget{class____array_a3f8bd6c9e9554f032fc9ce51037a9068}{
+std::vector$<$ size\_\-t $>$ {\bfseries c\_\-}}
+\label{class____array_a3f8bd6c9e9554f032fc9ce51037a9068}
 
 \item 
-\hypertarget{class____array_aa23a824622889b5edab8fcd74d9d2ca8}{
-std::vector$<$ int $>$ {\bfseries n\_\-}}
-\label{class____array_aa23a824622889b5edab8fcd74d9d2ca8}
+\hypertarget{class____array_aeeea561b072cbbbcbbf5385fc010ad9c}{
+std::vector$<$ size\_\-t $>$ {\bfseries n\_\-}}
+\label{class____array_aeeea561b072cbbbcbbf5385fc010ad9c}
 
 \item 
 \hypertarget{class____array_a9e84ea9904c281c73d38730bf1c63c6f}{
