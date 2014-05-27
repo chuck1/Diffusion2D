@@ -1,9 +1,7 @@
 #ifndef PATCH_HPP
 #define PATCH_HPP
 
-/*from face import *
-from util import *
-*/
+#include <map>
 #include <algorithm>
 
 #include <Diff2D/config.hh>

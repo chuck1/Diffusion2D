@@ -24,7 +24,7 @@ class Conn {
 	public:
 		// information concerning connection between face and conn
 		// from perspective of face
-		Conn(Face* face, void* conns);
+		Conn(Face_s face, void* conns);
 		void					refresh();
 		void					printinfo();
 		void					send(std::string name, array<real,1> v);
@@ -32,13 +32,17 @@ class Conn {
 
 		IS					pl_;
 		IS					ol_;
+
+		int					PG_;
+
 		Index_Lambda				il_;
 		
+
 		Face_s					face_;
 		Conn_s					twin_;
 		void*					conns_;
 		bool					parallel_;
-		std::map<std::string, array<real,2> >	equs_;
+		std::map<std::string, array<real,1> >	equs_;
 };
 
 

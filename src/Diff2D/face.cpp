@@ -3,16 +3,16 @@
 #include <memory>
 #include <vector>
 
-#include "math.hpp"
-#include "array.hpp"
-#include "config.hpp"
-#include "unit_vec.hpp"
-#include "equation.hpp"	
-#include "conn.hpp"
-#include "index_lambda.hpp"
-#include "patch.hpp"
-#include "patch_group.hpp"
-#include "face.hpp"
+#include <Diff2D/math.hpp>
+#include <Diff2D/array.hpp>
+#include <Diff2D/config.hh>
+#include <Diff2D/unit_vec.hpp>
+#include <Diff2D/equation.hpp>	
+#include <Diff2D/conn.hpp>
+#include <Diff2D/index_lambda.hpp>
+#include <Diff2D/patch.hpp>
+#include <Diff2D/patch_group.hpp>
+#include <Diff2D/face.hpp>
 
 Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, array<int,1> n): LocalCoor(normal) {
 
@@ -49,8 +49,8 @@ Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, arr
 	l_->get(1) = (ext_->get(1,1) - ext_->get(1,0)) / 2.0;
 
 
-	real a = l_->get(0) / 2.0;
-	real b = l_->get(1) / 2.0;
+	//real a = l_->get(0) / 2.0;
+	//real b = l_->get(1) / 2.0;
 
 	//x = linspace(d_.get(0,0,0) / 2. - a, a - d_.get(0,0,0) / 2., n_.get(0))
 	//y = linspace(d_.get(0,0,1) / 2. - b, b - d_.get(0,0,1) / 2., n_.get(1))
@@ -203,8 +203,11 @@ void		Face::step_pre_cell_open_bou(Equation_s equ, std::vector<int> ind, int V) 
 
 	// get stored boundary value
 	auto tmp = equ->v_bou_[v.i];
+
 	auto tmp2 = tmp[(v.s+1)/2];
+
 	auto v_bou_ar = equ->v_bou_[v.i][(v.s+1)/2];
+	
 
 	real v_bou = v_bou_ar->get(ind[p]);
 
@@ -234,11 +237,12 @@ real		Face::step(std::string equ_name) {
 	real R = 0.0;
 
 	bool ver1 = false;
-	bool ver2 = false;
+	//bool ver2 = false;
+	
 	// solve equation
 	step_pre(equ);
 
-	auto g = patch_->group_;
+	auto g = patch_->group_.lock();
 	auto S = g->S_[equ->name_];
 
 	////print "face S",S
@@ -335,6 +339,34 @@ void		Face::recv(std::string equ_name) {
 	}
 }
 
+
+
+grid_tup	Face::grid(std::string equ_name) {
+
+	auto x = linspace(ext_->get(0,0), ext_->get(0,1), n_->get(0));
+	auto y = linspace(ext_->get(1,0), ext_->get(1,1), n_->get(1));
+	
+	auto grid = meshgrid(x, y);
+	
+	auto X = grid.first;
+	auto Y = grid.first;
+	
+	auto Z = make_ones<real,2>(X->shape());
+	Z->multiply_self(pos_z_);
+	
+	auto equ = equs_[equ_name];
+	
+	auto W = equ->v_->sub({0,0},{-2,-2});
+	
+	if(z_.s > 0) {
+		W->transpose_self();
+	} else {
+		W->rot90_self(1);
+		W->fliplr_self();
+	}
+	
+	return make_tuple(X,Y,Z,W);
+}
 
 
 

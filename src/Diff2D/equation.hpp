@@ -27,13 +27,15 @@ class Equation {
 		};
 
 		Equation(std::string name, Face_s face, Equation_Prob_s equ_prob);
-		array<real,2>						grad();
+
+		array<real,3>						grad();
 		real							grad_mag();
 		real							min();
 		real							max();
 		real							grad_min();
 		real							grad_max();
 		real							mean();
+
 
 		std::string						name_;
 		Face_s							face_;
@@ -43,7 +45,7 @@ class Equation {
 		array<real,2>						v_;
 
 		unsigned int						flag_;
-		//std::vector< std::vector< array<real,1> > >		v_bou_;
+		multivec< 2, array<real,1> >				v_bou_;
 };
 
 #endif

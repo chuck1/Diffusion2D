@@ -5,27 +5,27 @@
 
 // information concerning connection between face and conn
 // from perspective of face
-Conn::Conn(Face* face, void* conns) {
+Conn::Conn(Face_s face, void* conns) {
 	face_ = face;
 	conns_ = conns;
 
 	parallel_ = false;
 }
 void		Conn::refresh() {
-	int OL_ = face_->nbr_to_loc(twin_.face);
+	int OL_ = face_->nbr_to_loc(twin_->face_);
 
-	ol_, sol_ = v2is(OL_);
-
-	PL_ = abs(cross(3, OL_));
+	ol_ = IS(OL_);
+	
+	int PL_ = abs(cross(3, OL_));
 	pl_ = IS(PL_);
 	
-	PG_ = face_.loc_to_glo(PL_);
+	PG_ = face_->loc_to_glo(PL_);
 	
-	il_ = face_.index_lambda(twin_.face);
+	il_ = face_->index_lambda(twin_->face_);
 
 	////printinfo()
 }
-void		Conn::printinfo() {
+void			Conn::printinfo() {
 	/*
 	   print "face",face_.Z
 	   print "nbr ",twin_.face.Z
@@ -33,53 +33,60 @@ void		Conn::printinfo() {
 	   print inspect.getsource(li_)
 	   print inspect.getsource(lj_)*/
 }
-void		Conn::send(std::string name, array<real,2>* v) {
+void			Conn::send(std::string name, array<real,1> v) {
 	if(parallel_) {
-		conns_[name].send(v);
+		assert(0);
+		//conns_[name].send(v);
 	} else {
 		equs_[name] = v;
 	}
 }
-void		Conn::recv(std::string name) {
-	n = face_.n[pl_];
+array<real,1>		Conn::recv(std::string name) {
+	int n = face_->n_->get(pl_.i);
+	
+	array<real,1> v;
 
 	if(parallel_) {
-		v = conns_[name].recv();
+		//v = conns_[name].recv();
+		assert(0);
 	} else {
 		try {
-			v = twin_.equs[name]
+			v = twin_->equs_[name];
 		} catch(...) {
 			//print "warning: array not available"
-			v = np.zeros(n);
+			v = make_zeros<real,1>({n});
 		}
-		return v;
 	}
+
+	return v;
 }
 
 
 
 
-void		Conn::connect(Face* f1, int a1, int b1, Face* f2, int a2, int b2, bool parallel = false) {
-	/*if multi:
-	  c1, c2 = multiprocessing.Pipe()
-else:
-c1, c2 = None, None
-*/
+void		connect(Face_s f1, int a1, int b1, Face_s f2, int a2, int b2, bool parallel) {
+	void *c1 = 0;
+	void *c2 = 0;
+	
+	if(parallel) {
+		assert(0);
+		//c1, c2 = multiprocessing.Pipe()
+	}
 
-	Conn* conn1 = new Conn(f1, c1);
-	Conn* conn2 = new Conn(f2, c2);
-
+	auto conn1 = std::make_shared<Conn>(f1, c1);
+	auto conn2 = std::make_shared<Conn>(f2, c2);
+	
 	conn1->twin_ = conn2;
 	conn2->twin_ = conn1;
-
+	
 	//f1.nbrs[a1,b1] = f2
 	//f2.nbrs[a2,b2] = f1
+	
+	f1->conns_[a1][b1] = conn1;
+	f2->conns_[a2][b2] = conn2;
 
-	f1.conns[a1,b1] = conn1;
-	f2.conns[a2,b2] = conn2;
-
-	conn1.refresh();
-	conn2.refresh();
+	conn1->refresh();
+	conn2->refresh();
 }
 
 

@@ -1,89 +1,102 @@
-import math
+#include <algorithm>
+#include <exception>
+#include <vector>
+#include <utility>
 
-from unit_vec import *
+#include <Diff2D/math.hpp>
 
 
-class NoIntersectError(Exception):
-	pass
+template <typename T> int sgn(T val) {
+	return (T(0) < val) - (val < T(0));
+}
 
-class EdgeError(Exception):
-	def __init__(self, rev):
-		self.rev = rev
+struct NoIntersectError: std::exception {
+};
+struct EdgeError: std::exception {
+	EdgeError(bool rev) {
+		rev_ = rev;
+	}
+	bool rev_;
+};
 
-def align(ind1, ind2):
-	ver = False
-	#ver = True
-
-	s = max(min(ind1), min(ind2))
-	e = min(max(ind1), max(ind2))
+std::pair< std::vector<int>, std::vector<int> >		align(std::vector<int> ind1, std::vector<int> ind2) {
+	bool ver = false;
+	//#ver = True
 	
-	if ver:
-		print "ind1", ind1
-		print "ind2", ind2
-		print "s", s, "e", e
-	
-	try:
-		s1 = ind1.index(s)
-		e1 = ind1.index(e)
-		s2 = ind2.index(s)
-		e2 = ind2.index(e)
-	except ValueError:
-		raise NoIntersectError
-	
-	if ver:
-		print "s1", s1, "e1", e1
-		print "s2", s2, "e2", e2
+	int s = std::max(
+			*std::min_element(ind1.cbegin(), ind1.cend()),
+			*std::min_element(ind2.cbegin(), ind1.cend())
+			);
 
-	if s == e:
-		raise EdgeError(False if s1 > s2 else True)
+	int e = std::min(
+			*std::max_element(ind1.cbegin(), ind1.cend()),
+			*std::max_element(ind2.cbegin(), ind2.cend())
+		   );
 	
-	d1 = sign(e1-s1)
-	d2 = sign(e2-s2)
+	if(ver) {
+		//print "ind1", ind1
+		//print "ind2", ind2
+		//print "s", s, "e", e
+	}
 	
-	if ver:
-		print ind1
+	
+	auto s1 = std::find(ind1.cbegin(), ind1.cend(), s);
+	auto e1 = std::find(ind1.cbegin(), ind1.cend(), e);
+	auto s2 = std::find(ind2.cbegin(), ind2.cend(), s);
+	auto e2 = std::find(ind2.cbegin(), ind2.cend(), e);
+	
+	if(
+			s1 == ind1.cend() || 
+			e1 == ind1.cend() || 
+			s2 == ind2.cend() || 
+			e2 == ind2.cend()) {
+		throw NoIntersectError();
+	}
+	
+	if(ver) {
+		//print "s1", s1, "e1", e1
+		//print "s2", s2, "e2", e2
+	}
+	
+	if(s == e) throw EdgeError(s1 < s2);
+	
+	int d1 = sgn(*e1-*s1);
+	int d2 = sgn(*e2-*s2);
+	
+	if(ver) {
+	/*	print ind1
 		print ind2
 
 		print "min",min(ind1), min(ind2), "s", s
 		print "max",max(ind1), max(ind2), "e", e
 	
 		print s1, e1, d1
-		print s2, e2, d2
+		print s2, e2, d2*/
+	}
 	
-	i1 = lambda i: s1 + (i - (d1-1)/2) * d1
-	i2 = lambda i: s2 + (i - (d2-1)/2) * d2
+	auto i1 = [&] (int i) {
+		return *s1 + (i - (d1-1)/2) * d1;
+	};
+	auto i2 = [&] (int i) {
+		return *s2 + (i - (d2-1)/2) * d2;
+	};
 	
-	r1 = []
-	r2 = []
+	std::vector<int> r1;
+	std::vector<int> r2;
 	
-	for i in range(abs(e1-s1)):
-		if ver:
-			print "1:", i1(i), "'", ind1[i1(i)], ind1[i1(i)+1], "'" #, ind1[i+s1]
-			print "2:", i2(i), "'", ind2[i2(i)], ind2[i2(i)+1], "'" #, ind2[i+s2]
+	for(int i : range(abs(e1-s1))) {
+		if(ver) {
+			//print "1:", i1(i), "'", ind1[i1(i)], ind1[i1(i)+1], "'" //#, ind1[i+s1]
+			//print "2:", i2(i), "'", ind2[i2(i)], ind2[i2(i)+1], "'" //#, ind2[i+s2]
+		}
 		
-		r1.append(i1(i))
-		r2.append(i2(i))
-
-	return r1,r2
+		r1.push_back(i1(i));
+		r2.push_back(i2(i));
+	}
+	
+	return make_pair(r1,r2);
+}
 	
 	
-	
-def nice_axes(a, b):
-	p = math.floor(math.log10(b - a))
-	a = nice_lower(a, p)
-	b = nice_upper(b, p)
-	return a, b
-
-def nice_upper(a, p):
-	a = a / 10**p
-	a = math.ceil(a)
-	a = a * 10**p
-	return a
-	
-def nice_lower(a, p):
-	a = a / 10**p
-	a = math.floor(a)
-	a = a * 10**p
-	return a
 
 

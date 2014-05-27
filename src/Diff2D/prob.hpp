@@ -8,7 +8,7 @@
 #include <Diff2D/prob.hpp>
 
 
-class Prob {
+class Prob: public std::enable_shared_from_this<Prob> {
 	public:
 		Prob(
 				std::string name,
@@ -16,7 +16,7 @@ class Prob {
 				std::vector< array<int,1> > nx,
 				int it_max_1,
 				int it_max_2);
-		Equation_s			create_equation(std::string name, real k, real alpha, real alpha_source);
+		Equation_Prob_s			create_equation(std::string name, real k, real alpha, real alpha_source);
 		Patch_Group_s			create_patch_group(std::string name, std::map<std::string, real> v_0, std::map<std::string, real> S);
 		real				temp_max(std::string equ_name);
 		real				temp_min(std::string equ_name);

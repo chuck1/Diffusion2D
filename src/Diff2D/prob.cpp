@@ -1,4 +1,6 @@
-
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 
 #include <Diff2D/config.hh>
 #include <Diff2D/face.hpp>
@@ -23,13 +25,13 @@ Prob::Prob(
 
 	//signal.signal(signal.SIGINT, self)
 }
-Equation_s	Prob::create_equation(std::string name, real k, real alpha, real alpha_source) {
-	auto e = std::make_shared<Equation>(name, k, alpha, alpha_source);
+Equation_Prob_s		Prob::create_equation(std::string name, real k, real alpha, real alpha_source) {
+	auto e = std::make_shared<Equation_Prob>(shared_from_this(), name, k, alpha, alpha_source);
 	equs_[name] = e;
 	return e;
 }
-Patch_Group_s	Prob::create_patch_group(std::string name, std::map<std::string, real> v_0, std::map<std::string, real> S) {
-	auto g = std::make_shared<Patch_Group>(name, v_0, S);
+Patch_Group_s		Prob::create_patch_group(std::string name, std::map<std::string, real> v_0, std::map<std::string, real> S) {
+	auto g = std::make_shared<Patch_Group>(shared_from_this(), name, v_0, S);
 
 	patch_groups_.push_back(g);
 
@@ -101,26 +103,33 @@ void		Prob::value_normalize(std::string equ_name) {
 	}
 }
 void		Prob::copy_value_to_source(std::string equ_name_from, std::string equ_name_to) {
+	Equation_s e1;
+	Equation_s e2;
 
-	for f in faces() {
-		e1 = f.equs[equ_name_from];
-		e2 = f.equs[equ_name_to];
+	for(auto f : faces()) {
+		e1 = f->equs_[equ_name_from];
+		e2 = f->equs_[equ_name_to];
 	}
-	s1 = tuple(a-2 for a in np.shape(e1.v));
-	s2 = np.shape(e2.s);
+	
+	std::vector<int> s1;
+	for(int a : e1->v_->shape()) {
+		s1.push_back(a-2);
+	}
 
+	auto s2 = e2->s_->shape();
+	
 	if(s1 == s2) {
-		e2.s = e1.v[:-2,:-2];
+		e2->s_ = e1->v_->sub({0,0},{-2,-2});
 	} else {
-		print s1, s2;
+		//print s1, s2;
 		throw 0;//raise ValueError('size mismatch')
 	}
 }
 std::vector<Face_s>		Prob::faces() {
 	std::vector<Face_s> ret;
-	for g in patch_groups_ {
-		for p in g.patches {
-			for f in p.faces.flatten() {
+	for(auto g : patch_groups_) {
+		for(auto p : g->patches_) {
+			for(auto f : *(p->faces_)) {
 				ret.push_back(f);
 			}
 		}
@@ -133,78 +142,89 @@ int		Prob::solve(std::string name, real cond, bool ver, real R_outer) {
 }
 int		Prob::solve_serial(std::string name, real cond, bool ver, real R_outer) {
 	std::vector<real> R;
-
-	for it in range(it_max_1_) {
-		R = np.append(R, 0.0);
-
-		for face in faces() {
-			R[-1] = max(face.step(name), R[-1]);
-			face.send(name);
+	real nR;
+	int it = 0;
+	for(; it < it_max_1_; ++it) {
+		nR = 0;
+		for(auto face : faces()) {
+			nR = std::max(face->step(name), nR);
+			face->send(name);
 		}
-		for face in faces() {
-			face.recv(name);
+		for(auto face : faces()) {
+			face->recv(name);
 		}
-
+		
 		if(ver) {
 			std::cout.flags(std::ios_base::scientific);
-			std::cout << setw(4) << it << setw(8) << R_outer << setw(8) << R[-1] << std::endl;
+			std::cout << std::setw(4) << it << std::setw(8) << R_outer << std::setw(8) << nR << std::endl;
 		}
-		if math.isnan(R[-1]) {
+		if(std::isnan(nR)) {
 			throw 0;//raise ValueError('nan')
 		}
-		if R[-1] < cond: break;
+		if(nR < cond) break;
+		
+		R.push_back(nR);
 	}
 	return it;
 }
 int		Prob::solve2(std::string equ_name, real cond1_final, real cond2, bool ver) {
 	//cond1 = 1
-
 	//it_cond = 2
-
-	R = 1.0;
-	for it_2 in range(it_max_2_) {
-
-		cond1 = R / 1000.0; // target residual for inner loop is proportional to current residual for outer loop
-
-		it_1 = solve(equ_name, cond1, ver, R);
-
+	
+	real R = 1.0;
+	int it_2 = 0;
+	for(; it_2 < it_max_2_; ++it_2) {
+	
+		real cond1 = R / 1000.0; // target residual for inner loop is proportional to current residual for outer loop
+		
+		/*int it_1 =*/ solve(equ_name, cond1, ver, R);
+	
 		R = 0.0;
+	
+		for(auto g : patch_groups_) {
+			real Rn = g->reset_s(equ_name);
 
-		for(g : patch_groups_) {
-			Rn = g.reset_s(equ_name);
+			R = std::max(Rn, R);
 
-			R = max(Rn, R);
+			std::cout <<
+				std::setw(3) << it_2 <<
+				std::setw(8) << R <<
+				std::endl;
 
-			print "{0:3d} {1:8e}".format(it_2,R);
-
-			if math.isnan(R) {
+			if(std::isnan(R)) {
 				throw 0;//raise ValueError('nan')
 			}
 			if(R < cond2) break;
 		}
-		return it_2;
 	}
+	return it_2;
 }
 void		Prob::save() {
-	f = open("case_" + name_, 'w')
-		pickle.dump(f)
+	std::ofstream ofs;
+	ofs.open("case_" + name_, std::ofstream::out);
+	//pickle.dump(f)
 }
-void	write(std::string equ_name) {
-
-	directory = name_ + "/";
-
-	if not os.path.exists(directory) {
+void		Prob::write(std::string equ_name) {
+	
+	std::string directory = name_ + "/";
+	
+	/*if(not os.path.exists(directory)) {
 		os.makedirs(directory)
-	}
-	name = "prof_" + equ_name + ".txt";
+	}*/
 
-	with open(directory + name,'w') as f:
-		for(g in patch_groups_){
-			print g
-				g.write(equ_name,f)
-		}
+	std::string name = "prof_" + equ_name + ".txt";
+
+	std::ofstream ofs;
+	ofs.open(directory + name, std::ofstream::out);
+
+	for(auto g : patch_groups_) {
+		//print g
+		g->write(equ_name, ofs);
+	}
 
 }
+
+
 
 
 

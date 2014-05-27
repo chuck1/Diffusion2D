@@ -98,33 +98,14 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 	public:
 		__array() {
 		}
-		/*__array(init_list il) {
-			//alloc()
-			set(il, v_, c_);
-		}*/
 		__array(__array<T,N> const & rhs) {
-
 		}
 	public:
-		/*template<typename U> void		set(std::initializer_list<U> il, T* ptr, std::vector<int> C) {
-			auto beg = C.begin();
-			int c = *beg;
-				
-			C.erase(beg);
-			
-			for(auto a : il) {
-				set(a, ptr, C);
-				ptr += c;
-			}
+		void					alloc(array<int,1> shape_arr) {
+			std::vector<int> shape;
+			for(int i : *shape_arr) shape.push_back(i);
+			alloc(shape);
 		}
-		void					set(std::initializer_list<T> il, T* ptr, std::vector<int> C) {
-			for(auto a : il) {
-				*ptr = a;
-				ptr++;
-			}
-		}*/
-
-
 		void					alloc(std::vector<int> n) {
 			assert(n.size() == N);
 
@@ -155,18 +136,19 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 				v_[i] = 1;
 			}
 		}
-		/*template<typename... I> void		ones(array<int,1> n) {
-			assert(n->size_ == N);
-
-			std::vector<int> v;
-
-			for(int* i = n->v_; i < (n->v_ + n->size_); ++i) {
-				v.push_back(*i);
+		
+		shared					transpose_self() { return shared(); }
+		shared					rot90_self(int i) { return shared(); }
+		shared					fliplr_self() { return shared(); }
+		std::vector<T>				ravel() {
+			std::vector<T> ret;
+			for(T* p = v_; p < (v_ + size_); ++p) {
+				ret.push_back(*p);
 			}
-		}*/
-
-
-		/** @name access @{ */
+			return ret;
+		}
+		/** @name access
+		 * @{ */
 		T&						operator()(int i) {
 			i %= size_;
 			return v_[i];
@@ -198,8 +180,58 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			
 			return __get1(t,c,i);
 		}
-
 		
+		void						copy(
+				T* src,
+				T* dst,
+				std::vector<int> vec_i_src_b,
+				std::vector<int> vec_i_src_e,
+				std::vector<int> vec_i_dst_b,
+				std::vector<int> vec_i_dst_e,
+				std::vector<int> vec_c_src,
+				std::vector<int> vec_c_dst) {
+
+			auto it_i_src_b = vec_i_src_b.begin();
+			auto it_i_src_e = vec_i_src_e.begin();
+			auto it_i_dst_b = vec_i_dst_b.begin();
+			auto it_i_dst_e = vec_i_dst_e.begin();
+			auto it_c_src   = vec_c_src.begin();
+			auto it_c_dst   = vec_c_dst.begin();
+			
+			int c_src = *it_c_src;
+			int c_dst = *it_c_dst;
+			
+			vec_i_src_b.erase(it_i_src_b);
+			vec_i_src_e.erase(it_i_src_e);
+			vec_i_dst_b.erase(it_i_dst_b);
+			vec_i_dst_e.erase(it_i_dst_e);
+			vec_c_src.erase(it_c_src);
+			vec_c_dst.erase(it_c_dst);
+			
+			int i_src = *it_i_src_b;
+			int i_dst = *it_i_dst_b;
+
+			for(;
+					i_src < *it_i_src_e;
+					++i_src
+					) {
+
+				copy(
+						src + i_src * c_src,
+						dst + i_dst * c_dst,
+						vec_i_src_b,
+						vec_i_src_e,
+						vec_i_dst_b,
+						vec_i_dst_e,
+						vec_c_src,
+						vec_c_dst);
+
+
+			}
+		}
+
+
+
 		template<typename... I> T&			get(I... b) {
 			return *(__get<I...>(v_, c_, b...));
 		}
@@ -210,7 +242,6 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			t += c[0] * a;
 
 			c.erase(c.begin());
-			//std::cout << "a = " << a << std::endl;
 
 			return __get(t,c,b...);
 		}
@@ -227,7 +258,7 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			ret += rhs;
 			return ret;
 		}
-		// self
+		/** @name self arithmetic @{ */
 		__array<T,N>&				operator+=(__array<T,N> const & rhs) {
 			assert(equal_size(rhs));
 
@@ -235,7 +266,7 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 				v_[i] += rhs.v_[i];
 			}
 
-			*this;
+			return *this;
 		}
 		__array<T,N>&				operator*=(__array<T,N> const & rhs) {
 			assert(equal_size(rhs));
@@ -244,17 +275,18 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 				v_[i] *= rhs.v_[i];
 			}
 
-			*this;
+			return *this;
 		}
-		__array<T,N>&				operator*=(__array<T,N> const & rhs) {
+		__array<T,N>&				operator/=(__array<T,N> const & rhs) {
 			assert(equal_size(rhs));
 
 			for(int i = 0; i < size_; ++i) {
-				v_[i] *= rhs.v_[i];
+				v_[i] /= rhs.v_[i];
 			}
 
-			*this;
+			return *this;
 		}
+		/** @} */
 		/** @name scalar self arithmatic @{ */
 		__array<T,N>&				operator*=(T const & rhs) {
 			for(int i = 0; i < size_; ++i) {
@@ -271,7 +303,8 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			return *this;
 		}
 		/** @} */
-		// shared self
+		/** @name shared self arithmetic
+		 * @{ */
 		shared					add_self(std::shared_ptr< __array<T,N> > const & rhs) {
 			this->operator+=(*rhs);
 			return __array<T,N>::shared_from_this();
@@ -284,11 +317,19 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			this /= rhs;
 			return *this;
 		}
+		/** @} */
+		/** @name shared self scalar arithmetic
+		 * @{ */
 		shared					multiply_self(T const & rhs) {
 			operator*=(rhs);
 			return __array<T,N>::shared_from_this();
 		}
-		// shared
+		shared					divide_self(T const & rhs) {
+			operator/=(rhs);
+			return __array<T,N>::shared_from_this();
+		}
+		/** @} */
+		/** @name shared @{ */
 		shared					add(std::shared_ptr< __array<T,N> > const & rhs) {
 			auto ret = std::make_shared< __array<T,N> >(*this);
 			(*ret) += (*rhs);
@@ -299,7 +340,8 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			ret *= rhs;
 			return ret;
 		}
-		// math
+		/** @} */
+		/** @name math @{ */
 		shared					square() {
 			auto ret = std::make_shared< __array<T,N> >(*this);
 			ret->square_self();
@@ -331,7 +373,7 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			}
 			return s;
 		}
-		// indexing
+		/** @name indexing @{ */
 		std::vector<int>			offset2index(int o) {
 			std::vector<int> ret;
 			int a = o;
@@ -345,21 +387,28 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			}
 			return ret;
 		}
-
-		// lin alg
-		shared					gradient(array<T,N+1> d) {
+		/** @} */
+		/** @name lin alg
+		 * @{ */
+		std::shared_ptr< __array<T,N+1> >	gradient(array<T,N+1> d) {
 			auto ret = make_array<T,N+1>();
 
 			std::vector<int> n = n_;
 			n.push_back(N);
 
 			ret->alloc(n);
+			
+			std::cout << "sorry, not yet implemented" << std::endl;
+			assert(0);
 
-			for(int i : range(size_)) {
-			}
+			//for(int i : range(size_)) {
+			//}
+
+			return ret;
 		}
-
-		// iterating
+		/** @} */
+		/** @name iterating
+		 * @{ */
 		T*					begin() {
 			return v_;
 		}
@@ -368,7 +417,7 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 		}
 
 		shared					sub(std::vector<int> beg, std::vector<int> end) {
-
+			// resolve negative indices
 			for(int i = 0; i < end.size(); ++i) {
 				if(end[i] < 0) {
 					end[i] = n_[i] + end[i];
@@ -377,15 +426,38 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 					beg[i] = n_[i] + beg[i];
 				}
 			}
-			auto size = end;
+			// calculate shape
+			auto shape = end;
 			for(int i = 0; i < beg.size(); ++i) {
-				size[i] -= beg[i];
+				shape[i] -= beg[i];
 			}
-		}
 
+			// alloc new array
+			auto ret = std::make_shared< __array<T,N> >();
+			ret->alloc(shape);
+
+			// fill
+			copy(
+					v_,
+					ret->v_,
+					beg,
+					end,
+					std::vector<int>(N,0),
+					n_,
+					c_,
+					ret->c_);
+			return ret;
+		}
+		/** @} */
+		/** @name info
+		 * @{ */
 		size_t					size() {
 			return size_;
 		}
+		std::vector<int>			shape() {
+			return n_;
+		}
+		/** @} */
 	public://private:
 		std::vector<int>		c_;
 		std::vector<int>		n_;
@@ -400,8 +472,8 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
   return std::make_shared< __array<T,N> >();
   }*/
 /*template<typename T, int N> array<T,N>		make_array(typename Initializer_list<N,T>::list_type il) {
-	return std::make_shared< __array<T,N> >(il);
-}*/
+  return std::make_shared< __array<T,N> >(il);
+  }*/
 
 template<typename T, int N> array<T,N>		make_ones(array<int,1> v) {
 	auto arr = std::make_shared< __array<T,N> >();
@@ -433,8 +505,41 @@ template<typename T, int N> array<T,N>		make_zeros(std::vector<int> n) {
 #define ARR_LOOP(arr, p, level) for(int p##level = p; p##level < (p + (arr->c_[level] * arr->n_[level])); p##level += arr->c_[level])
 
 
+template<typename T> array<T,1>		linspace(T s, T e, int n) {
+
+	auto ret = make_uninit<T,1>({n});
+	
+	T step = (e - s) / ((T)(n - 1));
+	
+	for(int i : range(n)) {
+		ret->get(i) = s + step * i;
+	}
+
+	return ret;
+}
+
+
+template<typename T> std::pair< array<T,2>, array<T,2> >		meshgrid(array<T,1> x, array<T,1> y) {
+	
+	int nx = x->n_[0];
+	int ny = y->n_[0];
+	
+	auto X = make_uninit<T,2>({nx,ny});
+
+	auto Y = make_uninit<T,2>({nx,ny});
+	
+	for(int i : range(nx)) {
+		for(int j : range(ny)) {
+			X->get(i,j) = x->get(i);
+			Y->get(i,j) = y->get(j);
+		}
+	}
+
+	return std::make_pair(X,Y);
+}
 
 #endif
+
 
 
 

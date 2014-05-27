@@ -1,8 +1,25 @@
+#include <fstream>
 
-#include "config.hpp"
-#include "patch.hpp"
-#include "prob.hpp"
+#include <Diff2D/config.hh>
+#include <Diff2D/face.hpp>
+#include <Diff2D/patch.hpp>
+#include <Diff2D/patch_group.hpp>
+#include <Diff2D/prob.hpp>
 
+template<typename T> void write_vec(std::ofstream& ofs, std::vector<T> x) {
+	int a = 0;
+
+	ofs << std::scientific;
+
+	for(auto b : x) {
+		ofs << b << " ";
+		a = a + 1;
+		if(a == 10) {
+			ofs << "\n";
+			a = 0;
+		}
+	}
+}
 
 Patch_Group::Patch_Group(
 		Prob_s prob,
@@ -24,18 +41,18 @@ Patch_s			Patch_Group::create_patch(
 		std::string name,
 		int normal,
 		std::vector< std::vector<int> > indices,
-		std::map< std::string, array<array<real,1>, 2 > > v_bou) {
+		v_bou_type v_bou) {
 
 	//print 'T_0',T_0
 
 	auto prob = prob_.lock();
 
-	auto p = std::make_shared<Patch>(name, normal, indices, prob->x_, prob->nx_, v_bou);
+	auto p = std::make_shared<Patch>(shared_from_this(), name, normal, indices, prob->x_, prob->nx_, v_bou);
 
 	patches_.push_back(p);
 	return p;
 }
-void		Patch_Group::reset_s(std::string equ_name) {
+real			Patch_Group::reset_s(std::string equ_name) {
 	/*def debug() {
 	  print "reset_s"
 	  print "equ_name",equ_name
@@ -46,79 +63,93 @@ void		Patch_Group::reset_s(std::string equ_name) {
 
 	real v_0 = v_0_[equ_name];
 
-	if(v_0 == 0.0) return;
+	if(v_0 == 0.0) return 0.0;
 
 	// current area-weighted-average value
 	real v = 0;
 	real A = 0;
-
+	
+	auto equ_prob = prob_.lock()->equs_[equ_name];
+	
 	for(auto p : patches_) {
 		for(auto f : *p->faces_) {//->flatten()) 
-			auto equ = f->equs[equ_name];
-
-			a = f.area();
-			v += equ.mean() * a;
+			auto equ = f->equs_[equ_name];
+		
+			real a = f->area();
+			v += equ->mean() * a;
 			A += a;
 		}
 	}
 	//print "name       ",name_
 	//print "num patches",len(patches_)
-
+	
 	real v_m = v/A;
-
+	
 	real dv = v_0 - v_m;
-
-	real dS = equ.equ_prob.k * dv / 10.0;
-
+	
+	real dS = equ_prob->k_ * dv / 10.0;
+	
 	S_[equ_name] += dS;
 	//Tmean_.append(vm)
 	//debug();
-	return math.fabs(dv / v_0);
+	return std::abs(dv / v_0);
 }	
 std::vector< Face_s >		Patch_Group::faces() {
 	std::vector< Face_s > ret;
 
-	for(p : patches_) {
-		for(f : p->faces_->flatten()) {
+	for(auto p : patches_) {
+		for(auto f : *(p->faces_)) {
 			ret.push_back(f);
 		}
 	}
+
+	return ret;
 }
-void				Patch_Group::write(std::string equ_name, std::ofstream file) {
+void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 
-	x = np.zeros(0);
-	y = np.zeros(0);
-	z = np.zeros(0);
-	w = np.zeros(0);
-
+	std::vector<real> x;// = np.zeros(0);
+	std::vector<real> y;// = np.zeros(0);
+	std::vector<real> z;// = np.zeros(0);
+	std::vector<real> w;// = np.zeros(0);
+	
 	for(auto f : faces()) {
-		X,Y,Z,W = f.grid(equ_name);
+		auto grid = f->grid(equ_name);
+		//X,Y,Z,W = f.grid(equ_name);
+		
+		auto Xr = std::get<0>(grid)->ravel();
+		auto Yr = std::get<0>(grid)->ravel();
+		auto Zr = std::get<0>(grid)->ravel();
+		auto Wr = std::get<0>(grid)->ravel();
+		
+		x.insert(x.begin(), Xr.begin(), Xr.end());
+		y.insert(y.begin(), Yr.begin(), Yr.end());
+		z.insert(z.begin(), Zr.begin(), Zr.end());
+		w.insert(w.begin(), Wr.begin(), Wr.end());
+	}
 
-		x = np.append(x, X.ravel());
-		y = np.append(y, Y.ravel());
-		z = np.append(z, Z.ravel());
-		w = np.append(w, W.ravel());
-	}	
-	name = "prof_" + name_ + "_" + equ_name;
+	std::string name = "prof_" + name_ + "_" + equ_name;
 
-	n = np.size(x,0);
+	int n = x.size();
+	
+	ofs << "((" << name << " point " << n << ")\n";
+	
+	ofs << "(x\n";
+	write_vec(ofs, x);
+	ofs << ")\n";
+	
+	ofs << "(y\n";
+	write_vec(ofs, y);
+	ofs << ")\n";
 
-	file.write("(({0} point {1})\n".format(name,n));
+	ofs << "(z\n";
+	write_vec(ofs, z);
+	ofs << ")\n";
 
-	file.write("(x\n");
-	file.write("".join(np_join(x)) + ")\n");
-
-	file.write("(y\n");
-	file.write("".join(np_join(y)) + ")\n");
-
-	file.write("(z\n");
-	file.write("".join(np_join(z)) + ")\n");
-
-	file.write("(w\n");
-	file.write("".join(np_join(w)) + ")\n");
-	//file.write(" ".join("{0:e}".format(a) for a in w) + ")")
-
-	file.write(")\n");
+	ofs << "(w\n";
+	write_vec(ofs, w);
+	ofs << ")\n";
+	
+	ofs << ")\n";
 }
 
 

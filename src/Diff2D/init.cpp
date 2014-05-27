@@ -1,3 +1,4 @@
+/*
 import sys
 import argparse
 
@@ -11,6 +12,6 @@ def init():
 	
 	if args.verbose: logging.basicConfig(level=logging.DEBUG)
 
-
+*/
 
 

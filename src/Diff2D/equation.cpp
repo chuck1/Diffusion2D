@@ -1,9 +1,9 @@
-#include "array.hpp"
-#include "equation.hpp"
-#include "face.hpp"
+#include <Diff2D/array.hpp>
+#include <Diff2D/equation.hpp>
+#include <Diff2D/face.hpp>
 
 
-Equation_Prob::Equation_Prob(Prob* prob, std::string name, real k, real alpha, real alpha_source) {
+Equation_Prob::Equation_Prob(Prob_s prob, std::string name, real k, real alpha, real alpha_source) {
 	prob_ = prob;
 	name_ = name;
 	k_ = k;
@@ -12,7 +12,7 @@ Equation_Prob::Equation_Prob(Prob* prob, std::string name, real k, real alpha, r
 }
 
 
-Equation::Equation(std::string name, Face* face, Equation_Prob* equ_prob) {
+Equation::Equation(std::string name, Face_s face, Equation_Prob_s equ_prob) {
 	name_ = name;
 	face_ = face;
 
@@ -22,15 +22,19 @@ Equation::Equation(std::string name, Face* face, Equation_Prob* equ_prob) {
 
 	array<int,1> n_extended = face_->n_->add(make_array<int,1>({2, 2}));
 	
-	v_->ones(n_extended);
+	v_->alloc(n_extended);
+	v_->ones();
 	
-	v_->multiply_self(face_->patch_->group_->v_0_[name_]);
+	auto group = face_->patch_->group_.lock();
+
+	v_->multiply_self(group->v_0_[name_]);
 	
-	s_->ones(face->n_);
+	s_->alloc(face->n_);
+	s_->ones();
 
 	flag_ = 0;
 }
-array<real,2>		Equation::grad() {
+array<real,3>		Equation::grad() {
 	//return np.gradient(v_[:-2,:-2], face_->d[0,0,0], face_.d[0,0,1])
 	return v_->sub({0,0},{-2,-2})->gradient(face_->d_);
 }

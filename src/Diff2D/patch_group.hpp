@@ -1,14 +1,14 @@
 #ifndef PATCH_GROUP_HPP
 #define PATCH_GROUP_HPP
 
-//include <string>
+#include <memory>
 
 #include <Diff2D/config.hh>
 #include <Diff2D/patch.hpp>
 #include <Diff2D/prob.hpp>
 
 
-class Patch_Group {
+class Patch_Group: public std::enable_shared_from_this<Patch_Group> {
 	public:
 		Patch_Group(
 				Prob_s prob,
@@ -20,10 +20,13 @@ class Patch_Group {
 				std::string name,
 				int normal,
 				std::vector< std::vector<int> > indices,
-				std::map< std::string, array<array<real,1>, 2 > > v_bou);
-		void		reset_s(std::string equ_name);
+				v_bou_type v_bou);
+
+		real		reset_s(std::string equ_name);
+
 		std::vector< Face_s >		faces();
-		void				write(std::string equ_name, std::ofstream file);
+
+		void				write(std::string equ_name, std::ofstream& ofs);
 
 
 
