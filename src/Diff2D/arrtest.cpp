@@ -2,7 +2,7 @@
 #include <vector>
 #include <map>
 
-#include "array.hpp"
+#include <Diff2D/array.hpp>
 
 
 void foo(std::vector<int>) {}

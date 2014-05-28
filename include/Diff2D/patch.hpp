@@ -4,7 +4,7 @@
 #include <map>
 #include <algorithm>
 
-#include <Diff2D/config.hh>
+#include <Diff2D/config.hpp>
 #include <Diff2D/unit_vec.hpp>
 #include <Diff2D/array.hpp>
 #include <Diff2D/types.hpp>

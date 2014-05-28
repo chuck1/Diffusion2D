@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include <Diff2D/config.hh>
+#include <Diff2D/config.hpp>
 #include <Diff2D/array.hpp>
 
 class Equation_Prob {

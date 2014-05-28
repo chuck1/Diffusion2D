@@ -1,7 +1,7 @@
 #include <map>
 
-#include "face.hpp"
-#include "conn.hpp"
+#include <Diff2D/face.hpp>
+#include <Diff2D/conn.hpp>
 
 // information concerning connection between face and conn
 // from perspective of face

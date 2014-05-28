@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <Diff2D/config.hh>
+#include <Diff2D/config.hpp>
 #include <Diff2D/patch.hpp>
 #include <Diff2D/prob.hpp>
 

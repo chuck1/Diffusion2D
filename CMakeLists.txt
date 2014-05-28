@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8.8)
 
 project(Diff2D)
 
-# find_package
+find_package(CMakeHelper)
 
 # include_directories
 
@@ -14,7 +14,7 @@ project(Diff2D)
 
 # common methods for static library
 # =================================
-include($ENV{HOME}/usr/lib/cmake/CMakeHelper/static/library.cmake)
+include(${CMakeHelper_INCLUDE_DIR}/CMakeHelper/static/library.cmake)
 
 
 add_subdirectory(test)

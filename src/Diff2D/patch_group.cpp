@@ -1,6 +1,6 @@
 #include <fstream>
 
-#include <Diff2D/config.hh>
+#include <Diff2D/config.hpp>
 #include <Diff2D/face.hpp>
 #include <Diff2D/patch.hpp>
 #include <Diff2D/patch_group.hpp>
