@@ -1,0 +1,6 @@
+[submodule "Diffusion2D-doc"]
+	path = Diffusion2D-doc
+	url = https://chuck1@github.com/chuck1/Diffusion2D-doc.git
+[submodule "doc"]
+	path = doc
+	url = https://chuck1@github.com/chuck1/Diffusion2D-doc.git
