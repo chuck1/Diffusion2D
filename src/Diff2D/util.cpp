@@ -2,6 +2,7 @@
 #include <exception>
 #include <vector>
 #include <utility>
+#include <cassert>
 
 #include <Diff2D/math.hpp>
 
@@ -26,14 +27,24 @@ align_ret_type		align(size_t_vec ind1, size_t_vec ind2) {
 	bool ver = false;
 	//#ver = True
 	
-	int s = std::max(
-			*std::min_element(ind1.cbegin(), ind1.cend()),
-			*std::min_element(ind2.cbegin(), ind1.cend())
-			);
+	auto ind1_min = std::min_element(ind1.cbegin(), ind1.cend());
+	assert(ind1_min != ind1.cend());
+
+	auto ind2_min = std::min_element(ind2.cbegin(), ind2.cend());
+	assert(ind2_min != ind2.cend());
+
+	auto ind1_max = std::max_element(ind1.cbegin(), ind1.cend());
+	assert(ind1_max != ind1.cend());
+
+	auto ind2_max = std::max_element(ind2.cbegin(), ind2.cend());
+	assert(ind2_max != ind2.cend());
+
+
+	int s = std::max(*ind1_min,*ind2_min);
 
 	int e = std::min(
-			*std::max_element(ind1.cbegin(), ind1.cend()),
-			*std::max_element(ind2.cbegin(), ind2.cend())
+			*ind1_max,
+			*ind2_max
 		   );
 	
 	if(ver) {

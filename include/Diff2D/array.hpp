@@ -2,9 +2,11 @@
 #define ARRAY_HPP
 
 #include <iostream>
+#include <iomanip>
 #include <cassert>
 #include <vector>
 #include <memory>
+#include <cstring>
 
 #include "math.hpp"
 
@@ -35,7 +37,7 @@ template <typename U> struct Initializer_list<1,U> {
 
 template<typename T, int N> array<T,N>		make_array();
 template<typename T, int N> array<T,N>		make_array(std::vector<size_t>, std::initializer_list<T> il);
-template<typename T, int N> array<T,N>		make_ones(array<int,1> v);
+template<typename T, int N> array<T,N>		make_ones(array<size_t,1> v);
 template<typename T, int N> array<T,N>		make_ones(std::vector<size_t> v);
 template<typename T, int N> array<T,N>		make_uninit(std::vector<size_t> n);
 
@@ -57,13 +59,15 @@ template <int N, typename T> std::vector<int>	size(typename Initializer_list<N,T
 
 template<typename T> void print(T* t, int n) {
 	for(int i = 0; i < n; ++i) {
-		std::cout << t[i] << std::endl;
+		std::cout << std::setw(16) << t[i];
 	}
+	std::cout << std::endl;
 }
 template<typename T> void print(std::vector<T> v) {
 	for(T i : v) {
-		std::cout << i << std::endl;
+		std::cout << std::setw(16) << i;
 	}
+	std::cout << std::endl;
 }
 
 
@@ -100,6 +104,8 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 		__array() {
 		}
 		__array(__array<T,N> const & rhs) {
+			alloc(rhs.n_);
+			memcpy(v_, rhs.v_, size_ * sizeof(T));
 		}
 	public:
 		/** @name Allocation
@@ -135,8 +141,9 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 
 			v_ = new T[size_];
 
-			print(n_);
-			print(c_);
+			std::cout << "n    "; print(n_);
+			std::cout << "c    "; print(c_);
+			std::cout << "size " << size_ << std::endl;
 		}
 		/** @} */
 		void					zeros() {
@@ -195,6 +202,7 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			return v_[i];
 		}
 		T&						get(int i[N]) {
+			std::vector<int> iv(i, i+N-1);
 			return *(__get(v_, c_, i, i+N-1));
 		}
 		T*						__get(T* t, int* c, int* i, int* i_last) {
@@ -204,29 +212,73 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 
 			return __get(t,c+1,i+1,i_last);
 		}
-		
-		T&						get(std::vector<int> i) {
+		/** @brief get
+		 * std::vector
+		 */
+		T&						get(std::vector<int> const & i) {
+			assert(i.size() <= N);
 			std::vector<size_t> iu;
-			for(size_t a = 0; a < N; ++a) iu.push_back((size_t)((i[a] + n_[a]) % n_[a]));
-			return *(__get1(v_, c_, iu));
+			for(size_t a = 0; a < N; ++a) {
+				int b = (i[a] + n_[a]) % n_[a];
+				assert((b >= 0) && (b < n_[a]));
+				iu.push_back((size_t)b);
+			}
+			return *(__get1(v_, c_.cbegin(), n_.cbegin(), iu.cbegin(), iu));
 		}
-		T&						get(std::vector<size_t> i) {
-			return *(__get1(v_, c_, i));
+		/** @brief get
+		 * std::vector
+		 */
+		T&						get(std::vector<size_t> const & i) {
+			assert(i.size() <= N);
+			for(size_t a = 0; a < N; ++a) {
+				assert(i[a] < n_[a]);
+			}
+			return *(__get1(v_, c_.cbegin(), n_.cbegin(), i.cbegin(), i));
 		}
-		T*						__get1(T* t, std::vector<size_t> c, std::vector<size_t> i) {
-			auto itc = c.begin();
-			auto iti = i.begin();
+		T*						__get1(
+				T* t,
+				std::vector<size_t>::const_iterator c,
+				std::vector<size_t>::const_iterator n,
+				std::vector<size_t>::const_iterator it,
+				std::vector<size_t> const & i) {
+			if(it == i.cend()) return t;
 			
-			t += (*itc) * (*iti);
+			t += (*c) * (*it);
 			
-			c.erase(itc);
-			i.erase(iti);
-			
-			if(i.empty()) return t;
-			
-			return __get1(t,c,i);
+			return __get1(
+					t,
+					std::next(c),
+					std::next(n),
+					std::next(it),
+					i);
 		}
+		/** @brief get
+		 * variadic input
+		 */
+		template<typename... I> T&			get(I... b) {
+			T* ptr = __get<I...>(v_, c_.begin(), n_.begin(), b...);
 
+			std::cout << "get " << (int)(ptr - v_) << std::endl;
+
+			return *(ptr);
+		}
+		template<typename... I> T*			__get(T* t, std::vector<size_t>::const_iterator c, std::vector<size_t>::const_iterator n, I... b) {
+			return t;
+		}
+		template<typename A, typename... B> T*		__get(T* t, std::vector<size_t>::const_iterator c, std::vector<size_t>::const_iterator n, A a, B... b) {
+			assert(c != c_.end());
+			assert(n != n_.end());
+			
+			a = (a + (*n)) % (*n);
+			assert((a >= 0) && (a < (*n)));
+
+			t += (*c) * a;
+			
+			c++;
+			n++;
+			
+			return __get(t,c,n,b...);
+		}
 		void						copy(
 				T* src,
 				T* dst,
@@ -278,19 +330,6 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 
 
 
-		template<typename... I> T&			get(I... b) {
-			return *(__get<I...>(v_, c_, b...));
-		}
-		template<typename... I> T*			__get(T* t, std::vector<size_t> c, I... b) {
-			return t;
-		}
-		template<typename A, typename... B> T*		__get(T* t, std::vector<size_t> c, A a, B... b) {
-			t += c[0] * a;
-
-			c.erase(c.begin());
-
-			return __get(t,c,b...);
-		}
 		/** @} */
 		bool		equal_size(__array<T,N> const & rhs) {
 			for(int i = 0; i < N; ++i) {
@@ -304,7 +343,8 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			ret += rhs;
 			return ret;
 		}
-		/** @name self arithmetic @{ */
+		/** @name self arithmetic
+		 * @{ */
 		__array<T,N>&				operator+=(__array<T,N> const & rhs) {
 			assert(equal_size(rhs));
 
@@ -545,12 +585,12 @@ template<typename T, int N> array<T,N>		make_array(std::vector<size_t> n, std::i
 	return arr;
 }
 
-template<typename T, int N> array<T,N>		make_ones(array<int,1> v) {
+template<typename T, int N> array<T,N>		make_ones_arr(array<size_t,1> v) {
 	auto arr = std::make_shared< __array<T,N> >();
-
-	std::vector<int> a(std::begin(*v), std::end(*v));
-
-	arr->ones(v);
+	std::vector<size_t> a(std::begin(*v), std::end(*v));
+	arr->alloc(a);
+	arr->ones();
+	return arr;
 }
 template<typename T, int N> array<T,N>		make_ones(std::vector<size_t> n) {
 	auto arr = std::make_shared< __array<T,N> >();

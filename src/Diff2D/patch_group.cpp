@@ -43,7 +43,7 @@ Patch_s			Patch_Group::create_patch(
 		std::vector<size_t> indicesx,
 		std::vector<size_t> indicesy,
 		std::vector<size_t> indicesz,
-		v_bou_type v_bou) {
+		patch_v_bou_type v_bou) {
 
 	//print 'T_0',T_0
 

@@ -5,11 +5,13 @@
 
 // information concerning connection between face and conn
 // from perspective of face
-Conn::Conn(Face_s face, void* conns) {
-	face_ = face;
-	conns_ = conns;
-
-	parallel_ = false;
+Conn::Conn(Face_s face, void* conns):
+	face_(face),
+twin_(),
+	conns_(conns),
+	parallel_(false)
+{
+	assert(face_);
 }
 void		Conn::refresh() {
 	int OL_ = face_->nbr_to_loc(twin_->face_);
@@ -49,19 +51,13 @@ array<real,1>		Conn::recv(std::string name) {
 	if(parallel_) {
 		//v = conns_[name].recv();
 		assert(0);
-	} else {
-		try {
-			v = twin_->equs_[name];
-		} catch(...) {
-			//print "warning: array not available"
-			v = make_zeros<real,1>({n});
-		}
 	}
 
-	return v;
+	v = twin_->equs_[name];
+	if(v) return v;
+	
+	return make_zeros<real,1>({n});
 }
-
-
 
 
 void		connect(Face_s f1, int a1, int b1, Face_s f2, int a2, int b2, bool parallel) {

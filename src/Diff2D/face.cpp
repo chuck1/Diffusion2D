@@ -2,6 +2,8 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <iostream>
+#include <iomanip>
 
 #include <Diff2D/math.hpp>
 #include <Diff2D/array.hpp>
@@ -14,26 +16,31 @@
 #include <Diff2D/patch_group.hpp>
 #include <Diff2D/face.hpp>
 
-Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, array<size_t,1> n): LocalCoor(normal) {
+Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, array<size_t,1> n):
+	LocalCoor(normal),
+	patch_(patch),
+	ext_(ext),
+	conns_({{0,0},{0,0}}),
+	pos_z_(pos_z),
+	n_(n),
+	d_(make_zeros<real,3>({n_->get(0)+2, n_->get(1)+2, 2}))
+{
+	std::cout << "Face ctor" << std::endl;
 
-	patch_ = patch;
-
-	ext_ = ext;
-
-	pos_z_ = pos_z;
-
-	n_ = n;
+	assert(patch);
+	assert(ext);
+	assert(n);
 
 	//// the extra 2 rows/cols are for storing neighbor values
-	array<size_t,1> n_extended = n_->add(make_array_1<size_t,1>({2, 2}));
+	//array<size_t,1> n_extended = n_->add(make_array_1<size_t,1>({2, 2}));
 	
-	d_->alloc({n_extended->get(0), n_extended->get(1), 2});
-	d_->zeros();
+	//d_ = make_zeros<real,3>({n_extended->get(0), n_extended->get(1), 2});
 
-	for(size_t i = 0; i < n_extended->n_[0]; ++i) {
-		for(size_t j = 0; j < n_extended->n_[1]; ++j) {
+	for(size_t i = 0; i < n_->get(0)+2; ++i) {
+		for(size_t j = 0; j < n_->get(1)+2; ++j) {
 			for(size_t k = 0; k < 2; ++k) {
 				d_->get(i,j,k) = (ext_->get(k,1) - ext_->get(k,0)) / ((real)n_->get(k));
+				std::cout << "d " << d_->get(i,j,k) << std::endl;
 			}
 		}
 	}
@@ -44,7 +51,8 @@ Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, arr
 
 	//conns_ = np.empty((2,2), dtype=object);
 
-	//// source
+	// source
+	l_ = make_uninit<real,1>({2});
 	l_->get(0) = (ext_->get(0,1) - ext_->get(0,0)) / 2.0;
 	l_->get(1) = (ext_->get(1,1) - ext_->get(1,0)) / 2.0;
 
@@ -59,8 +67,10 @@ Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, arr
 
 	//Tmean_ = []
 }
-void		Face::create_equ(std::string name, Equation_Prob_s equ_prob) {
-	equs_[name].reset(new Equation(name, shared_from_this(), equ_prob));
+Equation_s		Face::create_equ(std::string name, Equation_Prob_s equ_prob) {
+	auto equ = std::make_shared<Equation>(name, shared_from_this(), equ_prob);
+	equs_[name] = equ;
+	return equ;
 }
 int		Face::get_loc_pos_par_index(Face_s nbr) {
 	int OL = nbr_to_loc(nbr);
@@ -137,7 +147,11 @@ void		Face::send_array(Equation_s equ, Conn_s conn) {
 	conn->send(equ->name_, v);
 }	
 void		Face::recv_array(Equation_s equ, Conn_s conn) {
+	assert(equ);
+	assert(equ->v_);
+
 	auto v = conn->recv(equ->name_);
+	assert(v);
 
 	int ind[] = {0,0};
 	ind[conn->ol_.i] = (conn->ol_.s < 0) ? -1 : n_->get(conn->ol_.i);
@@ -151,6 +165,12 @@ Term		Face::term(Equation_s equ, std::vector<int> ind, int v, int sv, real To) {
 	// get the value and coefficienct for the cell adjacent to ind in the direction V
 
 	real d = d_->get(ind[0],ind[1],v);
+	DEBUG_IF(d <= 0) {
+		std::cout << "d get "
+			<< std::setw(8) << ind[0] << std::setw(8) << ind[1] << std::setw(8) << v
+			<< " = " << d << std::endl;
+		throw 0;
+	}
 
 	// interior cells and boundary cells with Face neighbors
 	int indnbr[] = {ind[0], ind[1]};
@@ -165,17 +185,28 @@ Term		Face::term(Equation_s equ, std::vector<int> ind, int v, int sv, real To) {
 	//print "T",T,"To",To
 
 	real d_nbr = d_->get(indnbr[0],indnbr[1],v);
-
+	
 	t.a = 2.0 / (d + d_nbr);
+	
+	if(std::isnan(t.a) || std::isinf(t.a)) {
+		std::cout << std::setw(16) << "d" << std::setw(16) << "d_nbr" << std::endl;
+		std::cout << std::setw(16) << d << std::setw(16) << d_nbr << std::endl;
+		throw 0;
+	}
 	return t;
 }
 void		Face::step_pre_cell(Equation_s equ, std::vector<int> ind, int V) {
+	assert(equ);
+
 	// set the v-array value for the boundary value at ind+V
 	IS v(V);
 
 	Conn_s conn = loc_to_conn(V);
 	if(conn) {
 		if(equ->flag_ & ONLY_PARALLEL_FACES) {
+			assert(conn->twin_);
+			assert(conn->twin_->face_);
+
 			if(conn->twin_->face_->Z_ == Z_) {
 				recv_array(equ, conn);
 			} else {
@@ -202,14 +233,16 @@ void		Face::step_pre_cell_open_bou(Equation_s equ, std::vector<int> ind, int V) 
 	  logging.debug("indn {0}".format(indn))*/
 
 	// get stored boundary value
-	auto tmp = equ->v_bou_[v.i];
+	assert(equ);
+	assert(equ->v_bou_.size() == 2);
 
-	auto tmp2 = tmp[(v.s+1)/2];
-
+	real v_bou;
 	auto v_bou_ar = equ->v_bou_[v.i][(v.s+1)/2];
-	
-
-	real v_bou = v_bou_ar->get(ind[p]);
+	if(v_bou_ar) {
+		v_bou = v_bou_ar->get(ind[p]);
+	} else {
+		v_bou = 0.0;
+	}
 
 	if(v_bou == 0.0) { // insulated
 		equ->v_->get(indn[0],indn[1]) = equ->v_->get(ind);
@@ -280,14 +313,22 @@ real		Face::step(std::string equ_name) {
 
 			real dy = equ->equ_prob_->alpha_ * (ys - yo);
 
-			/*def debug() {
-			  print "aW aE aS aN"
-			  print aW, aE, aS, aN
-			  print "yW yE yS yN yo ys dy"
-			  print yW, yE, yS, yN, yo, ys, dy
-			  }*/
-			////debug()
+			auto debug = [&] () {
+				std::cout << std::scientific;
 
+				std::cout << std::setw(16) << "termW.a" << std::setw(16) << "termE.a" << std::setw(16) << "termS.a" << std::setw(16) << "termN.a" << std::endl;
+				std::cout << std::setw(16) << termW.a << std::setw(16) << termE.a << std::setw(16) << termS.a << std::setw(16) << termN.a << std::endl;
+
+				std::cout
+					<< std::setw(16) << "termW.y" << std::setw(16) << "termE.y" << std::setw(16) << "termS.y" << std::setw(16) << "termN.y"
+					<< std::setw(16) << "yo" << std::setw(16) << "ys" << std::setw(16) << "dy" << std::endl;
+
+				std::cout
+					<< std::setw(16) << termW.y << std::setw(16) << termE.y << std::setw(16) << termS.y << std::setw(16) << termN.y
+					<< std::setw(16) << yo << std::setw(16) << ys << std::setw(16) << dy << std::endl;
+
+			};
+			
 			if(termW.a < 0 or termE.a < 0 or termS.a < 0 or termN.a < 0) {
 				//debug();
 				throw 0;
@@ -298,8 +339,8 @@ real		Face::step(std::string equ_name) {
 			}
 			if(std::isnan(yo)) throw 0;
 
-			if(std::isnan(ys) or std::isinf(ys)) {
-				//debug();
+			if(std::isnan(ys) || std::isinf(ys)) {
+				debug();
 				throw 0;
 			}
 			if(std::isnan(dy)) throw 0;
@@ -331,7 +372,7 @@ void		Face::send(std::string equ_name) {
 }
 void		Face::recv(std::string equ_name) {
 	auto equ = equs_[equ_name];
-	
+
 	for(auto c1 : conns_) {
 		for(auto con : c1) {
 			if(con) recv_array(equ, con);
@@ -345,26 +386,26 @@ grid_tup	Face::grid(std::string equ_name) {
 
 	auto x = linspace(ext_->get(0,0), ext_->get(0,1), n_->get(0));
 	auto y = linspace(ext_->get(1,0), ext_->get(1,1), n_->get(1));
-	
+
 	auto grid = meshgrid(x, y);
-	
+
 	auto X = grid.first;
 	auto Y = grid.first;
-	
+
 	auto Z = make_ones<real,2>(X->shape());
 	Z->multiply_self(pos_z_);
-	
+
 	auto equ = equs_[equ_name];
-	
+
 	auto W = equ->v_->sub({0,0},{-2,-2});
-	
+
 	if(z_.s > 0) {
 		W->transpose_self();
 	} else {
 		W->rot90_self(1);
 		W->fliplr_self();
 	}
-	
+
 	return make_tuple(X,Y,Z,W);
 }
 

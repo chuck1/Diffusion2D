@@ -11,6 +11,7 @@ find_package(CMakeHelper)
 
 #SET(GRU_VERSION 0.1.1)
 
+ADD_DEFINITIONS("-DDEBUG")
 
 # common methods for static library
 # =================================

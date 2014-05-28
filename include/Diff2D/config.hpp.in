@@ -3,6 +3,14 @@
 
 #include <memory>
 
+#ifdef DEBUG
+#   define DEBUG_IF(x) if(x)
+#elif defined RELEASE
+#   define DEBUG_IF(x) if(false)
+#else
+#    error "must define one of DEBUG or RELEASE"
+#endif
+
 typedef double real;
 
 enum {

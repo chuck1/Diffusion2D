@@ -22,7 +22,7 @@ class Patch_Group: public std::enable_shared_from_this<Patch_Group> {
 				std::vector<size_t> indicesx,
 				std::vector<size_t> indicesy,
 				std::vector<size_t> indicesz,
-				v_bou_type v_bou);
+				patch_v_bou_type v_bou);
 
 		real		reset_s(std::string equ_name);
 

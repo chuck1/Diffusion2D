@@ -33,9 +33,15 @@ int main() {
 	auto g3 = prob->create_patch_group("3", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}});
 	auto g4 = prob->create_patch_group("4", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}});
 	auto g5 = prob->create_patch_group("5", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}});
+	
+	patch_v_bou_type v_bou_def;
 
-	v_bou_type v_bou_def;
-	// = {"T":[[30.0,30.0],[30.0,30.0]],"s":[[1.0,1.0],[1.0,1.0]]}
+/*	v_bou_def["T"] = {
+		{30.0,30.0},
+		{30.0,30.0}
+	};
+
+	v_bou_def["s"] = {{1.0,1.0},{1.0,1.0}};*/
 	
 	//p0 = prob.createPatch(1,	[1,	[0,1],	[0,1]])
 	//p1 = prob.createPatch(2,	[[0,1],	1,	[0,1]])

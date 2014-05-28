@@ -21,7 +21,7 @@ class Patch: public LocalCoor, public std::enable_shared_from_this<Patch> {
 				multivec<2,size_t> indices,
 				std::vector< array<real,1> > x,
 				std::vector< array<size_t,1> > nx,
-				v_bou_type v_bou);
+				patch_v_bou_type v_bou);
 		
 
 		void		create_equ(std::string name, real v0, std::vector< array<real,1> > v_bou, real k, real al);
@@ -40,7 +40,7 @@ class Patch: public LocalCoor, public std::enable_shared_from_this<Patch> {
 		int					normal_;
 		coor_type				coor_;
 		cell_count_type				nx_;
-		v_bou_type				v_bou_;
+		patch_v_bou_type			v_bou_;
 
 		multivec<2,size_t>			indices_;
 		

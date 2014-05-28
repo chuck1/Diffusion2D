@@ -16,10 +16,11 @@ Patch::Patch(
 		multivec<2,size_t> indices,
 		coor_type x,
 		cell_count_type nx,
-		v_bou_type v_bou):
+		patch_v_bou_type v_bou):
 	LocalCoor(normal),
 	group_(group),
 	name_(name),
+	normal_(normal),
 	coor_(x),
 	nx_(nx),
 	v_bou_(v_bou),
@@ -101,29 +102,35 @@ void		Patch::create_faces() {
 
 			auto prob = group_.lock()->prob_.lock();
 
-			nface->create_equ("T", prob->equs_["T"]);
+			// T
+			{
+				auto equ = nface->create_equ("T", prob->equs_["T"]);
 
-			nface->create_equ("s", prob->equs_["s"]);
+				auto v_bou_T = v_bou_.find("T");
+				if(v_bou_T == v_bou_.cend()) {
+					equ->v_bou_ = {{0,0},{0,0}};
+				} else {
+					if(i == 0)	equ->v_bou_[0][0] = (v_bou_T->second)[0][0][j];
+					if(i == NX-1)	equ->v_bou_[0][1] = (v_bou_T->second)[0][1][j];
+					if(j == 0)	equ->v_bou_[1][0] = (v_bou_T->second)[1][0][i];
+					if(j == NY-1)	equ->v_bou_[1][1] = (v_bou_T->second)[1][1][i];
+				}
+			}
+			// s
+			{	
+				auto equ = nface->create_equ("s", prob->equs_["s"]);
 
-			nface->equs_["s"]->flag_ |= ONLY_PARALLEL_FACES;
-
-			// alloc v_bou dict in face
-			//nface->v_bou = {};
-
-			for(auto it : v_bou_) {
-				// alloc face v_bou list
-				//nface->v_bou_[it.first] = [[0,0],[0,0]];
-
-				// set face v_bou
-				//logging.debug("".format(np.shape(v_bou[k][)))
-
-				std::string k = it.first;
-
-				if(i == 0)	nface->v_bou_[k][0][0] = v_bou_[k][0][0][j];
-				if(i == NX-1)	nface->v_bou_[k][0][1] = v_bou_[k][0][1][j];
-				if(j == 0)	nface->v_bou_[k][1][0] = v_bou_[k][1][0][i];
-				if(j == NY-1)	nface->v_bou_[k][1][1] = v_bou_[k][1][1][i];
-
+				auto v_bou_s = v_bou_.find("s");
+				if(v_bou_s == v_bou_.cend()) {
+					equ->v_bou_ = {{0,0},{0,0}};
+				} else {
+					if(i == 0)	equ->v_bou_[0][0] = v_bou_s->second[0][0][j];
+					if(i == NX-1)	equ->v_bou_[0][1] = v_bou_s->second[0][1][j];
+					if(j == 0)	equ->v_bou_[1][0] = v_bou_s->second[1][0][i];
+					if(j == NY-1)	equ->v_bou_[1][1] = v_bou_s->second[1][1][i];
+				}
+				
+				equ->flag_ |= ONLY_PARALLEL_FACES;
 			}
 		}
 	}			

@@ -35,40 +35,19 @@ class LocalCoor {
 	public:
 		//# store as [[-1, 1],[-2, 2],[-3, 3]]
 
-		LocalCoor(int Z) {
-			Z_ = Z;
-			X_ = nxt(Z_);
-			Y_ = nxt(X_);
+		LocalCoor(int Z);
+		int		glo_to_loc(int G);
+		int		loc_to_glo(int L);
 
-			x_ = IS(X_);
-			y_ = IS(Y_);
-			z_ = IS(Z_);
-		}
-		int		glo_to_loc(int G) {
-			int sg = sign(G);
-			int sz = sign(Z_);
-
-			int d = nxt_dist(abs(Z_), abs(G));
-
-			int L = sg * nxt(3 * sz, d);
-
-			return L;
-		}
-		int		loc_to_glo(int L) {
-			int G = sign(L) * nxt(Z_, abs(L) % 3);
-			return G;
-		}
-
+		int	Z_;
 		int	X_;
 		int	Y_;
-		int	Z_;
+		
 		IS	x_;
 		IS	y_;
 		IS	z_;
 
 };
-
-
 
 
 

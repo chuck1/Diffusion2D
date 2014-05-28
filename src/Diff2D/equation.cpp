@@ -22,15 +22,13 @@ Equation::Equation(std::string name, Face_s face, Equation_Prob_s equ_prob) {
 	
 	auto n_extended = face_->n_->add(make_array_1<size_t,1>({2, 2}));
 	
-	v_->alloc(n_extended);
-	v_->ones();
+	v_ = make_ones_arr<real,2>(n_extended);
 	
 	auto group = face_->patch_->group_.lock();
 
 	v_->multiply_self(group->v_0_[name_]);
 	
-	s_->alloc(face->n_);
-	s_->ones();
+	s_ = make_ones_arr<real,2>(face->n_);
 
 	flag_ = 0;
 }
