@@ -8,7 +8,8 @@
 #include <memory>
 #include <cstring>
 
-#include "math.hpp"
+#include <Diff2D/math.hpp>
+#include <Diff2D/log.hpp>
 
 template<typename T, int N> class __array;
 template<typename T, int N> using array = std::shared_ptr< __array<T,N> >;
@@ -258,7 +259,7 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 		template<typename... I> T&			get(I... b) {
 			T* ptr = __get<I...>(v_, c_.begin(), n_.begin(), b...);
 
-			std::cout << "get " << (int)(ptr - v_) << std::endl;
+			BOOST_LOG_SEV(lg_array, debug) << "get " << (int)(ptr - v_);
 
 			return *(ptr);
 		}
