@@ -259,7 +259,7 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 		template<typename... I> T&			get(I... b) {
 			T* ptr = __get<I...>(v_, c_.begin(), n_.begin(), b...);
 
-			BOOST_LOG_SEV(lg_array, debug) << "get " << (int)(ptr - v_);
+			BOOST_LOG_SEV(d2d::lg, d2d::severity_level::debug) << "get " << (int)(ptr - v_);
 
 			return *(ptr);
 		}

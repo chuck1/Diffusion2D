@@ -1,9 +1,12 @@
 
+#include <Diff2D/init.hpp>
 #include <Diff2D/prob.hpp>
 #include <Diff2D/patch_group.hpp>
 #include <Diff2D/stitch.hpp>
 
-int main() {
+int main(int ac, char** av) {
+	
+	if(init(ac,av)) return 1;
 
 	size_t n = 10;
 	
