@@ -66,7 +66,7 @@ void		d2d::init(d2d::severity_level sl, d2d::log::flag flag) {
 				&& (!expr::has_attr(tag_attr) || (tag_attr & flag))
 				);
 */
-		sink->set_filter(flt::has_attr< unsigned int >("Tag"));
+		sink->set_filter(expr::has_attr< unsigned int >("Tag"));
 
 		sink->set_formatter(fmt);
 
