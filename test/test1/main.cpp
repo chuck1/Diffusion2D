@@ -6,7 +6,7 @@
 
 int main(int ac, char** av) {
 	
-	if(init(ac,av)) return 1;
+	d2d::log::init();
 
 	size_t n = 10;
 	

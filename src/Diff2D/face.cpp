@@ -165,7 +165,7 @@ Term		Face::term(Equation_s equ, std::vector<int> ind, int v, int sv, real To) {
 	// get the value and coefficienct for the cell adjacent to ind in the direction V
 
 	real d = d_->get(ind[0],ind[1],v);
-	DEBUG_IF(d <= 0) {
+	IF(d <= 0) {
 		std::cout << "d get "
 			<< std::setw(8) << ind[0] << std::setw(8) << ind[1] << std::setw(8) << v
 			<< " = " << d << std::endl;

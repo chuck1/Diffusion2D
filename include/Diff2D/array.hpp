@@ -10,6 +10,7 @@
 
 #include <Diff2D/math.hpp>
 #include <Diff2D/log.hpp>
+#include <Diff2D/config.hpp>
 
 template<typename T, int N> class __array;
 template<typename T, int N> using array = std::shared_ptr< __array<T,N> >;
@@ -124,7 +125,6 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 		}
 		void					alloc(std::vector<size_t> n) {
 			assert(this);
-			//std::cout << "this" << this << std::endl;
 			
 			assert(n.size() == N);
 
@@ -141,10 +141,10 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			}
 
 			v_ = new T[size_];
-
-			std::cout << "n    "; print(n_);
-			std::cout << "c    "; print(c_);
-			std::cout << "size " << size_ << std::endl;
+			
+			LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_ARRAY) << "n    ", print(n_);
+			LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_ARRAY) << "c    ", print(c_);
+			LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_ARRAY) << "size " << size_ << std::endl;
 		}
 		/** @} */
 		void					zeros() {
@@ -259,7 +259,7 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 		template<typename... I> T&			get(I... b) {
 			T* ptr = __get<I...>(v_, c_.begin(), n_.begin(), b...);
 
-			BOOST_LOG_SEV(d2d::lg, d2d::severity_level::debug) << "get " << (int)(ptr - v_);
+			LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_ARRAY) << "get " << (int)(ptr - v_) << std::endl;
 
 			return *(ptr);
 		}
@@ -283,47 +283,43 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 		void						copy(
 				T* src,
 				T* dst,
-				std::vector<size_t> vec_i_src_b,
-				std::vector<size_t> vec_i_src_e,
-				std::vector<size_t> vec_i_dst_b,
-				std::vector<size_t> vec_i_dst_e,
-				std::vector<size_t> vec_c_src,
-				std::vector<size_t> vec_c_dst) {
+				T* const & src0,
+				T* const & dst0,
+				std::vector<size_t>::const_iterator i_src_b,
+				std::vector<size_t>::const_iterator i_src_e,
+				std::vector<size_t>::const_iterator i_dst_b,
+				std::vector<size_t>::const_iterator i_dst_e,
+				std::vector<size_t>::const_iterator c_src,
+				std::vector<size_t>::const_iterator c_dst,
+				std::vector<size_t> const & vec_i_src_b) {
+	
+			LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_ARRAY)
+				<< "copy *(src + " << (src-src0) << ") to *(dst + " << (dst-dst0) << ")" << std::endl;
 
-			auto it_i_src_b = vec_i_src_b.begin();
-			auto it_i_src_e = vec_i_src_e.begin();
-			auto it_i_dst_b = vec_i_dst_b.begin();
-			auto it_i_dst_e = vec_i_dst_e.begin();
-			auto it_c_src   = vec_c_src.begin();
-			auto it_c_dst   = vec_c_dst.begin();
-			
-			int c_src = *it_c_src;
-			int c_dst = *it_c_dst;
-			
-			vec_i_src_b.erase(it_i_src_b);
-			vec_i_src_e.erase(it_i_src_e);
-			vec_i_dst_b.erase(it_i_dst_b);
-			vec_i_dst_e.erase(it_i_dst_e);
-			vec_c_src.erase(it_c_src);
-			vec_c_dst.erase(it_c_dst);
-			
-			int i_src = *it_i_src_b;
-			int i_dst = *it_i_dst_b;
 
-			for(;
-					i_src < *it_i_src_e;
-					++i_src
-					) {
+			if(i_src_b == vec_i_src_b.cend()) {
+				*dst = *src;
+				return;
+			}
+			
+			
+			int i_src = *i_src_b;
+			int i_dst = *i_dst_b;
+
+			for(; i_src < *i_src_e; ++i_src, ++i_dst) {
 
 				copy(
-						src + i_src * c_src,
-						dst + i_dst * c_dst,
-						vec_i_src_b,
-						vec_i_src_e,
-						vec_i_dst_b,
-						vec_i_dst_e,
-						vec_c_src,
-						vec_c_dst);
+						src + i_src * (*c_src),
+						dst + i_dst * (*c_dst),
+						src0,
+						dst0,
+						std::next(i_src_b),
+						std::next(i_src_e),
+						std::next(i_dst_b),
+						std::next(i_dst_e),
+						std::next(c_src),
+						std::next(c_dst),
+						vec_i_src_b);
 
 
 			}
@@ -493,7 +489,7 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			return ret;
 		}
 		/** @} */
-		/** @name lin alg
+		/** @name linear algebra
 		 * @{ */
 		std::shared_ptr< __array<T,N+1> >	gradient(array<T,N+1> d) {
 			auto n = n_;
@@ -501,13 +497,21 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			
 			auto ret = make_uninit<T,N+1>(n);
 			
-			std::cout << "sorry, not yet implemented" << std::endl;
+			LOG_SEV_CHANNEL(d2d::log::sl::critical, LOG_ARRAY)  << "sorry, not yet implemented" << std::endl;
 			assert(0);
 
 			//for(int i : range(size_)) {
 			//}
 
 			return ret;
+		}
+		T					fda_1_back(int i1, T h) {
+			ASSERT(N == 1);
+			
+			size_t iu0 = ((i1-1) + size_) % size_;
+			size_t iu1 = (i1 + size_) % size_;
+			
+			return ((v_[iu1] - v_[iu0]) / h);
 		}
 		/** @} */
 		/** @name iterating
@@ -525,7 +529,7 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			std::vector<size_t> beg, end;
 			
 			// resolve negative indices
-			for(size_t i = 0; i < end.size(); ++i) {
+			for(size_t i = 0; i < end_s.size(); ++i) {
 				beg.push_back((size_t)((beg_s[i] + n_[i]) % n_[i]));
 				end.push_back((size_t)((end_s[i] + n_[i]) % n_[i]));
 			}
@@ -539,16 +543,21 @@ template<typename T, int N> class __array: public std::enable_shared_from_this< 
 			auto ret = std::make_shared< __array<T,N> >();
 			ret->alloc(shape);
 
+			std::vector<size_t> dst_b(N,0);
+			
 			// fill
 			copy(
 					v_,
 					ret->v_,
-					beg,
-					end,
-					std::vector<size_t>(N,0),
-					n_,
-					c_,
-					ret->c_);
+					v_,
+					ret->v_,
+					beg.cbegin(),
+					end.cbegin(),
+					dst_b.cbegin(),
+					ret->n_.cbegin(),
+					c_.cbegin(),
+					ret->c_.cbegin(),
+					beg);
 			return ret;
 		}
 		/** @} */

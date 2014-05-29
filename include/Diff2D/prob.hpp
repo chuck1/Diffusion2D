@@ -46,8 +46,8 @@ class Prob: public std::enable_shared_from_this<Prob> {
 
 		std::map<std::string, Equation_Prob_s>		equs_;
 
-		int						it_max_1_;
-		int						it_max_2_;
+		size_t						it_max_inner_;
+		size_t						it_max_outer_;
 
 
 };

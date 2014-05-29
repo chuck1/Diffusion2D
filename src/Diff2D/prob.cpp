@@ -10,8 +10,10 @@ Prob::Prob(
 		std::string name,
 		std::vector< array<real,1> > x,
 		std::vector< array<size_t,1> > nx,
-		int it_max_1,
-		int it_max_2)
+		int it_max_inner,
+		int it_max_outer):
+	it_max_inner_(it_max_inner),
+	it_max_outer_(it_max_outer)
 {
 	name_ = name;
 
@@ -19,9 +21,6 @@ Prob::Prob(
 	nx_ = nx;
 
 	equs_ = {};
-
-	it_max_1_ = it_max_1;
-	it_max_2_ = it_max_2;
 
 	//signal.signal(signal.SIGINT, self)
 }
@@ -147,10 +146,13 @@ int		Prob::solve(std::string name, real cond, bool ver, real R_outer) {
 	return solve_serial(name, cond, ver, R_outer);
 }
 int		Prob::solve_serial(std::string name, real cond, bool ver, real R_outer) {
-	std::vector<real> R;
+
+	auto R = make_uninit<real,1>({it_max_inner_});
+	
 	real nR;
-	int it = 0;
-	for(; it < it_max_1_; ++it) {
+	
+	size_t it = 0;
+	for(; it < it_max_inner_; ++it) {
 		nR = 0;
 		for(auto face : faces()) {
 			nR = std::max(face->step(name), nR);
@@ -160,16 +162,24 @@ int		Prob::solve_serial(std::string name, real cond, bool ver, real R_outer) {
 			face->recv(name);
 		}
 		
-		if(ver) {
-			std::cout.flags(std::ios_base::scientific);
-			std::cout << std::setw(4) << it << std::setw(8) << R_outer << std::setw(8) << nR << std::endl;
-		}
-		if(std::isnan(nR)) {
+		
+		
+	
+		IF(std::isnan(nR)) {
 			throw 0;//raise ValueError('nan')
 		}
-		if(nR < cond) break;
 		
-		R.push_back(nR);
+		R->get(it) = nR;
+		
+		LOG_SEV_CHANNEL(d2d::log::sl::info, d2d::log::core) << std::scientific
+			<< std::setw(6) << it
+			<< std::setw(16) << R_outer
+			<< std::setw(16) << nR
+			<< std::setw(16) << R->fda_1_back(it, 1.0) << std::endl;
+
+
+		if(nR < cond || R->fda_1_back(it-1, 1.0)) break;
+		
 	}
 	return it;
 }
@@ -178,23 +188,23 @@ int		Prob::solve2(std::string equ_name, real cond1_final, real cond2, bool ver) 
 	//it_cond = 2
 	
 	real R = 1.0;
-	int it_2 = 0;
-	for(; it_2 < it_max_2_; ++it_2) {
-	
-		real cond1 = R / 1000.0; // target residual for inner loop is proportional to current residual for outer loop
-		
-		/*int it_1 =*/ solve(equ_name, cond1, ver, R);
-	
+	size_t it_outer = 0;
+	for(; it_outer < it_max_outer_; ++it_outer) {
+
+		real cond_inner = R / 1000.0; // target residual for inner loop is proportional to current residual for outer loop
+
+		/*int it_1 =*/ solve(equ_name, cond_inner, ver, R);
+
 		R = 0.0;
-	
+
 		for(auto g : patch_groups_) {
 			real Rn = g->reset_s(equ_name);
 
 			R = std::max(Rn, R);
 
 			std::cout <<
-				std::setw(3) << it_2 <<
-				std::setw(8) << R <<
+				std::setw(6) << it_outer <<
+				std::setw(16) << R <<
 				std::endl;
 
 			if(std::isnan(R)) {
@@ -203,7 +213,7 @@ int		Prob::solve2(std::string equ_name, real cond1_final, real cond2, bool ver) 
 			if(R < cond2) break;
 		}
 	}
-	return it_2;
+	return it_outer;
 }
 void		Prob::save() {
 	std::ofstream ofs;
@@ -211,12 +221,12 @@ void		Prob::save() {
 	//pickle.dump(f)
 }
 void		Prob::write(std::string equ_name) {
-	
+
 	std::string directory = name_ + "/";
-	
+
 	/*if(not os.path.exists(directory)) {
-		os.makedirs(directory)
-	}*/
+	  os.makedirs(directory)
+	  }*/
 
 	std::string name = "prof_" + equ_name + ".txt";
 

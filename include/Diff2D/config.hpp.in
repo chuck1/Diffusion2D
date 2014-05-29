@@ -4,9 +4,11 @@
 #include <memory>
 
 #ifdef DEBUG
-#   define DEBUG_IF(x) if(x)
+#    define IF(x) if(x)
+#    define ASSERT(x) assert(x)
 #elif defined RELEASE
-#   define DEBUG_IF(x) if(false)
+#   define IF(x) if(false)
+#   define ASSERT(x)
 #else
 #    error "must define one of DEBUG or RELEASE"
 #endif
