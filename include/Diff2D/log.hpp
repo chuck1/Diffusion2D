@@ -43,11 +43,6 @@ namespace d2d {
 		error,
 		critical
 	};
-	namespace log {
-		enum flag: unsigned int {
-			array = 1 << 0
-		};
-	}
 }
 
 // The operator puts a human-friendly representation of the severity level to the stream
@@ -56,11 +51,11 @@ std::ostream& operator<< (std::ostream& strm, d2d::severity_level level);
 //[ example_tutorial_filtering
 BOOST_LOG_ATTRIBUTE_KEYWORD(line_id, "LineID", unsigned int)
 BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", d2d::severity_level)
-//BOOST_LOG_ATTRIBUTE_KEYWORD(tag_attr, "Tag", unsigned int)
+BOOST_LOG_ATTRIBUTE_KEYWORD(channel, "Channel", std::string)
 
 
 namespace d2d {
-	void init(d2d::severity_level sl, d2d::log::flag flag);
+	void init(d2d::severity_level sl);
 
 	static src::severity_logger< d2d::severity_level > lg;
 

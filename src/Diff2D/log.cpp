@@ -6,7 +6,10 @@
 #include <fstream>
 #include <iomanip>
 
+#include <boost/log/utility/setup/console.hpp>
+
 //#include <boost/shared_ptr.hpp>
+
 //#include <boost/make_shared.hpp>
 //#include <boost/phoenix/bind.hpp>
 //#include <boost/date_time/posix_time/posix_time.hpp>
@@ -30,7 +33,7 @@ std::ostream& operator<< (std::ostream& strm, d2d::severity_level level)
 	static const char* strings[] =
 	{
 		"debug",
-		"notification",
+		"info",
 		"warning",
 		"error",
 		"critical"
@@ -45,63 +48,35 @@ std::ostream& operator<< (std::ostream& strm, d2d::severity_level level)
 	return strm;
 }
 
-void		d2d::init(d2d::severity_level sl, d2d::log::flag flag) {
-	// Setup the common formatter for all sinks
-	logging::formatter fmt = expr::stream
-		<< std::setw(6) << std::setfill('0') << line_id << std::setfill(' ')
-		<< ": <" << severity << ">\t"
-		<< expr::smessage;
-
-	// Initialize sinks
-	typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
-	
-	// full
-	{
-		boost::shared_ptr< text_sink > sink = boost::make_shared< text_sink >();
-
-		sink->locked_backend()->add_stream(boost::make_shared< std::ofstream >("full.log"));
-		
-	/*	sink->set_filter(
-				severity >= sl
-				&& (!expr::has_attr(tag_attr) || (tag_attr & flag))
-				);
-*/
-		sink->set_filter(expr::has_attr< unsigned int >("Tag"));
-
-		sink->set_formatter(fmt);
-
-		logging::core::get()->add_sink(sink);
-	}
-
-	// important
-	if(0) {
-		boost::shared_ptr< text_sink > sink = boost::make_shared< text_sink >();
-
-		sink->locked_backend()->add_stream(boost::make_shared< std::ofstream >("important.log"));
-
-		sink->set_formatter(fmt);
-
-		//sink->set_filter(severity >= warning || (expr::has_attr(tag_attr) && tag_attr == "IMPORTANT_MESSAGE"));
-
-		logging::core::get()->add_sink(sink);
-	}
-
-	// Add attributes
-	logging::add_common_attributes();
+void		d2d::init(d2d::severity_level sl) {
 
 
-	lg.add_attribute("Tag", attrs::constant<unsigned int>(d2d::log::flag::array));
-}
+	// Create a minimal severity table filter
+	typedef expr::channel_severity_filter_actor< std::string, severity_level > min_severity_filter;
+	min_severity_filter min_severity = expr::channel_severity_filter(channel, severity);
 
+	// Set up the minimum severity levels for different channels`
+	min_severity["core"] = d2d::info;
+	min_severity["array"] = d2d::warning;
 
-//src::severity_logger< severity_level > lg;
-
-void		d2d::test() {
-
-	BOOST_LOG_SEV(lg, debug) << "hello";
-
+	logging::add_console_log
+		(
+		 std::clog,
+		 keywords::filter = min_severity || severity >= critical,
+		 keywords::format =
+		 (
+		  expr::stream
+		  << line_id
+		  << ": <" << severity
+		  << "> [" << channel << "] "
+		  << expr::smessage
+		 )
+		);
 
 }
+
+typedef src::severity_channel_logger< d2d::severity_level, std::string > logger_type;
+logger_type lg;
 
 
 
