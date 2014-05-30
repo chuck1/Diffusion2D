@@ -4,8 +4,10 @@
 #include <memory>
 #include <string>
 
+#include <math-array/array.hpp>
+
 #include <Diff2D/config.hpp>
-#include <Diff2D/array.hpp>
+
 
 class Equation_Prob {
 	public:

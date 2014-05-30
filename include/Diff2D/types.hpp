@@ -1,7 +1,7 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
-#include <Diff2D/array.hpp>
+#include <math-array/array.hpp>
 
 typedef std::vector< array<real,1> >		coor_type;
 

@@ -72,20 +72,62 @@ real			Patch_Group::reset_s(std::string equ_name) {
 	  print "dS      ",dS
 	  print "S       ",S_[equ_name]*/
 
-	real v_0 = v_0_[equ_name];
+
+
+
+
+	{
+	def awa():
+# current area-weighted-average value
+		v = float(0)
+			A = float(0)
+
+			for p in self.patches:
+				for f in p.faces.flatten():
+					equ = f.equs[equ_name]
+
+					a = f.area()
+						v += equ.mean() * a
+						A += a
+
+						print "name       ",self.name
+						print "num patches",len(self.patches)
+
+						v_m = v/A
+						return v_m
+						def point():
+							for p in self.patches:
+							for f in p.faces.flatten():
+								equ = f.equs[equ_name]
+
+								v_m = equ.point(self.v_0_point)
+
+									if v_m:
+										return v_m
+											raise ValueError('point is not in patch_group')
+
+
+
+
+
+
+
+
+
+											real v_0 = v_0_[equ_name];
 
 	if(v_0 == 0.0) return 0.0;
 
 	// current area-weighted-average value
 	real v = 0;
 	real A = 0;
-	
+
 	auto equ_prob = prob_.lock()->equs_[equ_name];
-	
+
 	for(auto p : patches_) {
 		for(auto f : *p->faces_) {//->flatten()) 
 			auto equ = f->equs_[equ_name];
-		
+
 			real a = f->area();
 			v += equ->mean() * a;
 			A += a;
@@ -93,13 +135,13 @@ real			Patch_Group::reset_s(std::string equ_name) {
 	}
 	//print "name       ",name_
 	//print "num patches",len(patches_)
-	
+
 	real v_m = v/A;
-	
+
 	real dv = v_0 - v_m;
-	
+
 	real dS = equ_prob->k_ * dv / 10.0;
-	
+
 	S_[equ_name] += dS;
 	//Tmean_.append(vm)
 	//debug();
@@ -127,16 +169,16 @@ void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 	std::vector<real> y;// = np.zeros(0);
 	std::vector<real> z;// = np.zeros(0);
 	std::vector<real> w;// = np.zeros(0);
-	
+
 	for(auto f : faces()) {
 		auto grid = f->grid(equ_name);
 		//X,Y,Z,W = f.grid(equ_name);
-		
+
 		auto Xr = std::get<0>(grid)->ravel();
 		auto Yr = std::get<0>(grid)->ravel();
 		auto Zr = std::get<0>(grid)->ravel();
 		auto Wr = std::get<0>(grid)->ravel();
-		
+
 		x.insert(x.end(), Xr.begin(), Xr.end());
 		y.insert(y.end(), Yr.begin(), Yr.end());
 		z.insert(z.end(), Zr.begin(), Zr.end());
@@ -150,14 +192,14 @@ void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 
 	LOG_SEV_CHANNEL(d2d::log::sl::info, LOG_CORE)
 		<< "writing " << n << " points" << std::endl;
-	
-		
+
+
 	ofs << "((" << name << " point " << n << ")\n";
-	
+
 	ofs << "(x\n";
 	write_vec(ofs, x);
 	ofs << ")\n";
-	
+
 	ofs << "(y\n";
 	write_vec(ofs, y);
 	ofs << ")\n";
@@ -169,7 +211,7 @@ void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 	ofs << "(w\n";
 	write_vec(ofs, w);
 	ofs << ")\n";
-	
+
 	ofs << ")\n";
 }
 

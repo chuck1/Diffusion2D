@@ -2,10 +2,12 @@
 #include <algorithm>
 #include <vector>
 
+#include <math-array/array.hpp>
+
+
 #include <Diff2D/config.hpp>
 #include <Diff2D/face.hpp>
 #include <Diff2D/unit_vec.hpp>
-#include <Diff2D/array.hpp>
 
 
 

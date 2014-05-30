@@ -5,8 +5,9 @@
 #include <iostream>
 #include <iomanip>
 
+#include <math-array/array.hpp>
+
 #include <Diff2D/math.hpp>
-#include <Diff2D/array.hpp>
 #include <Diff2D/config.hpp>
 #include <Diff2D/unit_vec.hpp>
 #include <Diff2D/equation.hpp>	

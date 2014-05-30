@@ -3,7 +3,8 @@
 
 #include <map>
 
-#include <Diff2D/array.hpp>
+#include <math-array/array.hpp>
+
 #include <Diff2D/config.hpp>
 #include <Diff2D/prob.hpp>
 #include <Diff2D/types.hpp>

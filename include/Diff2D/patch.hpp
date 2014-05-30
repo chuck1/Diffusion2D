@@ -4,9 +4,10 @@
 #include <map>
 #include <algorithm>
 
+#include <math-array/array.hpp>
+
 #include <Diff2D/config.hpp>
 #include <Diff2D/unit_vec.hpp>
-#include <Diff2D/array.hpp>
 #include <Diff2D/types.hpp>
 
 
