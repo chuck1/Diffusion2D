@@ -3,10 +3,16 @@
 #include <Diff2D/prob.hpp>
 #include <Diff2D/patch_group.hpp>
 #include <Diff2D/stitch.hpp>
+#include <Diff2D/log.hpp>
+
 
 int main(int ac, char** av) {
-	
+	// program
 	d2d::log::init();
+
+	d2d::log::core = d2d::log::sl::debug;
+	
+	// solve
 
 	size_t n = 10;
 	
@@ -83,7 +89,6 @@ int main(int ac, char** av) {
 	f5 = p5->faces_[0,0];
 */
 	
-	
 	//f0.create_equ('T', 0., [[30.,0.],[0.,0.]], k, al)
 	
 	//f1.create_equ('T', 0., [[30.,0.],[0.,0.]], k, al)
@@ -94,10 +99,14 @@ int main(int ac, char** av) {
 	f5.equs['T'].v_bou = [[10.,10.],[10.,10.]];
 */
 	
+	prob->write("T");
+
+	return 0;
+
 	//prob.solve2(1e-2, 1e-4, True)
 	
 	//profile.run("prob.solve('s', 1e-1)")
-	prob->solve("s", 1e-3, true, 0.0);
+	prob->solve("s", 1e-3, true, 0, 0.0);
 	
 	
 	prob->value_add("s", -1.0);

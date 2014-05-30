@@ -1,22 +1,17 @@
 #ifndef DIFF2D_LOG_HPP
 #define DIFF2D_LOG_HPP
 
+/** @todo issue error from CMake if user #defines a log channel
+ * only the library build can decide if log channels are static or dynamic
+ */
 
-
-
-#ifdef LOG_DYN
-#    define LOG_CORE  d2d::log::core
-#    define LOG_ARRAY d2d::log::array
-#    undef LOG_STA
-#else
-#    define LOG_STA
-#endif
+/** @todo issue error is user sets a dynamic channel variable when the channel has already been defined as static */
 
 #ifndef LOG_CORE
-#    error "must define LOG_CORE severity level or define LOG_DYN"
+#    define LOG_CORE  d2d::log::core
 #endif
 #ifndef LOG_ARRAY
-#    error "must define LOG_ARRAY severity level or define LOG_DYN"
+#    define LOG_ARRAY d2d::log::array
 #endif
 
 

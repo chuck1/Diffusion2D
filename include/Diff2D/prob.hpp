@@ -30,8 +30,14 @@ class Prob: public std::enable_shared_from_this<Prob> {
 		void				value_normalize(std::string equ_name);
 		void				copy_value_to_source(std::string equ_name_from, std::string equ_name_to);
 		std::vector<Face_s>		faces();
-		int				solve(std::string name, real cond, bool ver, real R_outer);
-		int				solve_serial(std::string name, real cond, bool ver, real R_outer);
+		/** @brief solve
+		 * @param name name of variable to solve
+		 * @param cond residual stop condition
+		 * @param it_outer current iteration of outer loop for purpose of displaying
+		 * @param R_outer current residual of outer loop for purpose of displaying
+		 */
+		int				solve(std::string name, real cond, bool ver, size_t it_outer, real R_outer);
+		int				solve_serial(std::string name, real cond, bool ver, size_t it_outer, real R_outer);
 		int				solve2(std::string equ_name, real cond1_final, real cond2, bool ver);
 		void				save();
 		void				write(std::string equ_name);

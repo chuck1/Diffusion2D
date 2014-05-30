@@ -8,6 +8,10 @@ find_package(CMakeHelper)
 
 # include_directories
 
+# submodule
+INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/math-array/include")
+
+
 # custom include extensions
 #set(INCLUDE_EXTENSIONS obj)
 

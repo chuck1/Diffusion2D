@@ -4,3 +4,6 @@
 [submodule "doc"]
 	path = doc
 	url = https://chuck1@github.com/chuck1/Diffusion2D-doc.git
+[submodule "math-array"]
+	path = math-array
+	url = https://github.com/chuck1/math-array.git

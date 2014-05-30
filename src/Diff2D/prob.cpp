@@ -142,11 +142,14 @@ std::vector<Face_s>		Prob::faces() {
 	return ret;
 }
 // solving
-int		Prob::solve(std::string name, real cond, bool ver, real R_outer) {
-	return solve_serial(name, cond, ver, R_outer);
+int		Prob::solve(std::string name, real cond, bool ver, size_t it_outer, real R_outer) {
+	return solve_serial(name, cond, ver, it_outer, R_outer);
 }
-int		Prob::solve_serial(std::string name, real cond, bool ver, real R_outer) {
-
+int		Prob::solve_serial(std::string name, real cond_inner, bool ver, size_t it_outer, real R_outer) {
+	
+	real cond_grad_inner = 1E-8;
+	
+	/** @todo move this to class variable to avoid excess alloc!*/
 	auto R = make_uninit<real,1>({it_max_inner_});
 	
 	real nR;
@@ -172,45 +175,58 @@ int		Prob::solve_serial(std::string name, real cond, bool ver, real R_outer) {
 		R->get(it) = nR;
 		
 		LOG_SEV_CHANNEL(d2d::log::sl::info, d2d::log::core) << std::scientific
-			<< std::setw(6) << it
+			<< std::setw(6) << it_outer
 			<< std::setw(16) << R_outer
+			<< std::setw(6) << it
 			<< std::setw(16) << nR
 			<< std::setw(16) << R->fda_1_back(it, 1.0) << std::endl;
-
-
-		if(nR < cond || R->fda_1_back(it-1, 1.0)) break;
 		
+		
+		if(
+				(R->fda_1_back(it, 1.0) >= 0)
+				&& (R->fda_1_back(it, 1.0) < cond_grad_inner)) {
+			LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "break inner because residual gradient < " << std::scientific << cond_grad_inner << std::endl;
+			break;
+		}
+		if(nR < cond_inner) {
+			LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "break inner because residual < " << std::scientific << cond_inner << std::endl;
+			break;
+		}
 	}
 	return it;
 }
-int		Prob::solve2(std::string equ_name, real cond1_final, real cond2, bool ver) {
+int		Prob::solve2(std::string equ_name, real cond_inner_final, real cond_outer, bool ver) {
 	//cond1 = 1
 	//it_cond = 2
-	
-	real R = 1.0;
+
+	real R_outer = 1.0;
 	size_t it_outer = 0;
 	for(; it_outer < it_max_outer_; ++it_outer) {
 
-		real cond_inner = R / 1000.0; // target residual for inner loop is proportional to current residual for outer loop
+		real cond_inner = R_outer / 1000.0; // target residual for inner loop is proportional to current residual for outer loop
 
-		/*int it_1 =*/ solve(equ_name, cond_inner, ver, R);
+		/*int it_1 =*/ solve(equ_name, cond_inner, ver, it_outer, R_outer);
 
-		R = 0.0;
+		R_outer = 0.0;
 
 		for(auto g : patch_groups_) {
 			real Rn = g->reset_s(equ_name);
 
-			R = std::max(Rn, R);
+			R_outer = std::max(Rn, R_outer);
+		}
 
-			std::cout <<
-				std::setw(6) << it_outer <<
-				std::setw(16) << R <<
-				std::endl;
+		LOG_SEV_CHANNEL(d2d::log::sl::info, LOG_CORE)
+			<< std::setw(6) << it_outer
+			<< std::setw(16) << R_outer
+			<< std::endl;
 
-			if(std::isnan(R)) {
-				throw 0;//raise ValueError('nan')
-			}
-			if(R < cond2) break;
+		if(std::isnan(R_outer)) {
+			throw 0;//raise ValueError('nan')
+		}
+
+		if(R_outer < cond_outer) {
+			LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "break outer because residual < " << std::scientific << cond_outer << std::endl;
+			break;
 		}
 	}
 	return it_outer;
@@ -222,16 +238,17 @@ void		Prob::save() {
 }
 void		Prob::write(std::string equ_name) {
 
-	std::string directory = name_ + "/";
-
 	/*if(not os.path.exists(directory)) {
 	  os.makedirs(directory)
 	  }*/
-
-	std::string name = "prof_" + equ_name + ".txt";
-
+	
 	std::ofstream ofs;
-	ofs.open(directory + name, std::ofstream::out);
+	ofs.open("prof_" + name_ + "_" + equ_name + ".txt", std::ofstream::trunc);
+
+	if(!ofs.is_open()) {
+		LOG_SEV_CHANNEL(d2d::log::sl::warning, LOG_CORE) << "file stream not open" << std::endl;
+		return;
+	}
 
 	for(auto g : patch_groups_) {
 		//print g

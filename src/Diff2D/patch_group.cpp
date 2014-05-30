@@ -118,6 +118,11 @@ std::vector< Face_s >		Patch_Group::faces() {
 }
 void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 
+	if(!ofs.is_open()) {
+		LOG_SEV_CHANNEL(d2d::log::sl::warning, LOG_CORE) << "file stream not open" << std::endl;
+		return;
+	}
+
 	std::vector<real> x;// = np.zeros(0);
 	std::vector<real> y;// = np.zeros(0);
 	std::vector<real> z;// = np.zeros(0);
@@ -132,16 +137,21 @@ void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 		auto Zr = std::get<0>(grid)->ravel();
 		auto Wr = std::get<0>(grid)->ravel();
 		
-		x.insert(x.begin(), Xr.begin(), Xr.end());
-		y.insert(y.begin(), Yr.begin(), Yr.end());
-		z.insert(z.begin(), Zr.begin(), Zr.end());
-		w.insert(w.begin(), Wr.begin(), Wr.end());
+		x.insert(x.end(), Xr.begin(), Xr.end());
+		y.insert(y.end(), Yr.begin(), Yr.end());
+		z.insert(z.end(), Zr.begin(), Zr.end());
+		w.insert(w.end(), Wr.begin(), Wr.end());
 	}
 
 	std::string name = "prof_" + name_ + "_" + equ_name;
 
 	int n = x.size();
+
+
+	LOG_SEV_CHANNEL(d2d::log::sl::info, LOG_CORE)
+		<< "writing " << n << " points" << std::endl;
 	
+		
 	ofs << "((" << name << " point " << n << ")\n";
 	
 	ofs << "(x\n";
