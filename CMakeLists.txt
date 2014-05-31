@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8.8)
 
 project(Diff2D)
 
-SET(CMAKE_INSTALL_PREFIX /scratch/usr)
+SET(CMAKE_INSTALL_PREFIX $ENV{HOME}/usr)
 
 find_package(CMakeHelper)
 
