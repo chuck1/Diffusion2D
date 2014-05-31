@@ -9,6 +9,9 @@
 #include <Diff2D/config.hpp>
 
 
+class point_not_found: public std::exception {
+};
+
 class Equation_Prob {
 	public:
 		Equation_Prob(Prob_s prob, std::string name, real k, real alpha, real alpha_source);
@@ -37,7 +40,7 @@ class Equation {
 		real							grad_min();
 		real							grad_max();
 		real							mean();
-
+		real							point(real pt[2]);
 
 		std::string						name_;
 		Face_s							face_;

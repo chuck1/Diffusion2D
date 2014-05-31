@@ -57,7 +57,7 @@ Patch_s			Patch_Group::create_patch(
 	assert(me);
 
 	auto p = std::make_shared<Patch>(me, name, normal, indices, prob->x_, prob->nx_, v_bou);
-	
+
 	p->create_faces();
 
 	patches_.push_back(p);
@@ -76,9 +76,8 @@ real			Patch_Group::reset_s(std::string equ_name) {
 
 
 
-	{
-	def awa():
-# current area-weighted-average value
+	real		Patch_Group::awa() {
+		// current area-weighted-average value
 		v = float(0)
 			A = float(0)
 
@@ -95,26 +94,27 @@ real			Patch_Group::reset_s(std::string equ_name) {
 
 						v_m = v/A
 						return v_m
-						def point():
-							for p in self.patches:
-							for f in p.faces.flatten():
-								equ = f.equs[equ_name]
 
-								v_m = equ.point(self.v_0_point)
+	}{
+		def point():
+			for p in self.patches:
+			for f in p.faces.flatten():
+				equ = f.equs[equ_name]
 
-									if v_m:
-										return v_m
-											raise ValueError('point is not in patch_group')
+				v_m = equ.point(self.v_0_point)
 
-
-
-
+					if v_m:
+						return v_m
+							raise ValueError('point is not in patch_group')
 
 
 
 
+	}
 
-											real v_0 = v_0_[equ_name];
+
+
+	real v_0 = v_0_[equ_name];
 
 	if(v_0 == 0.0) return 0.0;
 

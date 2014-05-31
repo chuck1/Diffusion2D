@@ -57,61 +57,58 @@ real			Equation::mean() {
 	return v_->sub({0,0},{-2,-2})->max();
 }
 
-void			Equation::point(real pt[2]) {
+real			Equation::point(real pt[2]) {
 
 	// global coor cooresponding to local coors
-	Xg = self.face.loc_to_glo(1);
-	Yg = self.face.loc_to_glo(2);
-	Zg = self.face.loc_to_glo(3);
+	auto Xg = face_->loc_to_glo(1);
+	auto Yg = face_->loc_to_glo(2);
+	auto Zg = face_->loc_to_glo(3);
 
-	xg,sxg = v2is(Xg);
-	yg,syg = v2is(Yg);
-	zg,szg = v2is(Zg);
+	IS xg(Xg);
+	IS yg(Yg);
+	IS zg(Zg);
 
 	// is point in face extents
 
-	auto debug = [&] () {
+/*	auto debug = [&] () {
 		//print 'equ point'
 		//print xg,yg,zg
 		//print sxg,syg,szg
 		//print pt
-		//print self.face.ext
-	}
+		//print face_->ext
+	};*/
 
-	if(pt[xg] < face_->ext[0,0]) {
-		LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "x " << pt[xg] << " < " << face_->ext[0,0] << std::endl;
+	if(pt[xg.i] < face_->ext_->get(0,0)) {
+		LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "x " << pt[xg.i] << " < " << face_->ext_->get(0,0) << std::endl;
 		throw point_not_found();
 	}
 
-	if(pt[xg] > face_->ext[0,1]) {
-		LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "x " << pt[xg] << " > " << face_->ext[0,1] << std::endl;
+	if(pt[xg.i] > face_->ext_->get(0,1)) {
+		LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "x " << pt[xg.i] << " > " << face_->ext_->get(0,1) << std::endl;
 			throw point_not_found();
 	}
 
-	if(pt[yg] < face_->ext[1,0]) {
-		LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "y " << pt[yg] << " > " << face_->ext[1,0] << std::endl;
+	if(pt[yg.i] < face_->ext_->get(1,0)) {
+		LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "y " << pt[yg.i] << " > " << face_->ext_->get(1,0) << std::endl;
 			throw point_not_found();
 	}
 
-	if(pt[yg] > face_->ext[1,1]) {
-		LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "y " << pt[yg] << " > " << face_->ext[1,1] << std::endl;
+	if(pt[yg.i] > face_->ext_->get(1,1)) {
+		LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "y " << pt[yg.i] << " > " << face_->ext_->get(1,1) << std::endl;
 			throw point_not_found();
 	}
 
-	if(pt[zg] != face_->pos_z) {
-		LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "z"
-			throw point_not_found();
+	if(pt[zg.i] != face_->pos_z_) {
+		LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "z" << std::endl;
+		throw point_not_found();
 	}
 
-	i = (pt[xg] - face_->ext[0,0]) / self.face.d[0,0,0];
-	j = (pt[yg] - face_->ext[1,0]) / self.face.d[0,0,1];
-
-	i = round(i);
-	j = round(j);
+	int i = round((pt[xg.i] - face_->ext_->get(0,0)) / face_->d_->get(0,0,0));
+	int j = round((pt[yg.i] - face_->ext_->get(1,0)) / face_->d_->get(0,0,1));
 
 	//print 'equ point i,j',i,j
-
-	return self.v[i,j];
+	
+	return v_->get(i,j);
 }
 
 
