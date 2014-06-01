@@ -15,6 +15,7 @@
 #include <Diff2D/patch.hpp>
 #include <Diff2D/patch_group.hpp>
 #include <Diff2D/face.hpp>
+#include <Diff2D/boundary.hpp>
 
 Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, array<size_t,1> n):
 	LocalCoor(normal),
@@ -236,12 +237,11 @@ void		Face::step_pre_cell_open_bou(Equation_s equ, std::vector<int> ind, int V) 
 	assert(equ);
 	assert(equ->v_bou_.size() == 2);
 
-	real v_bou;
 	
 	std::shared_ptr<boundary> v_bou_obj = equ->v_bou_[v.i][(v.s+1)/2];
 	assert(v_bou_obj);
 	
-	v_bou_obj(equ, ind, indn, p);
+	v_bou_obj->eval(equ, ind, indn, p);
 	
 }
 void		Face::step_pre(Equation_s equ) {

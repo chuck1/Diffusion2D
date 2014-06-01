@@ -1,11 +1,10 @@
 cmake_minimum_required (VERSION 2.8.8)
 
-SET(CMAKE_CXX_COMPILER /scratch/usr/bin/g++)
-SET(CMAKE_INSTALL_PREFIX $ENV{HOME}/usr)
+INCLUDE($ENV{HOME}/.config.cmake)
+
+#SET(CMAKE_CXX_COMPILER /scratch/usr/bin/g++)
 
 project(Diff2D)
-
-
 
 
 find_package(CMakeHelper)

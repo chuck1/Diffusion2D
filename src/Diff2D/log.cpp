@@ -6,9 +6,7 @@
 
 void	d2d::log::init() {
 	
-	gal::log::min_severity["Diff2D"] = info;
 	
-	gal::log::init();
 }
 
 

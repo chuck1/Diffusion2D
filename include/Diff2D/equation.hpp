@@ -8,7 +8,7 @@
 
 #include <Diff2D/point.hpp>
 #include <Diff2D/config.hpp>
-
+#include <Diff2D/types.hpp>
 
 class point_not_found: public std::exception {
 };
@@ -51,7 +51,7 @@ class Equation {
 		array<real,2>						v_;
 
 		unsigned int						flag_;
-		multivec< 2, array<real,1> >				v_bou_;
+		equ_v_bou_type						v_bou_;
 };
 
 #endif
