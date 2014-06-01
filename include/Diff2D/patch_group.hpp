@@ -6,7 +6,7 @@
 #include <Diff2D/config.hpp>
 #include <Diff2D/patch.hpp>
 #include <Diff2D/prob.hpp>
-
+#include <Diff2D/point.hpp>
 
 class Patch_Group: public std::enable_shared_from_this<Patch_Group> {
 	public:
@@ -14,7 +14,8 @@ class Patch_Group: public std::enable_shared_from_this<Patch_Group> {
 				Prob_s prob,
 				std::string name,
 				std::map<std::string, real> v_0,
-				std::map<std::string, real> S);
+				std::map<std::string, real> S,
+				point v_0_point);
 
 		Patch_s				create_patch(
 				std::string name,
@@ -29,16 +30,14 @@ class Patch_Group: public std::enable_shared_from_this<Patch_Group> {
 		std::vector< Face_s >		faces();
 
 		void				write(std::string equ_name, std::ofstream& ofs);
-
-
-
-
-
+		void				write_binary(std::string equ_name);
+	public:
 		std::vector<Patch_s>		patches_;
 		Prob_w				prob_;
 		std::string			name_;
 		std::map<std::string, real>	v_0_;
 		std::map<std::string, real>	S_;
+		point				v_0_point_;
 };
 
 

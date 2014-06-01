@@ -25,8 +25,10 @@ Patch_Group::Patch_Group(
 		Prob_s prob,
 		std::string name,
 		std::map<std::string, real> v_0,
-		std::map<std::string, real> S):
-	prob_(prob)
+		std::map<std::string, real> S,
+		point v_0_point):
+	prob_(prob),
+	v_0_point_(v_0_point)
 {
 	assert(prob);
 
@@ -76,41 +78,47 @@ real			Patch_Group::reset_s(std::string equ_name) {
 
 
 
-	real		Patch_Group::awa() {
+/*	auto awa = [&]() {
 		// current area-weighted-average value
-		v = float(0)
-			A = float(0)
+		real v = 0;
+		real A = 0;
 
-			for p in self.patches:
-				for f in p.faces.flatten():
-					equ = f.equs[equ_name]
+		for(auto p : patches_) {
+			for(auto f : *p->faces_) {
+				auto equ = f->equs_[equ_name];
+				real a = f->area();
+				v += equ->mean() * a;
+				A += a;
+			}
+		}
 
-					a = f.area()
-						v += equ.mean() * a
-						A += a
+		//print "name       ",self.name
+		//print "num patches",len(self.patches)
 
-						print "name       ",self.name
-						print "num patches",len(self.patches)
-
-						v_m = v/A
-						return v_m
-
-	}{
-		def point():
-			for p in self.patches:
-			for f in p.faces.flatten():
-				equ = f.equs[equ_name]
-
-				v_m = equ.point(self.v_0_point)
-
-					if v_m:
-						return v_m
-							raise ValueError('point is not in patch_group')
+		real v_m = v/A;
+		return v_m;
+	};*/
 
 
+	auto point = [&] () {
+		real v_m;
+		for(auto p : patches_) {
+			for(auto f : *p->faces_) {
+				auto equ = f->equs_[equ_name];
 
-
-	}
+				try {
+					v_m = equ->at_point(v_0_point_);
+					return v_m;
+				} catch(point_not_found&) {
+					continue;
+				} catch(...) {
+					BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "unknwon error occured" << GAL_LOG_ENDLINE;
+					abort();
+				}
+			}
+		}
+		throw 0;//raise ValueError('point is not in patch_group')
+	};
 
 
 
@@ -119,24 +127,12 @@ real			Patch_Group::reset_s(std::string equ_name) {
 	if(v_0 == 0.0) return 0.0;
 
 	// current area-weighted-average value
-	real v = 0;
-	real A = 0;
 
 	auto equ_prob = prob_.lock()->equs_[equ_name];
 
-	for(auto p : patches_) {
-		for(auto f : *p->faces_) {//->flatten()) 
-			auto equ = f->equs_[equ_name];
 
-			real a = f->area();
-			v += equ->mean() * a;
-			A += a;
-		}
-	}
-	//print "name       ",name_
-	//print "num patches",len(patches_)
+	real v_m = point();
 
-	real v_m = v/A;
 
 	real dv = v_0 - v_m;
 
@@ -161,7 +157,7 @@ std::vector< Face_s >		Patch_Group::faces() {
 void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 
 	if(!ofs.is_open()) {
-		LOG_SEV_CHANNEL(d2d::log::sl::warning, LOG_CORE) << "file stream not open" << std::endl;
+		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "file stream not open" << std::endl;
 		return;
 	}
 
@@ -190,7 +186,7 @@ void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 	int n = x.size();
 
 
-	LOG_SEV_CHANNEL(d2d::log::sl::info, LOG_CORE)
+	BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info)
 		<< "writing " << n << " points" << std::endl;
 
 
@@ -214,6 +210,12 @@ void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 
 	ofs << ")\n";
 }
+void		Patch_Group::write_binary(std::string equ_name) {
+	for(auto p : patches_) {
+		p->write_binary(equ_name);
+	}
+}
+
 
 
 

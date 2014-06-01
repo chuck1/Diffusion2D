@@ -29,8 +29,8 @@ Equation_Prob_s		Prob::create_equation(std::string name, real k, real alpha, rea
 	equs_[name] = e;
 	return e;
 }
-Patch_Group_s		Prob::create_patch_group(std::string name, std::map<std::string, real> v_0, std::map<std::string, real> S) {
-	auto g = std::make_shared<Patch_Group>(shared_from_this(), name, v_0, S);
+Patch_Group_s		Prob::create_patch_group(std::string name, std::map<std::string, real> v_0, std::map<std::string, real> S, point v_0_point) {
+	auto g = std::make_shared<Patch_Group>(shared_from_this(), name, v_0, S, v_0_point);
 
 	patch_groups_.push_back(g);
 
@@ -115,14 +115,14 @@ void		Prob::copy_value_to_source(std::string equ_name_from, std::string equ_name
 		e1 = f->equs_[equ_name_from];
 		e2 = f->equs_[equ_name_to];
 	}
-	
+
 	std::vector<size_t> s1;
 	for(auto a : e1->v_->shape()) {
 		s1.push_back(a-2);
 	}
 
 	auto s2 = e2->s_->shape();
-	
+
 	if(s1 == s2) {
 		e2->s_ = e1->v_->sub({0,0},{-2,-2});
 	} else {
@@ -146,14 +146,14 @@ int		Prob::solve(std::string name, real cond, bool ver, size_t it_outer, real R_
 	return solve_serial(name, cond, ver, it_outer, R_outer);
 }
 int		Prob::solve_serial(std::string name, real cond_inner, bool ver, size_t it_outer, real R_outer) {
-	
-	real cond_grad_inner = 1E-8;
-	
+
+	real cond_grad_inner = -1E-7;
+
 	/** @todo move this to class variable to avoid excess alloc!*/
 	auto R = make_uninit<real,1>({it_max_inner_});
-	
+
 	real nR;
-	
+
 	size_t it = 0;
 	for(; it < it_max_inner_; ++it) {
 		nR = 0;
@@ -164,32 +164,34 @@ int		Prob::solve_serial(std::string name, real cond_inner, bool ver, size_t it_o
 		for(auto face : faces()) {
 			face->recv(name);
 		}
-		
-		
-		
-	
+
 		IF(std::isnan(nR)) {
-			throw 0;//raise ValueError('nan')
+			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "nan" << GAL_LOG_ENDLINE;
+			throw 0;
+		}
+		IF(std::isinf(nR)) {
+			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "nan" << GAL_LOG_ENDLINE;
+			throw 0;
 		}
 		
 		R->get(it) = nR;
 		
-		LOG_SEV_CHANNEL(d2d::log::sl::info, d2d::log::core) << std::scientific
+		real grad = R->fda_1_back(it, 1.0);
+		
+		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info) << std::scientific
 			<< std::setw(6) << it_outer
 			<< std::setw(16) << R_outer
 			<< std::setw(6) << it
 			<< std::setw(16) << nR
-			<< std::setw(16) << R->fda_1_back(it, 1.0) << std::endl;
+			<< std::setw(16) << grad << std::endl;
 		
 		
-		if(
-				(R->fda_1_back(it, 1.0) >= 0)
-				&& (R->fda_1_back(it, 1.0) < cond_grad_inner)) {
-			LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "break inner because residual gradient < " << std::scientific << cond_grad_inner << std::endl;
+		if((grad <= 0) && (grad > cond_grad_inner)) {
+			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info) << "break inner because residual gradient < " << std::scientific << cond_grad_inner << std::endl;
 			break;
 		}
 		if(nR < cond_inner) {
-			LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "break inner because residual < " << std::scientific << cond_inner << std::endl;
+			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info) << "break inner because residual < " << std::scientific << cond_inner << std::endl;
 			break;
 		}
 	}
@@ -215,7 +217,7 @@ int		Prob::solve2(std::string equ_name, real cond_inner_final, real cond_outer, 
 			R_outer = std::max(Rn, R_outer);
 		}
 
-		LOG_SEV_CHANNEL(d2d::log::sl::info, LOG_CORE)
+		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info)
 			<< std::setw(6) << it_outer
 			<< std::setw(16) << R_outer
 			<< std::endl;
@@ -225,7 +227,7 @@ int		Prob::solve2(std::string equ_name, real cond_inner_final, real cond_outer, 
 		}
 
 		if(R_outer < cond_outer) {
-			LOG_SEV_CHANNEL(d2d::log::sl::debug, LOG_CORE) << "break outer because residual < " << std::scientific << cond_outer << std::endl;
+			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "break outer because residual < " << std::scientific << cond_outer << std::endl;
 			break;
 		}
 	}
@@ -241,12 +243,12 @@ void		Prob::write(std::string equ_name) {
 	/*if(not os.path.exists(directory)) {
 	  os.makedirs(directory)
 	  }*/
-	
+
 	std::ofstream ofs;
 	ofs.open("prof_" + name_ + "_" + equ_name + ".txt", std::ofstream::trunc);
 
 	if(!ofs.is_open()) {
-		LOG_SEV_CHANNEL(d2d::log::sl::warning, LOG_CORE) << "file stream not open" << std::endl;
+		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "file stream not open" << GAL_LOG_ENDLINE;
 		return;
 	}
 
@@ -256,7 +258,14 @@ void		Prob::write(std::string equ_name) {
 	}
 
 }
+void		Prob::write_binary(std::string equ_name) {
 
+	for(auto g : patch_groups_) {
+		//print g
+		g->write_binary(equ_name);
+	}
+
+}
 
 
 

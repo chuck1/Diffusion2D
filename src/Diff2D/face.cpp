@@ -7,7 +7,6 @@
 
 #include <math-array/array.hpp>
 
-#include <Diff2D/math.hpp>
 #include <Diff2D/config.hpp>
 #include <Diff2D/unit_vec.hpp>
 #include <Diff2D/equation.hpp>	
@@ -224,9 +223,9 @@ void		Face::step_pre_cell_open_bou(Equation_s equ, std::vector<int> ind, int V) 
 	//logging.debug('step_pre_cell_open_bou')
 
 	IS v(V);
-	int indn[] = {ind[0], ind[1]};
+	std::vector<int> indn({ind[0], ind[1]});
 	indn[v.i] += v.s;
-
+	
 	int p = (v.i == 1) ? 0 : 1;
 
 	/*logging.debug("V    {0}".format(V))
@@ -238,19 +237,12 @@ void		Face::step_pre_cell_open_bou(Equation_s equ, std::vector<int> ind, int V) 
 	assert(equ->v_bou_.size() == 2);
 
 	real v_bou;
-	auto v_bou_ar = equ->v_bou_[v.i][(v.s+1)/2];
-	if(v_bou_ar) {
-		v_bou = v_bou_ar->get(ind[p]);
-	} else {
-		v_bou = 0.0;
-	}
-
-	if(v_bou == 0.0) { // insulated
-		equ->v_->get(indn[0],indn[1]) = equ->v_->get(ind);
-	} else { //// constant temperature
-		equ->v_->get(indn[0],indn[1]) = 2.0 * v_bou - equ->v_->get(ind);
-	}
-
+	
+	std::shared_ptr<boundary> v_bou_obj = equ->v_bou_[v.i][(v.s+1)/2];
+	assert(v_bou_obj);
+	
+	v_bou_obj(equ, ind, indn, p);
+	
 }
 void		Face::step_pre(Equation_s equ) {
 	// for boundaries, load boundary temperature cells with proper value
@@ -279,6 +271,8 @@ real		Face::step(std::string equ_name) {
 	auto g = patch_->group_.lock();
 	auto S = g->S_[equ->name_];
 
+	BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "face step S = " << S << GAL_LOG_ENDLINE;
+
 	////print "face S",S
 	/*
 	   void debug_s() {
@@ -287,8 +281,8 @@ real		Face::step(std::string equ_name) {
 	   print "A",A
 	   print "k",equ.equ_prob.k
 	   }*/
-	for(auto i : range(n_->get(0))) {
-		for(auto j : range(n_->get(1))) {
+	for(int i : range(n_->get(0))) {
+		for(int j : range(n_->get(1))) {
 			real A = d_->get(i,j,0) * d_->get(i,j,1);
 
 			real yo = equ->v_->get(i,j);
@@ -331,14 +325,16 @@ real		Face::step(std::string equ_name) {
 			};
 			
 			if(termW.a < 0 or termE.a < 0 or termS.a < 0 or termN.a < 0) {
-				//debug();
+				debug();
 				throw 0;
 			}
 
 			if (ver1) {
 				//debug();
 			}
-			if(std::isnan(yo)) throw 0;
+			
+			if(std::isnan(yo)) { debug(); throw 0; }
+			if(std::isinf(yo)) { debug(); throw 0; }
 
 			if(std::isnan(ys) || std::isinf(ys)) {
 				debug();
@@ -348,14 +344,30 @@ real		Face::step(std::string equ_name) {
 
 			equ->v_->get(i,j) += dy;
 
-			if (dy == 0.0) {
+			real nR;
+			if(yo == 0.0) {
+				BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "yo is zero" << GAL_LOG_ENDLINE;
+				//debug();
 			} else {
-				R = std::max(fabs(dy/yo), R);
+				nR = fabs(dy/yo);
+
+				if (dy == 0.0) {
+				} else {
+					R = std::max(nR, R);
+				}
 			}
 
-			if(std::isnan(R)) {
-				//print 'dy',dy,'yo',yo
-				throw 0;//raise ValueError('nan')
+
+
+			IF(std::isnan(R)) {
+				BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "R is nan" << GAL_LOG_ENDLINE;
+				debug();
+				throw 0;
+			}
+			IF(std::isinf(R)) {
+				BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "R is inf" << GAL_LOG_ENDLINE;
+				debug();
+				throw 0;
 			}
 		}
 	}
@@ -391,7 +403,7 @@ grid_tup	Face::grid(std::string equ_name) {
 	auto grid = meshgrid(x, y);
 
 	auto X = grid.first;
-	auto Y = grid.first;
+	auto Y = grid.second;
 
 	auto Z = make_ones<real,2>(X->shape());
 	Z->multiply_self(pos_z_);
@@ -410,7 +422,15 @@ grid_tup	Face::grid(std::string equ_name) {
 	return make_tuple(X,Y,Z,W);
 }
 
+void		Face::write_binary(std::string equ_name, math::basic_binary_oarchive& ar) {
 
+	auto g = grid(equ_name);
+
+	std::get<0>(g)->serialize(ar, 0);
+	std::get<1>(g)->serialize(ar, 0);
+	std::get<3>(g)->serialize(ar, 0);
+
+}
 
 
 

@@ -25,7 +25,7 @@ class Patch: public LocalCoor, public std::enable_shared_from_this<Patch> {
 				patch_v_bou_type v_bou);
 		
 
-		void		create_equ(std::string name, real v0, std::vector< array<real,1> > v_bou, real k, real al);
+		//void		create_equ(std::string name, real v0, patch_v_bou_edge_vec_type v_bou, real k, real al);
 
 		void		set_v_bou(std::string equ_name, std::vector< array<real,1> > v_bou);
 
@@ -33,6 +33,8 @@ class Patch: public LocalCoor, public std::enable_shared_from_this<Patch> {
 
 		void		create_faces();
 		void		grid_nbrs();
+
+		void		write_binary(std::string equ_name);
 	public:
 
 		Patch_Group_w				group_;

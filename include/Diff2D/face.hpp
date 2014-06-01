@@ -21,7 +21,6 @@ import equation
 #include <math-array/array.hpp>
 
 
-#include <Diff2D/math.hpp>
 #include <Diff2D/config.hpp>
 #include <Diff2D/unit_vec.hpp>
 #include <Diff2D/equation.hpp>	
@@ -73,16 +72,18 @@ class Face: public LocalCoor, public std::enable_shared_from_this<Face> {
 
 		grid_tup		grid(std::string equ_name);
 
+		void			write_binary(std::string equ_name, math::basic_binary_oarchive& ar);
+	public:
 
 		Patch_s						patch_;
 		array<real,2>					ext_;
-std::vector< std::vector<Conn_s> >		conns_;
+		std::vector< std::vector<Conn_s> >		conns_;
 		real						pos_z_;
 		array<size_t,1>					n_;
 		array<real,3>					d_;
 		array<real,1>					l_;
 		std::map< std::string, Equation_s >		equs_;
-		
+
 		//std::map<std::string, array<real,1>[2][2]>	v_bou_;
 };
 

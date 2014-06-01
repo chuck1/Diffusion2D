@@ -6,6 +6,7 @@
 
 #include <math-array/array.hpp>
 
+#include <Diff2D/point.hpp>
 #include <Diff2D/config.hpp>
 
 
@@ -40,7 +41,7 @@ class Equation {
 		real							grad_min();
 		real							grad_max();
 		real							mean();
-		real							point(real pt[2]);
+		real							at_point(point pt);
 
 		std::string						name_;
 		Face_s							face_;

@@ -4,7 +4,7 @@
 #include <utility>
 #include <cassert>
 
-#include <Diff2D/math.hpp>
+#include <math-array/range.hpp>
 
 
 template <typename T> int sgn(T val) {

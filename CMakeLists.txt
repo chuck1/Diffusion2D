@@ -1,10 +1,17 @@
 cmake_minimum_required (VERSION 2.8.8)
 
-project(Diff2D)
-
+SET(CMAKE_CXX_COMPILER /scratch/usr/bin/g++)
 SET(CMAKE_INSTALL_PREFIX $ENV{HOME}/usr)
 
+project(Diff2D)
+
+
+
+
 find_package(CMakeHelper)
+
+find_package(math-array)
+SET(DOX_TAGFILES ${math-array_DOX_TAGFILE})
 
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -dM")
 

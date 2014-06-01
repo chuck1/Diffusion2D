@@ -8,10 +8,9 @@
 
 int main(int ac, char** av) {
 	// program
+
 	d2d::log::init();
 
-	d2d::log::core = d2d::log::sl::debug;
-	
 	// solve
 
 	size_t n = 10;
@@ -38,10 +37,16 @@ int main(int ac, char** av) {
 	
 	Patch_s	p0, p1, p2, p3, p4, p5;
 	
-	auto g2 = prob->create_patch_group("2", {{"T",10.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}});
-	auto g3 = prob->create_patch_group("3", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}});
-	auto g4 = prob->create_patch_group("4", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}});
-	auto g5 = prob->create_patch_group("5", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}});
+	point pt2(1.5,1.5,3.0);
+	point pt3(0.0,1.5,1.5);
+	point pt4(1.5,0.0,1.5);
+	point pt5(1.5,1.5,0.0);
+	
+
+	auto g2 = prob->create_patch_group("2", {{"T",10.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}}, pt2);
+	auto g3 = prob->create_patch_group("3", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}}, pt3);
+	auto g4 = prob->create_patch_group("4", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}}, pt4);
+	auto g5 = prob->create_patch_group("5", {{"T", 0.0},{"s",2.0}}, {{"T",0.0},{"s",10.0}}, pt5);
 	
 	patch_v_bou_type v_bou_def;
 
@@ -55,7 +60,7 @@ int main(int ac, char** av) {
 	//p0 = prob.createPatch(1,	[1,	[0,1],	[0,1]])
 	//p1 = prob.createPatch(2,	[[0,1],	1,	[0,1]])
 	
-	p2 = g2->create_patch("2",3,	{0,1,2},	{0,1,2},	{2},		v_bou_def);
+	p2 = g2->create_patch("2",3,	{0,1,2},	{0,1,2},	{3},		v_bou_def);
 
 	p3 = g3->create_patch("3",-1,	{0},		{2,1,0},	{2,1,0},	v_bou_def);
 	p4 = g4->create_patch("4",-2,	{2,1,0},	{0},		{2,1,0},	v_bou_def);
@@ -99,24 +104,24 @@ int main(int ac, char** av) {
 	f5.equs['T'].v_bou = [[10.,10.],[10.,10.]];
 */
 	
-	prob->write("T");
-
-	return 0;
 
 	//prob.solve2(1e-2, 1e-4, True)
 	
 	//profile.run("prob.solve('s', 1e-1)")
-	prob->solve("s", 1e-3, true, 0, 0.0);
+	prob->solve("s", 1e-4, true, 0, 0.0);
 	
-	
+	prob->write_binary("s");
+
+	return 0;
+
 	prob->value_add("s", -1.0);
 
 	prob->value_normalize("s");
 
-	//prob.copy_value_to_source('s','T')
+	prob->copy_value_to_source("s","T");
 
 	//prob.solve('T', 1e-1, True)
-	prob->solve2("T", 1e-2, 1e-2, true);
+	prob->solve2("T", 1e-4, 1e-4, true);
 
 	//prob.plot3()
 
@@ -124,8 +129,9 @@ int main(int ac, char** av) {
 	//prob->.plot('T');
 
 	//pl.show()
-
-	prob->write("T");
+	
+	
+	prob->write_binary("T");
 
 
 }

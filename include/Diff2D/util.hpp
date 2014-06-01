@@ -7,7 +7,6 @@
 #include <vector>
 #include <utility>
 
-#include <Diff2D/math.hpp>
 
 
 template <typename T> int sgn(T val) {

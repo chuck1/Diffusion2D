@@ -8,6 +8,7 @@
 #include <Diff2D/config.hpp>
 #include <Diff2D/prob.hpp>
 #include <Diff2D/types.hpp>
+#include <Diff2D/point.hpp>
 
 /** @ingroup group_core
  * @brief %Problem
@@ -21,7 +22,8 @@ class Prob: public std::enable_shared_from_this<Prob> {
 				int it_max_1,
 				int it_max_2);
 		Equation_Prob_s			create_equation(std::string name, real k, real alpha, real alpha_source);
-		Patch_Group_s			create_patch_group(std::string name, std::map<std::string, real> v_0, std::map<std::string, real> S);
+		Patch_Group_s			create_patch_group(std::string name, std::map<std::string, real> v_0, std::map<std::string, real> S, point v_0_point);
+
 		real				temp_max(std::string equ_name);
 		real				temp_min(std::string equ_name);
 		real				grad_max(std::string equ_name);
@@ -41,8 +43,9 @@ class Prob: public std::enable_shared_from_this<Prob> {
 		int				solve_serial(std::string name, real cond, bool ver, size_t it_outer, real R_outer);
 		int				solve2(std::string equ_name, real cond1_final, real cond2, bool ver);
 		void				save();
-		void				write(std::string equ_name);
 
+		void				write(std::string equ_name);
+		void				write_binary(std::string equ_name);
 
 		std::vector<Patch_Group_s>			patch_groups_;
 

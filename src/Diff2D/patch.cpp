@@ -140,12 +140,12 @@ void		Patch::create_faces() {
 	grid_nbrs();
 
 }
-void		Patch::create_equ(std::string name, real v0, std::vector< array<real,1> > v_bou, real k, real al) {
+/*void		Patch::create_equ(std::string name, real v0, std::vector< array<real,1> > v_bou, real k, real al) {
 	auto prob = group_.lock()->prob_.lock();
 	for(auto f : *faces_) {
 		f->create_equ(name, prob->equs_[name]);
 	}
-}
+}*/
 /*void		set_v_bou(std::string equ_name, v_bou_vec_type v_bou) {
   for(auto f : *faces_) {
   f->equs_[equ_name]->v_bou_ = v_bou;
@@ -190,6 +190,26 @@ void		Patch::grid_nbrs() {
 		}
 	}
 }
+
+void		Patch::write_binary(std::string equ_name) {
+
+	std::ofstream ofs;
+	ofs.open("binary_" + equ_name + "_" + name_ + ".txt", std::ofstream::trunc);
+
+	if(!ofs.is_open()) {
+		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "file stream not open" << std::endl;
+		return;
+	}
+	
+	math::basic_binary_oarchive ar(ofs);
+
+	for(auto f : *faces_) {
+		f->write_binary(equ_name, ar);
+	}
+}
+
+
+
 
 
 
