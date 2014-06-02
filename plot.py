@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import pylab as pl
 import numpy as np
 import os
@@ -6,6 +8,13 @@ import argparse
 import glob
 import sys
 import math
+
+class patch_data:
+    def __init__(self):
+        self.X = []
+        self.Y = []
+        self.V = []
+       
 
 def nice_axes(a, b):
     p = math.floor(math.log10(b - a))
@@ -48,28 +57,25 @@ def do_file(filename):
 
     f = open(filename, 'rb')
 
-    fig = pl.figure()
-    ax = fig.add_subplot(111)
-
-    X = []
-    Y = []
-    V = []
-
+    pd = patch_data()
+    pd.name = filename
+    
     vmax = -1E37
     vmin = 1E37
 
     while True:
         x = y = v = None
         try:
+            normal = struct.unpack('i', f.read(4))[0]
             x = read_array(f)
             y = read_array(f)
             v = read_array(f)
             
-            v = np.transpose(v)
+            #v = np.transpose(v)
 
-            X.append(x)
-            Y.append(y)
-            V.append(v)
+            pd.X.append(x)
+            pd.Y.append(y)
+            pd.V.append(v)
             
             vmax = np.max(v) if np.max(v) > vmax else vmax
             vmin = np.min(v) if np.min(v) < vmin else vmin
@@ -77,13 +83,18 @@ def do_file(filename):
             print sys.exc_info()[0]
             break
 
-    a,b = nice_axes(vmin,vmax)
+    return vmin,vmax,pd
+
+def plot_file(pd,a,b):
     
+    fig = pl.figure()
+    
+    ax = fig.add_subplot(111)
+    ax.set_xlabel(pd.name)
+
     clrrng = np.linspace(a,b,11)
     
     print 'success'
-
-    
 
     #print np.shape(x)
     #print np.shape(y)
@@ -92,8 +103,8 @@ def do_file(filename):
     #print x
     #print y
     #print v
-
-    for x,y,v in zip(X,Y,V):
+    
+    for x,y,v in zip(pd.X,pd.Y,pd.V):
         con = ax.contourf(x,y,v,clrrng)
 
     pl.colorbar(con, ax = ax)
@@ -106,11 +117,35 @@ args = parser.parse_args()
 
 print args.files
 
+vmax = -1E37
+vmin = 1E37
+
+patch_datas = []
+
 for f in args.files:
-    do_file(f)
+    
+    fmin,fmax,pd = do_file(f)
+
+    patch_datas.append(pd)
+
+    vmax = fmax if fmax > vmax else vmax
+    vmin = fmin if fmin < vmin else vmin
+
+a,b = nice_axes(vmin,vmax)
+
+
+for pd in patch_datas:
+    plot_file(pd,vmin,vmax)
+
 
 
 pl.show()
+
+
+
+
+
+
 
 
 

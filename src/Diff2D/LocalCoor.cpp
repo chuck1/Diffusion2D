@@ -38,6 +38,13 @@ int		LocalCoor::loc_to_glo(int L) {
 	int G = sign(L) * nxt(Z_, abs(L) % 3);
 	return G;
 }
+IS		LocalCoor::glo_to_loc2(int G) {
+	return IS(glo_to_loc(G));
+}
+IS		LocalCoor::loc_to_glo2(int L) {
+	return IS(loc_to_glo(L));
+}
+
 
 
 

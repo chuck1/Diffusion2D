@@ -3,6 +3,8 @@
 
 /** @file types.hpp */
 
+#include <map>
+
 #include <math-array/array.hpp>
 
 struct boundary;

@@ -38,6 +38,9 @@ class LocalCoor {
 		LocalCoor(int Z);
 		int		glo_to_loc(int G);
 		int		loc_to_glo(int L);
+		
+		IS		glo_to_loc2(int G);
+		IS		loc_to_glo2(int G);
 
 		int	Z_;
 		int	X_;

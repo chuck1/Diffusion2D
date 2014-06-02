@@ -40,8 +40,10 @@ Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, arr
 	for(size_t i = 0; i < n_->get(0)+2; ++i) {
 		for(size_t j = 0; j < n_->get(1)+2; ++j) {
 			for(size_t k = 0; k < 2; ++k) {
-				d_->get(i,j,k) = (ext_->get(k,1) - ext_->get(k,0)) / ((real)n_->get(k));
-				std::cout << "d " << d_->get(i,j,k) << std::endl;
+				d_->get(i,j,k) = fabs(
+						(ext_->get(k,1) - ext_->get(k,0)) / ((real)n_->get(k))
+						);
+				//std::cout << "d " << d_->get(i,j,k) << std::endl;
 			}
 		}
 	}
@@ -50,7 +52,6 @@ Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, arr
 	//print d_
 	//raise ValueError('bad') }*/
 
-	//conns_ = np.empty((2,2), dtype=object);
 
 	// source
 	l_ = make_uninit<real,1>({2});
@@ -63,7 +64,6 @@ Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, arr
 
 	//x = linspace(d_.get(0,0,0) / 2. - a, a - d_.get(0,0,0) / 2., n_.get(0))
 	//y = linspace(d_.get(0,0,1) / 2. - b, b - d_.get(0,0,1) / 2., n_.get(1))
-	//Y,X = np.meshgrid(y,x)
 
 
 	//Tmean_ = []
@@ -239,8 +239,11 @@ void		Face::step_pre_cell_open_bou(Equation_s equ, std::vector<int> ind, int V) 
 
 	
 	std::shared_ptr<boundary> v_bou_obj = equ->v_bou_[v.i][(v.s+1)/2];
-	assert(v_bou_obj);
-	
+	if(!v_bou_obj) {
+		v_bou_obj = std::make_shared<boundary_insulated>();
+		equ->v_bou_[v.i][(v.s+1)/2] = v_bou_obj;
+	}
+
 	v_bou_obj->eval(equ, ind, indn, p);
 	
 }
@@ -308,7 +311,7 @@ real		Face::step(std::string equ_name) {
 
 			real dy = equ->equ_prob_->alpha_ * (ys - yo);
 
-			auto debug = [&] () {
+			auto ldebug = [&] () {
 				std::cout << std::scientific;
 
 				std::cout << std::setw(16) << "termW.a" << std::setw(16) << "termE.a" << std::setw(16) << "termS.a" << std::setw(16) << "termN.a" << std::endl;
@@ -325,7 +328,7 @@ real		Face::step(std::string equ_name) {
 			};
 			
 			if(termW.a < 0 or termE.a < 0 or termS.a < 0 or termN.a < 0) {
-				debug();
+				ldebug();
 				throw 0;
 			}
 
@@ -333,11 +336,11 @@ real		Face::step(std::string equ_name) {
 				//debug();
 			}
 			
-			if(std::isnan(yo)) { debug(); throw 0; }
-			if(std::isinf(yo)) { debug(); throw 0; }
+			if(std::isnan(yo)) { ldebug(); throw 0; }
+			if(std::isinf(yo)) { ldebug(); throw 0; }
 
 			if(std::isnan(ys) || std::isinf(ys)) {
-				debug();
+				ldebug();
 				throw 0;
 			}
 			if(std::isnan(dy)) throw 0;
@@ -346,7 +349,7 @@ real		Face::step(std::string equ_name) {
 
 			real nR;
 			if(yo == 0.0) {
-				BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "yo is zero" << GAL_LOG_ENDLINE;
+				BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "yo is zero" << GAL_LOG_ENDLINE;
 				//debug();
 			} else {
 				nR = fabs(dy/yo);
@@ -361,12 +364,12 @@ real		Face::step(std::string equ_name) {
 
 			IF(std::isnan(R)) {
 				BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "R is nan" << GAL_LOG_ENDLINE;
-				debug();
+				ldebug();
 				throw 0;
 			}
 			IF(std::isinf(R)) {
 				BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "R is inf" << GAL_LOG_ENDLINE;
-				debug();
+				ldebug();
 				throw 0;
 			}
 		}
@@ -395,7 +398,7 @@ void		Face::recv(std::string equ_name) {
 
 
 
-grid_tup	Face::grid(std::string equ_name) {
+grid_return_type	Face::grid(std::string equ_name) {
 
 	auto x = linspace(ext_->get(0,0), ext_->get(0,1), n_->get(0));
 	auto y = linspace(ext_->get(1,0), ext_->get(1,1), n_->get(1));
@@ -412,23 +415,27 @@ grid_tup	Face::grid(std::string equ_name) {
 
 	auto W = equ->v_->sub({0,0},{-2,-2});
 
-	if(z_.s > 0) {
+
+/*	if(z_.s > 0) {
 		W->transpose_self();
 	} else {
 		W->rot90_self(1);
 		W->fliplr_self();
-	}
-
-	return make_tuple(X,Y,Z,W);
+	}*/
+	
+	
+	return grid_return_type(X,Y,Z,W);
 }
 
 void		Face::write_binary(std::string equ_name, math::basic_binary_oarchive& ar) {
 
 	auto g = grid(equ_name);
-
-	std::get<0>(g)->serialize(ar, 0);
-	std::get<1>(g)->serialize(ar, 0);
-	std::get<3>(g)->serialize(ar, 0);
+	
+	ar << Z_;
+	
+	g.X[0]->serialize(ar, 0);
+	g.X[1]->serialize(ar, 0);
+	g.W->serialize(ar, 0);
 
 }
 

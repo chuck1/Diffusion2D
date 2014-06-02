@@ -67,6 +67,9 @@ void		Patch::create_faces() {
 	size_t NX = npatch_->get(0);
 	size_t NY = npatch_->get(1);
 
+	//int Is, Js, Ms, Ns;
+	size_t numx, numy;
+
 	for(size_t i = 0; i < NX; ++i) {
 		for(size_t j = 0; j < NY; ++j) {
 			int I = indices_[x_.i][i];
@@ -74,20 +77,54 @@ void		Patch::create_faces() {
 			int M = indices_[x_.i][i+1];
 			int N = indices_[y_.i][j+1];
 
-			int Is = std::min(I,M);
-			int Js = std::min(J,N);
-			int Ms = std::max(I,M);
-			int Ns = std::max(J,N);
+			std::cout << "I M J N" << std::endl;
+			std::cout << I << " " << M << " " << J << " " << N << std::endl;
 
+			/*	if(Z_ < 0) {
+				assert(I > M);
+				assert(J > N);
+
+				Is = M;
+				Js = N;
+				Ms = I;
+				Ns = J;
+				} else {
+				assert(I < M);
+				assert(J < N);
+
+				Is = I;
+				Js = J;
+				Ms = M;
+				Ns = N;
+				}*/
+
+			// extends are global coordinate associated with local begin and end
 			auto ext = make_uninit<real,2>({2,2});
-			ext->get(0,0) = coor_[x_.i]->get(Is);
-			ext->get(0,1) = coor_[x_.i]->get(Ms);
-			ext->get(1,0) = coor_[y_.i]->get(Js);
-			ext->get(1,1) = coor_[y_.i]->get(Ns);
+			ext->get(0,0) = coor_[x_.i]->get(I);
+			ext->get(0,1) = coor_[x_.i]->get(M);
+			ext->get(1,0) = coor_[y_.i]->get(J);
+			ext->get(1,1) = coor_[y_.i]->get(N);
+			/*ext->get(0,0) = coor_[x_.i]->get(Is);
+			  ext->get(0,1) = coor_[x_.i]->get(Ms);
+			  ext->get(1,0) = coor_[y_.i]->get(Js);
+			  ext->get(1,1) = coor_[y_.i]->get(Ns);*/
 
+			std::cout << "extendts" << std::endl;
+			std::cout
+				<< std::setw(16) << "0,0"
+				<< std::setw(16) << "0,1"
+				<< std::setw(16) << "1,0"
+				<< std::setw(16) << "1,1"
+				<< std::endl;
+			std::cout
+				<< std::setw(16) << ext->get(0,0)
+				<< std::setw(16) << ext->get(0,1)
+				<< std::setw(16) << ext->get(1,0)
+				<< std::setw(16) << ext->get(1,1)
+				<< std::endl;
 
-			auto numx = nx_[x_.i]->get(std::min(I,M));
-			auto numy = nx_[y_.i]->get(std::min(J,N));
+			numx = nx_[x_.i]->get(std::min(I,M));
+			numy = nx_[y_.i]->get(std::min(J,N));
 
 			auto numarr = make_array_1<size_t,1>({numx, numy});
 
@@ -104,36 +141,61 @@ void		Patch::create_faces() {
 
 			auto prob = group_.lock()->prob_.lock();
 
-			// T
-			{
-				auto equ = nface->create_equ("T", prob->equs_["T"]);
 
-				auto v_bou_T = v_bou_.find("T");
-				if(v_bou_T == v_bou_.cend()) {
-					equ->v_bou_ = {{0,0},{0,0}};
-				} else {
-					if(i == 0)	equ->v_bou_[0][0] = (v_bou_T->second)[0][0][j];
-					if(i == NX-1)	equ->v_bou_[0][1] = (v_bou_T->second)[0][1][j];
-					if(j == 0)	equ->v_bou_[1][0] = (v_bou_T->second)[1][0][i];
-					if(j == NY-1)	equ->v_bou_[1][1] = (v_bou_T->second)[1][1][i];
-				}
-			}
-			// s
-			{	
-				auto equ = nface->create_equ("s", prob->equs_["s"]);
 
-				auto v_bou_s = v_bou_.find("s");
+			auto lsetup_bou = [&] (std::string name, unsigned int flag) {
+
+				auto equ = nface->create_equ(name, prob->equs_[name]);
+				assert(equ);
+
+				auto v_bou_s = v_bou_.find(name);
 				if(v_bou_s == v_bou_.cend()) {
 					equ->v_bou_ = {{0,0},{0,0}};
 				} else {
-					if(i == 0)	equ->v_bou_[0][0] = v_bou_s->second[0][0][j];
-					if(i == NX-1)	equ->v_bou_[0][1] = v_bou_s->second[0][1][j];
-					if(j == 0)	equ->v_bou_[1][0] = v_bou_s->second[1][0][i];
-					if(j == NY-1)	equ->v_bou_[1][1] = v_bou_s->second[1][1][i];
+					assert((v_bou_s->second).size() == 2);
+					assert((v_bou_s->second)[0].size() == 2);
+					assert((v_bou_s->second)[1].size() == 2);
+
+					assert(equ->v_bou_.size() == 2);
+					assert(equ->v_bou_[0].size() == 2);
+					assert(equ->v_bou_[1].size() == 2);
+
+
+					auto lset_equ_bou = [&](
+							size_t itmp,
+							size_t jtmp,
+							size_t vec_ind,
+							size_t cmp_ind,
+							size_t cmp_val,
+							size_t vec_size_cmp)
+					{
+
+						std::vector< std::shared_ptr<boundary> >&	vec = (v_bou_s->second)[itmp][jtmp];
+						std::shared_ptr<boundary>&			equ_bou = equ->v_bou_[itmp][jtmp];
+
+						if(cmp_ind == cmp_val) {
+							if(vec.size() == vec_size_cmp) {
+								equ_bou = vec[vec_ind];
+							} else if(vec.size() == 1) {
+								equ_bou = vec[0];
+							} else {
+								std::cout << "boundary vector[][] must be of size 1 or equal to number of faces along direction in patch" << std::endl;
+								abort();
+							}
+						}
+					};
+
+					lset_equ_bou(0, 0, j, i, 0,	NY);
+					lset_equ_bou(0, 1, j, i, NX-1,	NY);
+					lset_equ_bou(1, 0, i, j, 0,	NX);		
+					lset_equ_bou(1, 1, i, j, NY-1,	NX);
 				}
-				
-				equ->flag_ |= ONLY_PARALLEL_FACES;
-			}
+
+				equ->flag_ |= flag;
+			};
+
+			lsetup_bou("T",0);
+			lsetup_bou("s",ONLY_PARALLEL_FACES);
 		}
 	}			
 
@@ -141,11 +203,11 @@ void		Patch::create_faces() {
 
 }
 /*void		Patch::create_equ(std::string name, real v0, std::vector< array<real,1> > v_bou, real k, real al) {
-	auto prob = group_.lock()->prob_.lock();
-	for(auto f : *faces_) {
-		f->create_equ(name, prob->equs_[name]);
-	}
-}*/
+  auto prob = group_.lock()->prob_.lock();
+  for(auto f : *faces_) {
+  f->create_equ(name, prob->equs_[name]);
+  }
+  }*/
 /*void		set_v_bou(std::string equ_name, v_bou_vec_type v_bou) {
   for(auto f : *faces_) {
   f->equs_[equ_name]->v_bou_ = v_bou;
@@ -200,7 +262,7 @@ void		Patch::write_binary(std::string equ_name) {
 		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "file stream not open" << std::endl;
 		return;
 	}
-	
+
 	math::basic_binary_oarchive ar(ofs);
 
 	for(auto f : *faces_) {

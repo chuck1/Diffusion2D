@@ -17,7 +17,9 @@ Equation_Prob::Equation_Prob(Prob_s prob, std::string name, real k, real alpha, 
 Equation::Equation(std::string name, Face_s face, Equation_Prob_s equ_prob):
 	name_(name),
 	face_(face),
-	equ_prob_(equ_prob) {
+	equ_prob_(equ_prob),
+	v_bou_({{0,0},{0,0}})
+{
 
 	//v_0_ = v_0
 
@@ -25,7 +27,7 @@ Equation::Equation(std::string name, Face_s face, Equation_Prob_s equ_prob):
 			face_->n_->get(0) + 2,
 			face_->n_->get(1) + 2
 			});
-	
+
 	auto group = face_->patch_->group_.lock();
 
 	v_->multiply_self(group->v_0_[name_]);

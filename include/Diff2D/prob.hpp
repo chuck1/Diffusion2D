@@ -39,9 +39,16 @@ class Prob: public std::enable_shared_from_this<Prob> {
 		 * @param it_outer current iteration of outer loop for purpose of displaying
 		 * @param R_outer current residual of outer loop for purpose of displaying
 		 */
-		int				solve(std::string name, real cond, bool ver, size_t it_outer, real R_outer);
-		int				solve_serial(std::string name, real cond, bool ver, size_t it_outer, real R_outer);
-		int				solve2(std::string equ_name, real cond1_final, real cond2, bool ver);
+		int				solve(std::string name, real cond, size_t it_outer, real R_outer);
+		int				solve_serial(std::string name, real cond, size_t it_outer, real R_outer);
+		/** @brief solve2
+		 *
+		 * @param equ_name name
+		 * @param cond_outer residual stop condition of outer loop
+		 * @param inner_outer_ratio ratio of inner loop residual stop condition to current outer loop residual
+		 * @param ver verbosity
+		 */
+		int				solve2(std::string equ_name, real cond_outer, real inner_out_ratio);
 		void				save();
 
 		void				write(std::string equ_name);

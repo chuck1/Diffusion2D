@@ -5,21 +5,8 @@
 #include <Diff2D/patch.hpp>
 #include <Diff2D/patch_group.hpp>
 #include <Diff2D/prob.hpp>
+#include <Diff2D/util.hpp>
 
-template<typename T> void write_vec(std::ofstream& ofs, std::vector<T> x) {
-	int a = 0;
-
-	ofs << std::scientific;
-
-	for(auto b : x) {
-		ofs << b << " ";
-		a = a + 1;
-		if(a == 10) {
-			ofs << "\n";
-			a = 0;
-		}
-	}
-}
 
 Patch_Group::Patch_Group(
 		Prob_s prob,
@@ -161,6 +148,8 @@ void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 		return;
 	}
 
+	assert(0);
+
 	std::vector<real> x;// = np.zeros(0);
 	std::vector<real> y;// = np.zeros(0);
 	std::vector<real> z;// = np.zeros(0);
@@ -170,10 +159,10 @@ void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 		auto grid = f->grid(equ_name);
 		//X,Y,Z,W = f.grid(equ_name);
 
-		auto Xr = std::get<0>(grid)->ravel();
-		auto Yr = std::get<0>(grid)->ravel();
-		auto Zr = std::get<0>(grid)->ravel();
-		auto Wr = std::get<0>(grid)->ravel();
+		auto Xr = grid.X[0]->ravel();
+		auto Yr = grid.X[1]->ravel();
+		auto Zr = grid.X[2]->ravel();
+		auto Wr = grid.W->ravel();
 
 		x.insert(x.end(), Xr.begin(), Xr.end());
 		y.insert(y.end(), Yr.begin(), Yr.end());

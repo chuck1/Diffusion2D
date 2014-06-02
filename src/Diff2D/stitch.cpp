@@ -98,6 +98,8 @@ void		stitch(Patch_s patch1, Patch_s patch2) {
 }
 
 void		stitch_ortho(Patch_s patch1, Patch_s patch2) {
+	std::cout << "stitch ortho '" << patch1->name_ << "' '" << patch2->name_ << "'" << std::endl;
+
 	bool ver = false;
 	//ver = True
 
@@ -119,7 +121,8 @@ void		stitch_ortho(Patch_s patch1, Patch_s patch2) {
 		p = 1;
 		rev = e.rev_;
 	} catch(...) {
-		throw;
+		std::cout << "unknwon error" << std::endl;
+		abort();
 	}
 
 
@@ -132,7 +135,8 @@ void		stitch_ortho(Patch_s patch1, Patch_s patch2) {
 		p = 0;
 		rev = e.rev_;
 	} catch(...) {
-		throw;
+		std::cout << "unknwon error" << std::endl;
+		abort();
 	}
 	
 	IS ol1, ol2;	
@@ -164,17 +168,37 @@ void		stitch_ortho(Patch_s patch1, Patch_s patch2) {
 	for(; it1 != r1.end(); ++it1, ++it2) {
 		ind1[p] = *it1;
 		ind2[p] = *it2;
-		
+	
+		std::cout
+				<< "ind1 " << ind1[0] << " " << ind1[1] << " "
+				<< "ind2 " << ind2[0] << " " << ind2[1] << std::endl;
+
 		auto f1 = patch1->faces_->get(ind1[0],ind1[1]);
 		auto f2 = patch2->faces_->get(ind2[0],ind2[1]);
 
 		if(f1->conns_[o][(ol1.s+1)/2]) {
-			//print "face1", ind1
-			//print "face2", ind2
-			throw 0;//raise ValueError('nbr not none')
+
+			std::cout << "f1 nbr not none" << std::endl;
+
+			std::cout << f1->conns_[o][(ol1.s+1)/2] << std::endl;
+
+			std::cout
+				<< "ind1 " << ind1[0] << " " << ind1[1] << " "
+				<< "ind2 " << ind2[0] << " " << ind2[1] << std::endl;
+
+			std::cout << "o = " << o << " ol1.s = " << ol1.s << " ol2.s = " << ol2.s << std::endl;
+
+			continue;
+			abort();
 		}
 		if(f2->conns_[o][(ol2.s+1)/2]) {
-			throw 0;//raise ValueError('nbr not none')
+			std::cout << "f2 nbr not none" << std::endl;
+			std::cout
+				<< "ind1 " << ind1[0] << " " << ind1[1] << " "
+				<< "ind2 " << ind2[0] << " " << ind2[1] << std::endl;
+
+			continue;
+			abort();
 		}
 
 		connect(f1, o, (ol1.s + 1)/2, f2, o, (ol2.s + 1)/2);

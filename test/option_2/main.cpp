@@ -1,20 +1,46 @@
 
+#include <Diff2D/boundary.hpp>
 #include <Diff2D/init.hpp>
 #include <Diff2D/prob.hpp>
 #include <Diff2D/patch_group.hpp>
 #include <Diff2D/stitch.hpp>
 #include <Diff2D/log.hpp>
 
+
+void solve_source(std::shared_ptr<Prob> prob) {
+	//prob->solve2(1e-4, 1e-2, True);
+	
+	prob->solve("s", 1e-4, 0, 0);
+
+	prob->write_binary("s");
+	prob->write("s");
+
+}
+void solve_temp(std::shared_ptr<Prob> prob) {
+	//prob->solve2(1e-4, 1e-2, True);
+	
+	prob->solve("T", 1e-4, 0, 0);
+
+	prob->write_binary("T");
+	prob->write("T");
+
+}
 void solve_with_source(std::shared_ptr<Prob> prob) {
 	//prob->solve2(1e-4, 1e-2, True);
 
-	prob->solve("s", 1e-2, true, 0, 0);
+	prob->solve("s", 1e-4, 0, 0);
+
+	prob->write_binary("S");
 
 	prob->value_add("s", -1.0);
 	prob->value_normalize("s");
 	prob->copy_value_to_source("s","T");
 
-	prob->solve2("T", 1e-2, 1e-2, true);
+	prob->solve2("T", 1e-4, 1e-4);
+
+	prob->write_binary("T");
+	prob->write("T");
+
 }
 
 int main(int ac, char** av) {
@@ -51,25 +77,25 @@ int main(int ac, char** av) {
 
 	// irradiated edge temperatures
 	patch_v_bou_edge_vec_type T_irr_xm({
-			make_ones<real,1>({nz->get(1)})->multiply_self(10.0),
-			make_ones<real,1>({nz->get(2)})->multiply_self(20.0),
-			make_ones<real,1>({nz->get(3)})->multiply_self(30.0)
+			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(1)})->multiply_self(10.0)),
+			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(2)})->multiply_self(20.0)),
+			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(30.0))
 			});
 
 
 	patch_v_bou_edge_vec_type T_irr_xp({
-		make_ones<real,1>({nz->get(1)})->multiply_self(10.0),
-		make_ones<real,1>({nz->get(2)})->multiply_self(20.0),
-		make_ones<real,1>({nz->get(3)})->multiply_self(30.0)
-		});
+			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(1)})->multiply_self(10.0)),
+			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(2)})->multiply_self(20.0)),
+			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(30.0))
+			});
 
 	patch_v_bou_edge_vec_type T_irr_zm({
-		make_ones<real,1>({nx->get(3)})->multiply_self(10.0)
-		});
+			std::make_shared<boundary_array>(make_ones<real,1>({nx->get(3)})->multiply_self(10.0))
+			});
 
 	patch_v_bou_edge_vec_type T_irr_zp({
-		make_ones<real,1>({nx->get(3)})->multiply_self(30.0)
-		});
+			std::make_shared<boundary_array>(make_ones<real,1>({nx->get(3)})->multiply_self(30.0))
+			});
 
 	//nx = [10, 10, 10, 50, 10, 10, 10];
 	//ny = [50, 50];
@@ -79,12 +105,12 @@ int main(int ac, char** av) {
 	//print ny;
 	//print nz;
 
-	
+
 	coor_type X({x,y,z});
 
 	cell_count_type n({nx,ny,nz});
 
-	auto prob = std::make_shared<Prob>("opt2", X, n, 1000, 1000);
+	auto prob = std::make_shared<Prob>("opt2", X, n, 1E5, 1E5);
 
 	prob->create_equation("T", 10.0, 1.5, 1.5);
 	prob->create_equation("s", 10.0, 1.5, 1.5);
@@ -94,34 +120,34 @@ int main(int ac, char** av) {
 	// create patch groups;
 
 	point pt_xm(
-		0,
-		(y->get(0) + y->get(1)) / 2.0,
-		(z->get(2) + z->get(3)) / 2.0);
+			0,
+			(y->get(0) + y->get(1)) / 2.0,
+			(z->get(2) + z->get(3)) / 2.0);
 
 	point pt_xp(
-		x->get(-1),
-		(y->get(0) + y->get(1)) / 2.0,
-		(z->get(2) + z->get(3)) / 2.0);
+			x->get(-1),
+			(y->get(0) + y->get(1)) / 2.0,
+			(z->get(2) + z->get(3)) / 2.0);
 
 	point pt_ym(
-		(x->get(1) + x->get(2)) / 2.0,
-		0,
-		(z->get(2) + z->get(3)) / 2.0);
+			(x->get(1) + x->get(2)) / 2.0,
+			0,
+			(z->get(2) + z->get(3)) / 2.0);
 
 	point pt_yp(
-		(x->get(1) + x->get(2)) / 2.0,
-		y->get(1),
-		(z->get(2) + z->get(3)) / 2.0);
+			(x->get(1) + x->get(2)) / 2.0,
+			y->get(1),
+			(z->get(2) + z->get(3)) / 2.0);
 
 	point pt_zm(
-		(x->get(3) + x->get(4)) / 2.0,
-		(y->get(0) + y->get(1)) / 2.0,
-		0);
+			(x->get(3) + x->get(4)) / 2.0,
+			(y->get(0) + y->get(1)) / 2.0,
+			0);
 
 	point pt_zp(
-		(x->get(3) + x->get(4)) / 2.0,
-		(y->get(0) + y->get(1)) / 2.0,
-		z->get(5));
+			(x->get(3) + x->get(4)) / 2.0,
+			(y->get(0) + y->get(1)) / 2.0,
+			z->get(5));
 
 
 	auto g_xm		= prob->create_patch_group("xm",		{{"T",100.0},{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_xm);
@@ -130,8 +156,22 @@ int main(int ac, char** av) {
 	auto g_yp		= prob->create_patch_group("yp",		{{"T",100.0},{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_yp);
 	auto g_zm		= prob->create_patch_group("zm",		{{"T",100.0},{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_zm);
 	auto g_zp		= prob->create_patch_group("zp",		{{"T",100.0},{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_zp);
+	
+	
+	// the default boundary for solve source is const = 1.0
+	auto const_bou(std::make_shared<boundary_single>(1.0));
+	patch_v_bou_vec_type v_bou_s_def({
+			{
+			{const_bou},
+			{const_bou}
+			},
+			{
+			{const_bou},
+			{const_bou}
+			}
+			});
 
-	patch_v_bou_type v_bou_def;
+	patch_v_bou_type v_bou_def({{"s",v_bou_s_def}});
 
 	patch_v_bou_type v_bou_irr_xm;
 	patch_v_bou_type v_bou_irr_xp;
@@ -275,14 +315,8 @@ int main(int ac, char** av) {
 
 	// solve;
 
-	solve_with_source(prob);
-
-	//prob->solve("T", 1e-3, True);
-
-
-	prob->write("T");
-
-
+	//solve_with_source(prob);
+	solve_temp(prob);
 
 };
 

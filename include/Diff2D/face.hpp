@@ -36,8 +36,21 @@ struct Term {
 	real	y;
 };
 
+struct grid_return_type {
+	grid_return_type(
+			array<real,2> x,
+			array<real,2> y,
+			array<real,2> z,
+			array<real,2> w):
+		X({x,y,z}),
+		W(w)
+	{}
+	array<real,2>	X[3];
+	array<real,2>	W;
+};
+
 //typedef std::tuple< std::vector<real>, std::vector<real>, std::vector<real>, std::vector<real> >		grid_tup;
-typedef std::tuple< array<real,2>, array<real,2>, array<real,2>, array<real,2> >		grid_tup;
+//typedef std::tuple< array<real,2>, array<real,2>, array<real,2>, array<real,2> >		grid_tup;
 
 /** @ingroup group_core
  * @brief %Face
@@ -70,7 +83,7 @@ class Face: public LocalCoor, public std::enable_shared_from_this<Face> {
 		void			send(std::string equ_name);
 		void			recv(std::string equ_name);
 
-		grid_tup		grid(std::string equ_name);
+		grid_return_type	grid(std::string equ_name);
 
 		void			write_binary(std::string equ_name, math::basic_binary_oarchive& ar);
 	public:

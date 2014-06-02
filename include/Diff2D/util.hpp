@@ -7,7 +7,20 @@
 #include <vector>
 #include <utility>
 
+template<typename T> inline void write_vec(std::ofstream& ofs, std::vector<T> x) {
+	int a = 0;
 
+	ofs << std::scientific;
+
+	for(auto b : x) {
+		ofs << b << " ";
+		a = a + 1;
+		if(a == 10) {
+			ofs << "\n";
+			a = 0;
+		}
+	}
+}
 
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
