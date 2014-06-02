@@ -1,3 +1,6 @@
+#define _POSIX_SOURCE
+#include <sys/stat.h>
+
 #include <map>
 #include <algorithm>
 #include <vector>
@@ -255,8 +258,39 @@ void		Patch::grid_nbrs() {
 
 void		Patch::write_binary(std::string equ_name) {
 
+	// construct names
+	
+	auto group = group_.lock();
+	assert(group);
+	auto prob = group->prob_.lock();
+	assert(prob);
+
+	std::string dir1 = "output";
+	std::string dir2 = dir1 + "/" + prob->name_;
+	std::string filename = dir2 + "/binary_" + equ_name + "_" + name_ + ".txt";
+	
+	// create folders
+	
+	struct stat sb;
+
+	if(stat(dir1.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) {
+	} else {
+		if(mkdir(dir1.c_str(),S_IRWXU|S_IRGRP|S_IXGRP) != 0) {
+			perror("mkdir error:");
+			return;
+		}
+	}
+
+	if(stat(dir2.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) {
+	} else {
+		if(mkdir(dir2.c_str(),S_IRWXU|S_IRGRP|S_IXGRP) != 0) {
+			perror("mkdir error:");
+			return;
+		}
+	}
+	
 	std::ofstream ofs;
-	ofs.open("binary_" + equ_name + "_" + name_ + ".txt", std::ofstream::trunc);
+	ofs.open(filename, std::ofstream::trunc);
 
 	if(!ofs.is_open()) {
 		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "file stream not open" << std::endl;

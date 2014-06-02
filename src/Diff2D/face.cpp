@@ -431,10 +431,14 @@ void		Face::write_binary(std::string equ_name, math::basic_binary_oarchive& ar) 
 
 	auto g = grid(equ_name);
 	
-	ar << Z_;
-	
+	ar << x_.i;
+	ar << y_.i;
+	ar << z_.i;
+
 	g.X[0]->serialize(ar, 0);
 	g.X[1]->serialize(ar, 0);
+	g.X[2]->serialize(ar, 0);
+
 	g.W->serialize(ar, 0);
 
 }

@@ -317,7 +317,9 @@ void		Prob::write(std::string equ_name) {
 
 }
 void		Prob::write_binary(std::string equ_name) {
-
+	
+	
+	
 	for(auto g : patch_groups_) {
 		//print g
 		g->write_binary(equ_name);

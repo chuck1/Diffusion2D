@@ -8,7 +8,10 @@
 
 void solve_source(std::shared_ptr<Prob> prob) {
 	//prob->solve2(1e-4, 1e-2, True);
-	
+
+	prob->write_binary("s");
+	prob->write("s");
+
 	prob->solve("s", 1e-4, 0, 0);
 
 	prob->write_binary("s");
@@ -17,7 +20,10 @@ void solve_source(std::shared_ptr<Prob> prob) {
 }
 void solve_temp(std::shared_ptr<Prob> prob) {
 	//prob->solve2(1e-4, 1e-2, True);
-	
+
+	prob->write_binary("T");
+	prob->write("T");
+
 	prob->solve("T", 1e-4, 0, 0);
 
 	prob->write_binary("T");
@@ -53,10 +59,14 @@ int main(int ac, char** av) {
 	coor_type x;
 	cell_count_type N;
 
+	/*x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));
 	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));
-	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));
-	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));
+	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));*/
 	
+	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0}));
+	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0}));
+	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0}));
+
 	N.push_back(make_array_1<size_t,1>({n+0,n+0}));
 	N.push_back(make_array_1<size_t,1>({n+2,n+2}));
 	N.push_back(make_array_1<size_t,1>({n+4,n+4}));
@@ -108,7 +118,7 @@ int main(int ac, char** av) {
 	//p0 = prob.createPatch(1,	[1,	[0,1],	[0,1]])
 	//p1 = prob.createPatch(2,	[[0,1],	1,	[0,1]])
 
-	p2 = g2->create_patch("2",3,	{0,1,2},	{0,1,2},	{3},		v_bou_def);
+	p2 = g2->create_patch("2",3,	{0,1,2},	{0,1,2},	{2},		v_bou_def);
 
 	p3 = g3->create_patch("3",-1,	{0},		{2,1,0},	{2,1,0},	v_bou_def);
 	p4 = g4->create_patch("4",-2,	{2,1,0},	{0},		{2,1,0},	v_bou_def);

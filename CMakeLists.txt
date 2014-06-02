@@ -20,6 +20,7 @@ SET(DOX_TAGFILES ${math-array_DOX_TAGFILE})
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/math-array/include")
 
 
+
 # custom include extensions
 #set(INCLUDE_EXTENSIONS obj)
 
@@ -36,5 +37,6 @@ cmh_static_library()
 
 
 add_subdirectory(test)
+
 
 
