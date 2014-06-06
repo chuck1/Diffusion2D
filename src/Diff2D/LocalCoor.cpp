@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include <Diff2D/config.hpp>
 #include <Diff2D/unit_vec.hpp>
 
 LocalCoor::LocalCoor(int Z):
@@ -21,8 +22,7 @@ LocalCoor::LocalCoor(int Z):
 	y_=(IS(Y_));
 	z_=(IS(Z_));
 
-
-	std::cout << "LocalCoor ctor" << std::endl;
+	DEBUG_LINE std::cout << "LocalCoor ctor" << std::endl;
 }
 int		LocalCoor::glo_to_loc(int G) {
 	int sg = sign(G);
@@ -44,7 +44,12 @@ IS		LocalCoor::glo_to_loc2(int G) {
 IS		LocalCoor::loc_to_glo2(int L) {
 	return IS(loc_to_glo(L));
 }
-
+IS		LocalCoor::glo_to_loc2(IS G) {
+	return IS(glo_to_loc(G.v()));
+}
+IS		LocalCoor::loc_to_glo2(IS L) {
+	return IS(loc_to_glo(L.v()));
+}
 
 
 

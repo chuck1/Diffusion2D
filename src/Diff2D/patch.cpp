@@ -1,5 +1,3 @@
-#define _POSIX_SOURCE
-#include <sys/stat.h>
 
 #include <map>
 #include <algorithm>
@@ -11,7 +9,8 @@
 #include <Diff2D/config.hpp>
 #include <Diff2D/face.hpp>
 #include <Diff2D/unit_vec.hpp>
-
+#include <Diff2D/util.hpp>
+#include <Diff2D/boundary.hpp>
 
 
 Patch::Patch(
@@ -37,8 +36,8 @@ Patch::Patch(
 
 	//print 'T_0',T_0
 
-	auto NX = indices[x_.i].size() - 1;
-	auto NY = indices[y_.i].size() - 1;
+	auto NX = indices_[x_.i].size() - 1;
+	auto NY = indices_[y_.i].size() - 1;
 
 	// expand scalar v_bou values
 	/*		for k in v_bou.keys() {
@@ -50,12 +49,12 @@ Patch::Patch(
 
 	// make sure indices are sorted properly
 
-	std::sort(indices[x_.i].begin(), indices[x_.i].end());
-	std::sort(indices[y_.i].begin(), indices[y_.i].end());
+	std::sort(indices_[x_.i].begin(), indices_[x_.i].end());
+	std::sort(indices_[y_.i].begin(), indices_[y_.i].end());
 
 	if(normal < 0) {
-		std::reverse(indices[x_.i].begin(), indices[x_.i].end());
-		std::reverse(indices[y_.i].begin(), indices[y_.i].end());
+		std::reverse(indices_[x_.i].begin(), indices_[x_.i].end());
+		std::reverse(indices_[y_.i].begin(), indices_[y_.i].end());
 	}
 
 	npatch_ = make_array_1<size_t,1>({NX,NY});
@@ -80,8 +79,6 @@ void		Patch::create_faces() {
 			int M = indices_[x_.i][i+1];
 			int N = indices_[y_.i][j+1];
 
-			std::cout << "I M J N" << std::endl;
-			std::cout << I << " " << M << " " << J << " " << N << std::endl;
 
 			/*	if(Z_ < 0) {
 				assert(I > M);
@@ -112,8 +109,10 @@ void		Patch::create_faces() {
 			  ext->get(1,0) = coor_[y_.i]->get(Js);
 			  ext->get(1,1) = coor_[y_.i]->get(Ns);*/
 
-			std::cout << "extendts" << std::endl;
-			std::cout
+			LOG_PATCH std::cout << "I M J N" << std::endl;
+			LOG_PATCH std::cout << I << " " << M << " " << J << " " << N << std::endl;
+			LOG_PATCH std::cout << "extents" << std::endl;
+			LOG_PATCH std::cout
 				<< std::setw(16) << "0,0"
 				<< std::setw(16) << "0,1"
 				<< std::setw(16) << "1,0"
@@ -181,6 +180,9 @@ void		Patch::create_faces() {
 								equ_bou = vec[vec_ind];
 							} else if(vec.size() == 1) {
 								equ_bou = vec[0];
+							} else if(vec.empty()) {
+								vec.push_back(std::make_shared<boundary_insulated>());
+								equ_bou = vec[0];
 							} else {
 								std::cout << "boundary vector[][] must be of size 1 or equal to number of faces along direction in patch" << std::endl;
 								abort();
@@ -219,79 +221,104 @@ void		Patch::create_faces() {
 
 
 // value statistics
-real		Patch::max(std::string equ_name) {
-	real v = -1E37;
-
+real				Patch::min(std::string const & name) const {
+	real v = 1E37;
 	for(auto f : *faces_) {
-		real a = f->equs_[equ_name]->max();
-		real v = std::max(v,a);
-		//print "a v",a,v
-	}	
+		auto e = f->equs_[name];
+		assert(e);
+		v = std::min(v,e->min());
+	}
+	return v;
+}
+real				Patch::max(std::string const & name) const {
+	real v = -1E37;
+	for(auto f : *faces_) {
+		auto e = f->equs_[name];
+		assert(e);
+		v = std::max(v,e->max());
+	}
 	return v;
 }
 void		Patch::grid_nbrs() {
-	int nx = faces_->n_[0];
-	int ny = faces_->n_[1];
+#ifdef _DEBUG
+	std::cout << "grid_nbrs" << std::endl;
+	print_row(8,"name","Z");
+	print_row(8,name_,Z_);
+#endif
 
-	for(int i : range(nx)) {
-		for(int j : range(ny)) {
+	size_t nx = faces_->n_[0];
+	size_t ny = faces_->n_[1];
+
+	for(size_t i : range(nx)) {
+		for(size_t j : range(ny)) {
+			int is = i;
+			int js = j;
+#ifdef _DEBUG
+			print_row(4,"i","j","is","js");
+			print_row(4,i,j,is,js);
+#endif
 			auto f1 = faces_->get(i,j);
-			if(i > 0) {
-				if(not f1->conns_[0][0])
-					connect(f1, 0, 0, faces_->get(i-1,j), 0, 1);
-			}
-			if(i < (nx-1)) {
-				if(not f1->conns_[0][1])
-					connect(f1, 0, 1, faces_->get(i+1,j), 0, 0);
-			}
-			if(j > 0) {
-				if(not f1->conns_[1][0])
-					connect(f1, 1, 0, faces_->get(i,j-1), 1, 1);
-			}
-			if(j < (ny-1)) {
-				if(not f1->conns_[1][1])
-					connect(f1, 1, 1, faces_->get(i,j+1), 1, 0);
+			
+			auto lconnect = [&] (bool criteria, size_t i, size_t s, int i_off, int j_off) {
+				int i2 = is + i_off;
+				int j2 = js + j_off;
+				if(criteria) {
+					print_row(4,"i2","j2",i2,j2);
+
+					auto f2 = faces_->get(i2, j2);
+					try {
+						connect(f1, i, s, f2, i, ((s==0)?1:0));
+					} catch(conns_not_zero e) {
+					} catch(...) {
+						std::cout << "unknwon error" << std::endl;
+						abort();
+					}
+				}
+			};
+			
+			assert(i >= 0);
+			assert(j >= 0);
+
+			lconnect(((size_t)i) > 0, 	0, 0, -1,  0);
+			lconnect(((size_t)i) < (nx-1), 	0, 1,  1,  0);
+			lconnect(((size_t)j) > 0, 	1, 0,  0, -1);
+			lconnect(((size_t)j) < (ny-1),	1, 1,  0,  1);
+
+		}
+	}
+}
+void		Patch::connection_info() const {
+	std::cout << "patch " << name_ << std::endl;
+	for(size_t i : range(faces_->n_[0])) {
+		for(size_t j : range(faces_->n_[1])) {
+			std::cout << "\tface[" << i << "][" << j << "]" << std::endl;
+
+			auto f = faces_->get(i,j);
+			for(auto ic : range(2)) {
+				for(auto jc : range(2)) {
+					auto c = f->conns_[ic][jc];
+					if(c) {
+						std::cout << "\t\tconn["<< ic <<"]["<< jc <<"] = face in patch '" << c->twin_->face_->patch_->name_ << "'" << std::endl;
+					}
+				}
 			}
 		}
 	}
 }
-
-void		Patch::write_binary(std::string equ_name) {
+void		Patch::write_binary(std::string ename) {
 
 	// construct names
-	
+
 	auto group = group_.lock();
 	assert(group);
 	auto prob = group->prob_.lock();
 	assert(prob);
 
-	std::string dir1 = "output";
-	std::string dir2 = dir1 + "/" + prob->name_;
-	std::string filename = dir2 + "/binary_" + equ_name + "_" + name_ + ".txt";
-	
-	// create folders
-	
-	struct stat sb;
-
-	if(stat(dir1.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) {
-	} else {
-		if(mkdir(dir1.c_str(),S_IRWXU|S_IRGRP|S_IXGRP) != 0) {
-			perror("mkdir error:");
-			return;
-		}
-	}
-
-	if(stat(dir2.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode)) {
-	} else {
-		if(mkdir(dir2.c_str(),S_IRWXU|S_IRGRP|S_IXGRP) != 0) {
-			perror("mkdir error:");
-			return;
-		}
-	}
+	auto dir = prob->mkdir(ename);
+	auto filename = dir + "/binary_" + name_ + ".txt";
 	
 	std::ofstream ofs;
 	ofs.open(filename, std::ofstream::trunc);
-
 	if(!ofs.is_open()) {
 		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "file stream not open" << std::endl;
 		return;
@@ -300,7 +327,7 @@ void		Patch::write_binary(std::string equ_name) {
 	math::basic_binary_oarchive ar(ofs);
 
 	for(auto f : *faces_) {
-		f->write_binary(equ_name, ar);
+		f->write_binary(ename, ar);
 	}
 }
 

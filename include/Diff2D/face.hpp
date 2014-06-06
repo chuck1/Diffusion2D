@@ -78,7 +78,7 @@ class Face: public LocalCoor, public std::enable_shared_from_this<Face> {
 		void			step_pre_cell(Equation_s equ, std::vector<int> ind, int V);
 		void			step_pre_cell_open_bou(Equation_s equ, std::vector<int> ind, int V);
 		void			step_pre(Equation_s equ);
-		real			step(std::string equ_name);
+		real			step(std::string equ_name, size_t it);
 
 		void			send(std::string equ_name);
 		void			recv(std::string equ_name);

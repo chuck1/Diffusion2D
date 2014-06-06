@@ -80,34 +80,43 @@ real			Equation::at_point(point pt) {
 	//print face_->ext
 	};*/
 	
-	BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "search for " << pt.x << " " << pt.y << " " << pt.z << GAL_LOG_ENDLINE;
-	BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "extents are:" << GAL_LOG_ENDLINE;
-	BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "    " << face_->ext_->get(0,0) << " " << face_->ext_->get(0,1) << GAL_LOG_ENDLINE;
-	BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "    " << face_->ext_->get(1,0) << " " << face_->ext_->get(1,1) << GAL_LOG_ENDLINE;
-	BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "    " << face_->pos_z_ << GAL_LOG_ENDLINE;
+	DEBUG_LINE std::cout << "patch '" << face_->patch_->name_ << "'" << std::endl;
+	DEBUG_LINE std::cout << "search for " << pt.x << " " << pt.y << " " << pt.z << std::endl;
+	DEBUG_LINE std::cout << "extents are:" << std::endl;
+	DEBUG_LINE std::cout << "\t" << face_->ext_->get(0,0) << " " << face_->ext_->get(0,1) << std::endl;
+	DEBUG_LINE std::cout << "\t" << face_->ext_->get(1,0) << " " << face_->ext_->get(1,1) << std::endl;
+	DEBUG_LINE std::cout << "\t" << face_->pos_z_ << std::endl;
+	
+	real ext[3][2];
 
-	if(pt[xg.i] < face_->ext_->get(0,0)) {
-		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "x " << pt[xg.i] << " < " << face_->ext_->get(0,0) << std::endl;
+	ext[xg.i][0] = std::min(face_->ext_->get(0,0), face_->ext_->get(0,1));
+	ext[xg.i][1] = std::max(face_->ext_->get(0,0), face_->ext_->get(0,1));
+	ext[yg.i][0] = std::min(face_->ext_->get(1,0), face_->ext_->get(1,1));
+	ext[yg.i][1] = std::max(face_->ext_->get(1,0), face_->ext_->get(1,1));
+	
+	
+	if(pt[xg.i] < ext[xg.i][0]) {
+		DEBUG_LINE std::cout << "x " << pt[xg.i] << " < " << ext[xg.i][0] << std::endl;
 		throw point_not_found();
 	}
 
-	if(pt[xg.i] > face_->ext_->get(0,1)) {
-		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "x " << pt[xg.i] << " > " << face_->ext_->get(0,1) << std::endl;
+	if(pt[xg.i] > ext[xg.i][1]) {
+		DEBUG_LINE std::cout << "x " << pt[xg.i] << " > " << ext[xg.i][1] << std::endl;
 		throw point_not_found();
 	}
 
-	if(pt[yg.i] < face_->ext_->get(1,0)) {
-		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "y " << pt[yg.i] << " > " << face_->ext_->get(1,0) << std::endl;
+	if(pt[yg.i] < ext[yg.i][0]) {
+		DEBUG_LINE std::cout << "y " << pt[yg.i] << " > " << ext[yg.i][0] << std::endl;
 		throw point_not_found();
 	}
 
-	if(pt[yg.i] > face_->ext_->get(1,1)) {
-		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "y " << pt[yg.i] << " > " << face_->ext_->get(1,1) << std::endl;
+	if(pt[yg.i] > ext[yg.i][1]) {
+		DEBUG_LINE std::cout << "y " << pt[yg.i] << " > " << ext[yg.i][1] << std::endl;
 		throw point_not_found();
 	}
-
+	
 	if(pt[zg.i] != face_->pos_z_) {
-		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "z" << std::endl;
+		DEBUG_LINE std::cout << "z" << std::endl;
 		throw point_not_found();
 	}
 

@@ -29,10 +29,16 @@ class Patch: public LocalCoor, public std::enable_shared_from_this<Patch> {
 
 		void		set_v_bou(std::string equ_name, std::vector< array<real,1> > v_bou);
 
-		real		max(std::string equ_name);
-
+		/** @name value inspection and manipulation
+		 * @{
+		 */
+		real		min(std::string const & equ_name) const;
+		real		max(std::string const & equ_name) const;
+		/** @} */
 		void		create_faces();
 		void		grid_nbrs();
+		
+		void		connection_info() const;
 
 		void		write_binary(std::string equ_name);
 	public:

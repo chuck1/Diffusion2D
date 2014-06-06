@@ -5,6 +5,7 @@
 
 struct IS {
 	IS() {}
+	IS(IS const & is): i(is.i), s(is.s) {}
 	IS&	operator=(IS const & is) {
 		i = is.i;
 		s = is.s;
@@ -40,7 +41,10 @@ class LocalCoor {
 		int		loc_to_glo(int L);
 		
 		IS		glo_to_loc2(int G);
-		IS		loc_to_glo2(int G);
+		IS		loc_to_glo2(int L);
+
+		IS		glo_to_loc2(IS G);
+		IS		loc_to_glo2(IS L);
 
 		int	Z_;
 		int	X_;

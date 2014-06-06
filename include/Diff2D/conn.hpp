@@ -16,9 +16,16 @@ import equation
 
 #include <map>
 #include <memory>
+#include <exception>
 
 #include "face.hpp"
 #include "index_lambda.hpp"
+
+struct conns_not_zero: std::exception {
+	const char*	what() {
+		return "conns not zero";
+	}
+};
 
 class Conn {
 	public:

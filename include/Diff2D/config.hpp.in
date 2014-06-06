@@ -5,15 +5,28 @@
 
 #include <memory>
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #    define IF(x) if(x)
-#    define ASSERT(x) assert(x)
-#elif defined RELEASE
-#   define IF(x) if(false)
-#   define ASSERT(x)
+#    define DEBUG_LINE if(1)
+#elif defined NDEBUG
+#    define IF(x) if(0)
+#    define DEBUG_LINE if(0)
 #else
-#    error "must define one of DEBUG or RELEASE"
+#    error "must define one of _DEBUG or NDEBUG"
 #endif
+
+#ifdef DEBUG_FACE
+#define LOG_FACE if(1)
+#else
+#define LOG_FACE if(0)
+#endif
+
+#ifdef DEBUG_PATCH
+#define LOG_PATCH if(1)
+#else
+#define LOG_PATCH if(0)
+#endif
+
 
 typedef double real;
 

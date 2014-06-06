@@ -23,7 +23,7 @@ void solve_temp(std::shared_ptr<Prob> prob) {
 
 	prob->write_binary("T");
 	prob->write("T");
-
+	
 	prob->solve("T", 1e-4, 0, 0);
 
 	prob->write_binary("T");
@@ -88,13 +88,36 @@ int main(int ac, char** av) {
 	point pt5(1.5,1.5,0.0);
 	
 
-	auto g2 = prob->create_patch_group("2", {{"T",20.0},{"s",2.0}}, {{"T", 50.0},{"s",100.0}}, pt2);
+	auto g2 = prob->create_patch_group("2", {{"T",20.0},{"s",2.0}}, {{"T",  0.0},{"s",100.0}}, pt2);
 	auto g3 = prob->create_patch_group("3", {{"T", 0.0},{"s",2.0}}, {{"T",  0.0},{"s",100.0}}, pt3);
 	auto g4 = prob->create_patch_group("4", {{"T", 0.0},{"s",2.0}}, {{"T",  0.0},{"s",100.0}}, pt4);
-	auto g5 = prob->create_patch_group("5", {{"T", 0.0},{"s",2.0}}, {{"T",-50.0},{"s",100.0}}, pt5);
+	auto g5 = prob->create_patch_group("5", {{"T", 0.0},{"s",2.0}}, {{"T",  0.0},{"s",100.0}}, pt5);
 	
 	auto const_bou(std::make_shared<boundary_single>(1.0));
+
+	auto const_bou2(std::make_shared<boundary_single>(10));
+	auto const_bou3(std::make_shared<boundary_single>(20));
+
+	patch_v_bou_vec_type v_bou_T_zm({
+			{
+			{const_bou2},{const_bou2}
+			},
+			{
+			{const_bou2},{const_bou2}
+			}
+			});
+
+	patch_v_bou_vec_type v_bou_T_zp({
+			{
+			{const_bou3},{const_bou3}
+			},
+			{
+			{const_bou3},{const_bou3}
+			}
+			});
+
 	
+
 	patch_v_bou_vec_type v_bou_s_def({
 			{
 			{const_bou,const_bou},
@@ -108,6 +131,9 @@ int main(int ac, char** av) {
 
 	patch_v_bou_type v_bou_def({{"s",v_bou_s_def}});
 
+	patch_v_bou_type v_bou_zm({{"s",v_bou_s_def},{"T",v_bou_T_zm}});
+	patch_v_bou_type v_bou_zp({{"s",v_bou_s_def},{"T",v_bou_T_zp}});
+
 	/*	v_bou_def["T"] = {
 		{30.0,30.0},
 		{30.0,30.0}
@@ -118,11 +144,10 @@ int main(int ac, char** av) {
 	//p0 = prob.createPatch(1,	[1,	[0,1],	[0,1]])
 	//p1 = prob.createPatch(2,	[[0,1],	1,	[0,1]])
 
-	p2 = g2->create_patch("2",3,	{0,1,2},	{0,1,2},	{2},		v_bou_def);
-
+	p2 = g2->create_patch("2",3,	{0,1,2},	{0,1,2},	{2},		v_bou_zp);
 	p3 = g3->create_patch("3",-1,	{0},		{2,1,0},	{2,1,0},	v_bou_def);
 	p4 = g4->create_patch("4",-2,	{2,1,0},	{0},		{2,1,0},	v_bou_def);
-	p5 = g5->create_patch("5",-3,	{2,1,0},	{2,1,0},	{0},		v_bou_def);
+	p5 = g5->create_patch("5",-3,	{2,1,0},	{2,1,0},	{0},		v_bou_zm);
 
 
 	stitch(p0,p1);
