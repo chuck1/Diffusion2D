@@ -46,9 +46,14 @@ void solve_with_source(std::shared_ptr<Prob> prob) {
 }
 
 int main(int ac, char** av) {
+	
+	if(ac != 2) {
+		std::cout << "usage: " << av[0] << " <run number>" << std::endl;
+		return 1;
+	}
 
 	// thomas's data
-	size_t run_index = 0;
+	size_t run_index = atoi(av[1]);
 	real T_in_pipe[]  = {152.9, 203.6, 415.1};
 	real T_in_head[]  = {203.5, 291.8, 487.8};
 	real T_in_flux[]  = {227.7, 315.7, 504.7};
@@ -59,7 +64,7 @@ int main(int ac, char** av) {
 	const char* prob_names[] = {"opt2_run1","opt2_run2","opt2_run3"};
 	
 	// convert to kelvin
-	for(size_t i = 0; i < 1; ++i) {
+	for(size_t i = 0; i < 3; ++i) {
 		T_in_pipe[i]  += 273.15;
 		T_in_head[i]  += 273.15;
 		T_in_flux[i]  += 273.15;
