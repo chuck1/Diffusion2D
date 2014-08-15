@@ -48,7 +48,7 @@ Patch_Group_s		Prob::create_patch_group(std::string name, std::map<std::string, 
 //save()
 sys.exit(0)
 }*/	
-real		Prob::max(std::string const & equ_name) const {
+real			Prob::max(std::string const & equ_name) const {
 	real T = -1E37;
 	for(auto f : faces()) {
 		auto e = f->equs_[equ_name];
@@ -56,7 +56,7 @@ real		Prob::max(std::string const & equ_name) const {
 	}
 	return T;
 }
-real		Prob::min(std::string const & equ_name) const {
+real			Prob::min(std::string const & equ_name) const {
 	real v = 1E37;
 	for(auto f : faces()) {
 		auto e = f->equs_[equ_name];
@@ -64,7 +64,7 @@ real		Prob::min(std::string const & equ_name) const {
 	}	
 	return v;
 }
-real		Prob::grad_max(std::string const & equ_name) const {
+real			Prob::grad_max(std::string const & equ_name) const {
 	real v = -1E37;
 	for(auto f : faces()) {
 		auto e = f->equs_[equ_name];
@@ -72,7 +72,7 @@ real		Prob::grad_max(std::string const & equ_name) const {
 	}
 	return v;
 }
-real		Prob::grad_min(std::string const & equ_name) const {
+real			Prob::grad_min(std::string const & equ_name) const {
 	real v = 1E37;
 	for(auto f : faces()) {
 		auto e = f->equs_[equ_name];
@@ -81,24 +81,24 @@ real		Prob::grad_min(std::string const & equ_name) const {
 	return v;
 }
 // value manipulation
-void		Prob::value_add(std::string const & equ_name, array<real,2> const & v) {
+void			Prob::value_add(std::string const & equ_name, array<real,2> const & v) {
 	for(auto f : faces()) {
 		auto equ = f->equs_[equ_name];
 		equ->v_->add_self(v);
 	}
 }
-void		Prob::value_add(std::string const & equ_name, real const & v) {
+void			Prob::value_add(std::string const & equ_name, real const & v) {
 	for(auto f : faces()) {
 		auto equ = f->equs_[equ_name];
 		equ->v_->add_self(v);
 	}
 }
-void		Prob::value_clamp_per_group(std::string const & name, real a, real const & b) {
+void			Prob::value_clamp_per_group(std::string const & name, real a, real const & b) {
 	for(auto g : patch_groups_) {
 		g->value_clamp(name,a,b);
 	}
 }
-void		Prob::value_normalize(std::string const & equ_name) {
+void			Prob::value_normalize(std::string const & equ_name) {
 	for(auto g : patch_groups_) {
 		// max value in patch group
 		real v_max = -1E37;
@@ -119,7 +119,7 @@ void		Prob::value_normalize(std::string const & equ_name) {
 		}
 	}
 }
-void		Prob::copy_value_to_source(std::string equ_name_from, std::string equ_name_to) {
+void			Prob::copy_value_to_source(std::string equ_name_from, std::string equ_name_to) {
 	Equation_s e1;
 	Equation_s e2;
 
@@ -154,10 +154,10 @@ std::vector<Face_s>		Prob::faces() const {
 	return ret;
 }
 // solving
-int		Prob::solve(std::string name, real cond, size_t it_outer, real R_outer) {
+int				Prob::solve(std::string name, real cond, size_t it_outer, real R_outer) {
 	return solve_serial(name, cond, it_outer, R_outer);
 }
-int		Prob::solve_serial(std::string name, real cond_inner, size_t it_outer, real R_outer) {
+int				Prob::solve_serial(std::string name, real cond_inner, size_t it_outer, real R_outer) {
 
 	real cond_grad_inner = -1E-9;
 
@@ -213,7 +213,7 @@ int		Prob::solve_serial(std::string name, real cond_inner, size_t it_outer, real
 	}
 	return it;
 }
-int		Prob::solve_outer_group(
+int				Prob::solve_outer_group(
 		std::string const & ename,
 		real cond_outer,
 		real cond_inner,
@@ -269,7 +269,7 @@ int		Prob::solve_outer_group(
 	}
 	return it_outer;
 }
-void		Prob::solve2(std::string ename, real cond_outer, real cond_inner) {
+void			Prob::solve2(std::string ename, real cond_outer, real cond_inner) {
 	
 	//real R_outer = 1.0;
 
@@ -301,19 +301,19 @@ void		Prob::solve2(std::string ename, real cond_outer, real cond_inner) {
 		it3++;
 	}
 }
-void		Prob::save() {
+void			Prob::save() {
 	std::ofstream ofs;
 	ofs.open("case_" + name_, std::ofstream::out);
 	//pickle.dump(f)
 }
-void		Prob::connection_info() const {
+void			Prob::connection_info() const {
 	for(auto g : patch_groups_) {
 		for(auto p : g->patches_) {
 			p->connection_info();
 		}
 	}
 }
-void		Prob::value_stats(std::string const & name) const {
+void			Prob::value_stats(std::string const & name) const {
 	size_t col = 16;
 	std::cout
 		<< std::setw(col*4) << std::setfill(' ') << " "
@@ -343,7 +343,7 @@ void		Prob::value_stats(std::string const & name) const {
 		print_row(16, ("'" + g->name_ + "'"), target, value, error);
 	}
 }
-void		Prob::write(std::string equ_name) {
+void			Prob::write(std::string equ_name) {
 
 	/*if(not os.path.exists(directory)) {
 	  os.makedirs(directory)
@@ -416,7 +416,7 @@ void		Prob::write(std::string equ_name) {
 
 
 }
-void		Prob::write_binary(std::string ename) {
+void			Prob::write_binary(std::string ename) {
 
 	for(auto g : patch_groups_) {
 		//print g

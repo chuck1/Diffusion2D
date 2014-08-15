@@ -39,6 +39,7 @@ class Patch: public LocalCoor, public std::enable_shared_from_this<Patch> {
 		void		grid_nbrs();
 		
 		void		connection_info() const;
+		void		info_geom() const;
 
 		void		write_binary(std::string equ_name);
 	public:

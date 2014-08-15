@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 2.8.8)
 INCLUDE($ENV{HOME}/.config.cmake)
 
 project(Diff2D)
+SET(Diff2D_STATIC ON)
 
 find_package(CMakeHelper)
 
@@ -21,9 +22,9 @@ cmh_vars_from_file("${PROJECT_BINARY_DIR}/vars.txt")
 
 #SET(GRU_VERSION 0.1.1)
 
-cmh_static_library()
+cmh_library()
 
-cmh_process_debug(DEBUG DEBUG_FACE)
+#cmh_process_debug(DEBUG DEBUG_FACE)
 
 add_subdirectory(test)
 

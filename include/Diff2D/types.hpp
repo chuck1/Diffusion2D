@@ -9,9 +9,9 @@
 
 struct boundary;
 
-typedef std::vector< array<real,1> >		coor_type;
+typedef std::vector< array<real,1> >					coor_type;
 
-typedef std::vector< array<size_t,1> >		cell_count_type;
+typedef std::vector< array<size_t,1> >					cell_count_type;
 
 
 typedef std::vector< std::shared_ptr< boundary > >			patch_v_bou_edge_vec_type;

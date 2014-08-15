@@ -305,6 +305,32 @@ void		Patch::connection_info() const {
 		}
 	}
 }
+void		Patch::info_geom() const {
+	
+	int I = *std::min_element(indices_[x_.i].cbegin(), indices_[x_.i].cend());
+	int M = *std::max_element(indices_[x_.i].cbegin(), indices_[x_.i].cend());
+	int J = *std::min_element(indices_[y_.i].cbegin(), indices_[y_.i].cend());
+	int N = *std::max_element(indices_[y_.i].cbegin(), indices_[y_.i].cend());
+	
+
+	
+	real xm = coor_[x_.i]->get(I);
+	real xp = coor_[x_.i]->get(M);
+	real ym = coor_[y_.i]->get(J);
+	real yp = coor_[y_.i]->get(N);
+
+	print_row(16,"xm","xp","ym","yp");
+	print_row(16, I, M, J, N);
+
+	print_row(16,"xm","xp","ym","yp");
+	print_row(16,xm,xp,ym,yp);
+
+	real z = coor_[z_.i]->get(indices_[z_.i][0]);
+
+	print_row(16, "z");
+	print_row(16, z);
+
+}
 void		Patch::write_binary(std::string ename) {
 
 	// construct names

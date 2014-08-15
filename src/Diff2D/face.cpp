@@ -74,7 +74,7 @@ Equation_s		Face::create_equ(std::string name, Equation_Prob_s equ_prob) {
 	equs_[name] = equ;
 	return equ;
 }
-int		Face::get_loc_pos_par_index(Face_s nbr) {
+int				Face::get_loc_pos_par_index(Face_s nbr) {
 	int OL = nbr_to_loc(nbr);
 
 	int PL = abs(cross(3, OL));
@@ -82,16 +82,16 @@ int		Face::get_loc_pos_par_index(Face_s nbr) {
 	int PG = loc_to_glo(PL);
 	return PG;
 }	
-real		Face::x(int i) {
+real			Face::x(int i) {
 	return (i + 0.5) * d_->get(0);
 }
-real		Face::y(int j) {
+real			Face::y(int j) {
 	return (j + 0.5) * d_->get(1);
 }
-real		Face::area() {
+real			Face::area() {
 	return (ext_->get(0,1) - ext_->get(0,0)) * (ext_->get(1,1) - ext_->get(1,0));
 }
-int		Face::nbr_to_loc(Face_s nbr) {
+int				Face::nbr_to_loc(Face_s nbr) {
 	//if(not nbr) raise ValueError('nbr is None')
 
 	for(int i = 0; i < 2; ++i) {
@@ -109,7 +109,7 @@ int		Face::nbr_to_loc(Face_s nbr) {
 	//raise ValueError('nbr not found')
 	throw 0;
 }
-Conn_s			Face::loc_to_conn(int V) {
+Conn_s				Face::loc_to_conn(int V) {
 	IS v(V);
 	return conns_[v.i][(v.s+1)/2];
 }
@@ -140,7 +140,7 @@ Index_Lambda		Face::index_lambda(Face_s nbr) {
 
 	return il;
 }
-void		Face::send_array(Equation_s equ, Conn_s conn) {
+void			Face::send_array(Equation_s equ, Conn_s conn) {
 	auto v = make_ones<real,1>({n_->get(conn->pl_.i)});
 
 	for(size_t a = 0; a < n_->get(conn->pl_.i); ++a) {
@@ -148,7 +148,7 @@ void		Face::send_array(Equation_s equ, Conn_s conn) {
 	}
 	conn->send(equ->name_, v);
 }	
-void		Face::recv_array(Equation_s equ, Conn_s conn) {
+void			Face::recv_array(Equation_s equ, Conn_s conn) {
 	assert(equ);
 	assert(equ->v_);
 

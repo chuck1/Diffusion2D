@@ -47,69 +47,34 @@ void solve_with_source(std::shared_ptr<Prob> prob) {
 
 int main(int ac, char** av) {
 	
-	if(ac != 3) {
-		std::cout << "usage: " << av[0] << " <run number> <scale>" << std::endl;
+	if(ac != 2) {
+		std::cout << "usage: " << av[0] << " <run number>" << std::endl;
 		return 1;
 	}
 
 	// thomas's data
 	size_t run_index = atoi(av[1]);
+	real T_in_pipe[]  = {152.9, 203.6, 415.1};
+	real T_in_head[]  = {203.5, 291.8, 487.8};
+	real T_in_flux[]  = {227.7, 315.7, 504.7};
+	real T_out_flux[] = {244.6, 346.9, 522.5};
+	real T_out_head[] = {250.8, 355.7, 538.0};
+	real T_out_pipe[] = {229.3, 332.6, 512.8};
 
+	real* T_ym = new real[3];
 
-	// ==========
-	// control
-	// ==========
-	real scale = atof(av[2]);
-	//real scale = 0.606;
+	const char* prob_names[] = {"opt2_run1","opt2_run2","opt2_run3"};
 	
-	
-//634.5223014119	611.2349553897	675.8979759917	674.4981102261	11.7001041789	507.2588370153	652.0528261193
-//686.8098464691	659.479292501	733.2753376981	732.1215825149	28.841169229	538.5126767765	706.8066929417
-
-
-
-	std::vector<real> T_in_flux({
-			227.7,	315.7,	504.7,	367.9249,	557.72247,		586.2404895029,634.5223014119,686.8098464691,
-			523.3696119556});
-	std::vector<real> T_in_head({
-			203.5,	291.8,	487.8,	0,		525.3628,		567.4808479472,611.2349553897,659.479292501,
-			523.8404520971});
-
-	std::vector<real> T_out_flux({
-			244.6,	346.9,	522.5,	366.3048,	548.469987840989,	621.5411770666,675.8979759917,733.2753376981,
-			574.3322611331});
-	std::vector<real> T_out_head({
-			250.8,	355.7,	538.0,	0,		568.710121826855,	620.5250819196,674.4981102261,732.1215825149,
-			566.3465735021});
-	
-	std::vector<real> T_in_pipe({152.9,
-			203.6,	415.1,	370.1631,	456.99214314841,	482.1696683249,507.2588370153,538.5126767765,
-			454.1317974646});
-	std::vector<real> T_out_pipe({
-			229.3,	332.6,	512.8,	366.0912,	542.033367685513,	601.3546277796,652.0528261193,706.8066929417,
-			552.5905878072});
-
-
-	const char* prob_names[] = {
-		"opt2_run1",		// 0
-		"opt2_run2",		// 1
-		"opt2_run3",		// 2
-		"opt2_all_ins_1",	// 3
-		"opt2_07_02_run_1",	// 4
-		"opt2_07_02_run_2",	// 5
-		"opt2_07_02_run_3",	// 6
-		"opt2_07_02_run_4",	// 7
-		"opt2_07_02_run_5"	// 8
-	};
-
 	// convert to kelvin
-	for(size_t i = 0; i < T_in_pipe.size(); ++i) {
+	for(size_t i = 0; i < 3; ++i) {
 		T_in_pipe[i]  += 273.15;
 		T_in_head[i]  += 273.15;
 		T_in_flux[i]  += 273.15;
 		T_out_flux[i] += 273.15;
 		T_out_head[i] += 273.15;
 		T_out_pipe[i] += 273.15;
+
+		T_ym[i] = (T_in_flux[i] + T_out_flux[i]) * 0.5;
 	}
 
 	// solve
@@ -155,53 +120,7 @@ int main(int ac, char** av) {
 
 	real s = 1.0e10;
 
-	real T_flux_avg = (T_in_flux[run_index] + T_out_flux[run_index]) / 2.0 * scale;
 
-	// irradiated edge temperatures
-	/*
-	   patch_v_bou_edge_vec_type T_irr_xm({
-	   std::make_shared<boundary_array>(make_ones<real,1>({nz->get(1)})->multiply_self(T_in_flux[run_index])),
-	   std::make_shared<boundary_array>(make_ones<real,1>({nz->get(2)})->multiply_self(T_in_flux[run_index])),
-	   std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_in_flux[run_index])),
-	   std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_in_flux[run_index]))
-	   });
-
-	   patch_v_bou_edge_vec_type T_irr_xp({
-	   std::make_shared<boundary_array>(make_ones<real,1>({nz->get(1)})->multiply_self(T_out_flux[run_index])),
-	   std::make_shared<boundary_array>(make_ones<real,1>({nz->get(1)})->multiply_self(T_out_flux[run_index])),
-	   std::make_shared<boundary_array>(make_ones<real,1>({nz->get(2)})->multiply_self(T_out_flux[run_index])),
-	   std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_out_flux[run_index]))
-	   });
-
-	   patch_v_bou_edge_vec_type T_irr_zm({
-	   std::make_shared<boundary_array>(linspace(T_out_flux[run_index], T_in_flux[run_index], nx->get(3)))
-	   });
-
-	   patch_v_bou_edge_vec_type T_irr_zp({
-	   std::make_shared<boundary_array>(linspace(T_out_flux[run_index], T_in_flux[run_index], nx->get(3)))
-	   });
-	   */
-	patch_v_bou_edge_vec_type T_irr_xm({
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(1)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(2)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
-			});
-
-	patch_v_bou_edge_vec_type T_irr_xp({
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(1)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(1)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(2)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
-			});
-
-	patch_v_bou_edge_vec_type T_irr_zm({
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
-			});
-
-	patch_v_bou_edge_vec_type T_irr_zp({
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
-			});
 	//nx = [10, 10, 10, 50, 10, 10, 10];
 	//ny = [50, 50];
 	//nz = [10, 10, 30, 10, 10];
@@ -218,24 +137,6 @@ int main(int ac, char** av) {
 			});
 
 
-	patch_v_bou_vec_type v_bou_T_irr_xm({
-			{T_irr_xm,{}},
-			{{},{}}
-			});
-	patch_v_bou_vec_type v_bou_T_irr_xp({
-			{{},T_irr_xp},
-			{{},{}}
-			});	
-	patch_v_bou_vec_type v_bou_T_irr_zm({
-			{{},{}},
-			{T_irr_zm,{}}
-
-			});	
-	patch_v_bou_vec_type v_bou_T_irr_zp({
-			{{},{}},
-			{{},T_irr_zp}
-			});
-
 
 	patch_v_bou_vec_type v_bou_T_i({
 			{{T_bou_i},{T_bou_i}},
@@ -249,10 +150,6 @@ int main(int ac, char** av) {
 
 	patch_v_bou_type v_bou_def({{"s",v_bou_s_def}});
 
-	patch_v_bou_type v_bou_irr_xm({{"s",v_bou_s_def},{"T",v_bou_T_irr_xm}});
-	patch_v_bou_type v_bou_irr_xp({{"s",v_bou_s_def},{"T",v_bou_T_irr_xp}});
-	patch_v_bou_type v_bou_irr_zm({{"s",v_bou_s_def},{"T",v_bou_T_irr_zm}});
-	patch_v_bou_type v_bou_irr_zp({{"s",v_bou_s_def},{"T",v_bou_T_irr_zp}});
 
 
 	patch_v_bou_type v_bou_i({{"s",v_bou_s_def},{"T",v_bou_T_i}});
@@ -266,12 +163,8 @@ int main(int ac, char** av) {
 			(y->get(0) + y->get(1)) / 2.0,
 			(z->get(2) + z->get(3)) / 2.0);
 
-	point pt_f_in(
-			(x->get(1) + x->get(2)) / 2.0,
-			0.0,
-			z->get(3));
-	point pt_f_out(
-			(x->get(5) + x->get(6)) / 2.0,
+	point pt_ym(
+			(x->get(2) + x->get(5)) / 2.0,
 			0.0,
 			z->get(3));
 
@@ -297,18 +190,17 @@ int main(int ac, char** av) {
 
 	//==============================================================
 
-	auto prob = std::make_shared<Prob>(prob_names[run_index], X, n, 1E5, 1E5);
+	auto prob = std::make_shared<Prob>(prob_names[run_index], X, n, 2E4, 2E4);
 
 	prob->create_equation("T", 10.0, 1.5, 1.5);
 	prob->create_equation("s", 10.0, 1.5, 1.5);
 
-	auto g_xyz		= prob->create_patch_group("xyz",		{{"T",0.0},			{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_xz);
-	auto g_f_in		= prob->create_patch_group("f_in",		{{"T",T_in_flux[run_index]},	{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_f_in);
-	auto g_f_out		= prob->create_patch_group("f_out",		{{"T",T_out_flux[run_index]},	{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_f_out);
-	auto g_h_in		= prob->create_patch_group("h_in",		{{"T",T_in_head[run_index]},	{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_h_in);
-	auto g_h_out		= prob->create_patch_group("h_out",		{{"T",T_out_head[run_index]},	{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_h_out);
-	auto g_in		= prob->create_patch_group("in",		{{"T",T_in_pipe[run_index]},	{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_in);
-	auto g_out		= prob->create_patch_group("out",		{{"T",T_out_pipe[run_index]},	{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_out);
+	auto g_xyz		= prob->create_patch_group("xyz",		{{"T",0.0},		{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_xz);
+	auto g_h_in		= prob->create_patch_group("h_in",		{{"T",0.0},		{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_h_in);
+	auto g_h_out		= prob->create_patch_group("h_out",		{{"T",0.0},		{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_h_out);
+	auto g_in		= prob->create_patch_group("in",		{{"T",0.0},		{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_in);
+	auto g_out		= prob->create_patch_group("out",		{{"T",0.0},		{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_out);
+	auto g_ym		= prob->create_patch_group("out",		{{"T",T_ym[run_index]},	{"s",2.0}}, {{"T",0.0},{"s",s}}, pt_ym);
 
 	// create patches
 
@@ -324,16 +216,17 @@ int main(int ac, char** av) {
 
 
 	// ym
-	auto p_ym_0_0	= g_f_in->create_patch("p_ym_0_0",	-2,	{0,1,2,3},	{0},	{0,1},		v_bou_def);
-	auto p_ym_0_1	= g_f_in->create_patch("p_ym_0_1",	-2,	{0,1,2,3},	{0},	{1,2,3,4,5},	v_bou_irr_xm);// = {"T":{{T_irr_xm,0.0},{0.0,0.0}},"s":{{1.0,1.0},{1.0,1.0}}});
-	auto p_ym_0_2	= g_f_in->create_patch("p_ym_0_2",	-2,	{0,1,2,3},	{0},	{5,6},		v_bou_def);// = {"T":{{0.0,0.0},{0.0,0.0}},	"s":{{1.0,1.0},{1.0,1.0}}});
+	auto p_ym_0_0	= g_ym->create_patch("p_ym_0_0",	-2,	{0,1,2,3},	{0},	{0,1},		v_bou_def);
+	auto p_ym_0_1	= g_ym->create_patch("p_ym_0_1",	-2,	{0,1,2,3},	{0},	{1,2,3,4,5},	v_bou_def);
+	auto p_ym_0_2	= g_ym->create_patch("p_ym_0_2",	-2,	{0,1,2,3},	{0},	{5,6},		v_bou_def);// = {"T":{{0.0,0.0},{0.0,0.0}},	"s":{{1.0,1.0},{1.0,1.0}}});
 
-	auto p_ym_1_0	= g_xyz->create_patch("p_ym_1_0",	-2,	{3,4},		{0},	{0,1},		v_bou_irr_zm);// = {"T":{{0.0,0.0},{T_irr_zm,0.0}},"s":{{1.0,1.0},{1.0,1.0}}});
-	auto p_ym_1_2	= g_xyz->create_patch("p_ym_1_2",	-2,	{3,4},		{0},	{5,6},		v_bou_irr_zp);// = {"T":{{0.0,0.0},{0.0,T_irr_zp}},"s":{{1.0,1.0},{1.0,1.0}}});
+	auto p_ym_1_0	= g_ym->create_patch("p_ym_1_0",	-2,	{3,4},		{0},	{0,1},		v_bou_def);
+	auto p_ym_1_1	= g_ym->create_patch("p_ym_1_1",	-2,	{3,4},		{0},	{1,2,3,4,5},	v_bou_def);
+	auto p_ym_1_2	= g_ym->create_patch("p_ym_1_2",	-2,	{3,4},		{0},	{5,6},		v_bou_def);// = {"T":{{0.0,0.0},{0.0,T_irr_zp}},"s":{{1.0,1.0},{1.0,1.0}}});
 
-	auto p_ym_2_0	= g_f_out->create_patch("p_ym_2_0",	-2,	{4,5,6,7},	{0},	{0,1},		v_bou_def);// = {"T":{{0.0,0.0},{0.0,0.0}},	"s":{{1.0,1.0},{1.0,1.0}}});
-	auto p_ym_2_1	= g_f_out->create_patch("p_ym_2_1",	-2,	{4,5,6,7},	{0},	{1,2,3,4,5},	v_bou_irr_xp);// = {"T":{{0.0,T_irr_xp},{0.0,0.0}},"s":{{1.0,1.0},{1.0,1.0}}});
-	auto p_ym_2_2	= g_f_out->create_patch("p_ym_2_2",	-2,	{4,5,6,7},	{0},	{5,6},		v_bou_def);// = {"T":{{0.0,0.0},{0.0,0.0}},	"s":{{1.0,1.0},{1.0,1.0}}});
+	auto p_ym_2_0	= g_ym->create_patch("p_ym_2_0",	-2,	{4,5,6,7},	{0},	{0,1},		v_bou_def);// = {"T":{{0.0,0.0},{0.0,0.0}},	"s":{{1.0,1.0},{1.0,1.0}}});
+	auto p_ym_2_1	= g_ym->create_patch("p_ym_2_1",	-2,	{4,5,6,7},	{0},	{1,2,3,4,5},	v_bou_def);// = {"T":{{0.0,T_irr_xp},{0.0,0.0}},"s":{{1.0,1.0},{1.0,1.0}}});
+	auto p_ym_2_2	= g_ym->create_patch("p_ym_2_2",	-2,	{4,5,6,7},	{0},	{5,6},		v_bou_def);// = {"T":{{0.0,0.0},{0.0,0.0}},	"s":{{1.0,1.0},{1.0,1.0}}});
 
 	// yp
 	auto p_yp_0_0	= g_in->create_patch("p_yp_0_0",	2,	{0,1,2,3},	{1},	{0,1},		v_bou_def);// = {"T":{{0.0,0.0},{0.0,0.0}},"s":{{1.0,1.0},{1.0,1.0}}});
@@ -495,11 +388,16 @@ int main(int ac, char** av) {
 	stitch(p_ym_0_0,	p_ym_0_1);
 	stitch(p_ym_0_0,	p_ym_1_0);
 
+	stitch(p_ym_1_0,	p_ym_1_1);
 	stitch(p_ym_1_0,	p_ym_2_0);
-
+	
 	stitch(p_ym_2_0,	p_ym_2_1);
 
+	stitch(p_ym_0_1,	p_ym_1_1);
 	stitch(p_ym_0_1,	p_ym_0_2);
+
+	stitch(p_ym_1_1,	p_ym_2_1);
+	stitch(p_ym_1_1,	p_ym_1_2);
 
 	stitch(p_ym_2_1,	p_ym_2_2);
 
@@ -516,9 +414,9 @@ int main(int ac, char** av) {
 
 	prob->connection_info();
 
-	//solve_with_source(prob);
+	solve_with_source(prob);
 	//solve_source(prob);
-	solve_temp(prob);
+	//solve_temp(prob);
 
 	prob->value_stats("T");
 
