@@ -23,7 +23,7 @@ Equation::Equation(std::string name, Face_s face, Equation_Prob_s equ_prob):
 
 	//v_0_ = v_0
 
-	v_ = make_ones<real,2>({
+	v_ = math::make_ones<real,2>({
 			face_->n_->get(0) + 2,
 			face_->n_->get(1) + 2
 			});
@@ -32,11 +32,11 @@ Equation::Equation(std::string name, Face_s face, Equation_Prob_s equ_prob):
 
 	v_->multiply_self(group->v_0_[name_]);
 
-	s_ = make_ones_arr<real,2>(face->n_);
+	s_ = math::make_ones_arr<real,2>(face->n_);
 
 	flag_ = 0;
 }
-array<real,3>		Equation::grad() {
+math::array<real,3>		Equation::grad() {
 	//return np.gradient(v_[:-2,:-2], face_->d[0,0,0], face_.d[0,0,1])
 	return v_->sub({0,0},{-2,-2})->gradient(face_->d_);
 }

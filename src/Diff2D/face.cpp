@@ -18,14 +18,14 @@
 
 
 
-Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, array<size_t,1> n):
+Face::Face(Patch_s patch, int normal, math::array<real,2> const & ext, real pos_z, math::array<size_t,1> n):
 	LocalCoor(normal),
 	patch_(patch),
 	ext_(ext),
 	conns_({{0,0},{0,0}}),
 	pos_z_(pos_z),
 	n_(n),
-	d_(make_zeros<real,3>({n_->get(0)+2, n_->get(1)+2, 2}))
+	d_(math::make_zeros<real,3>({n_->get(0)+2, n_->get(1)+2, 2}))
 {
 	LOG_FACE std::cout << "Face ctor" << std::endl;
 
@@ -55,7 +55,7 @@ Face::Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, arr
 
 
 	// source
-	l_ = make_uninit<real,1>({2});
+	l_ = math::make_uninit<real,1>({2});
 	l_->get(0) = (ext_->get(0,1) - ext_->get(0,0)) / 2.0;
 	l_->get(1) = (ext_->get(1,1) - ext_->get(1,0)) / 2.0;
 
@@ -141,7 +141,7 @@ Index_Lambda		Face::index_lambda(Face_s nbr) {
 	return il;
 }
 void			Face::send_array(Equation_s equ, Conn_s conn) {
-	auto v = make_ones<real,1>({n_->get(conn->pl_.i)});
+	auto v = math::make_ones<real,1>({n_->get(conn->pl_.i)});
 
 	for(size_t a = 0; a < n_->get(conn->pl_.i); ++a) {
 		v->get(a) = equ->v_->get(conn->il_(0,a), conn->il_(1,a));
@@ -291,7 +291,7 @@ real		Face::step(std::string equ_name, size_t it_outer) {
 	auto g = patch_->group_.lock();
 	auto S = g->S_[equ->name_]->get(it_outer);
 
-	BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "face step S = " << S << GAL_LOG_ENDLINE;
+	LOG(lg, info, debug) << "face step S = " << S;
 
 	////print "face S",S
 	/*
@@ -366,7 +366,7 @@ real		Face::step(std::string equ_name, size_t it_outer) {
 
 			real nR;
 			if(yo == 0.0) {
-				BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", debug) << "yo is zero" << GAL_LOG_ENDLINE;
+				LOG(lg, info, debug) << "yo is zero";
 				//debug();
 			} else {
 				nR = fabs(dy/yo);
@@ -380,12 +380,12 @@ real		Face::step(std::string equ_name, size_t it_outer) {
 
 
 			IF(std::isnan(R)) {
-				BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "R is nan" << GAL_LOG_ENDLINE;
+				LOG(lg, info, critical) << "R is nan";
 				ldebug();
 				throw 0;
 			}
 			IF(std::isinf(R)) {
-				BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "R is inf" << GAL_LOG_ENDLINE;
+				LOG(lg, info, critical) << "R is inf";
 				ldebug();
 				throw 0;
 			}
@@ -414,15 +414,15 @@ void		Face::recv(std::string equ_name) {
 }
 grid_return_type	Face::grid(std::string equ_name) {
 
-	auto x = linspace(ext_->get(0,0), ext_->get(0,1), n_->get(0));
-	auto y = linspace(ext_->get(1,0), ext_->get(1,1), n_->get(1));
+	auto x = math::linspace(ext_->get(0,0), ext_->get(0,1), n_->get(0));
+	auto y = math::linspace(ext_->get(1,0), ext_->get(1,1), n_->get(1));
 
 	auto grid = meshgrid(x, y);
 
 	auto X = grid.first;
 	auto Y = grid.second;
 
-	auto Z = make_ones<real,2>(X->shape());
+	auto Z = math::make_ones<real,2>(X->shape());
 	Z->multiply_self(pos_z_);
 
 	auto equ = equs_[equ_name];

@@ -21,16 +21,15 @@ void solve_source(std::shared_ptr<Prob> prob) {
 	//prob->write("s");
 
 }
-void solve_temp(std::shared_ptr<Prob> prob) {
+void solve_temp(std::shared_ptr<Prob> prob, std::string filename_post) {
 	//prob->solve2(1e-4, 1e-2, True);
 	
 	prob->solve("T", r_inner, 0, 0);
 
-	prob->write_binary("T");
-	prob->write("T");
+	prob->write("T", filename_post);
 
 }
-void solve_with_source(std::shared_ptr<Prob> prob) {
+void solve_with_source(std::shared_ptr<Prob> prob, std::string filename_post) {
 	//prob->solve2(1e-4, 1e-2, True);
 
 	solve_source(prob);
@@ -40,34 +39,57 @@ void solve_with_source(std::shared_ptr<Prob> prob) {
 	
 	prob->solve2("T", r_inner, r_outer);
 
-	prob->write_binary("T");
-	prob->write("T");
+	prob->write("T", filename_post);
+
+}
+
+std::vector<real> T_in_flux;
+std::vector<real> T_in_head;
+std::vector<real> T_out_flux;
+std::vector<real> T_out_head;
+std::vector<real> T_test_sect_5;
+std::vector<real> T_in_pipe;
+std::vector<real> T_out_pipe;
+
+void add(std::vector<real> v) {
+	if(v.size() != 7) {
+		abort();
+	}
+
+	T_in_flux.push_back(v[0]);
+	T_in_head.push_back(v[1]);
+	T_out_flux.push_back(v[2]);
+	T_out_head.push_back(v[3]);
+	T_test_sect_5.push_back(v[4]);
+	T_in_pipe.push_back(v[5]);
+	T_out_pipe.push_back(v[6]);
 
 }
 
 int main(int ac, char** av) {
-	
+
 	if(ac != 3) {
 		std::cout << "usage: " << av[0] << " <run number> <scale>" << std::endl;
 		return 1;
 	}
 
 	// thomas's data
-	size_t run_index = atoi(av[1]);
+	size_t	run_index = atoi(av[1]);
+	real	scale = atof(av[2]);
 
 
 	// ==========
 	// control
 	// ==========
-	real scale = atof(av[2]);
 	//real scale = 0.606;
-	
-	
-//634.5223014119	611.2349553897	675.8979759917	674.4981102261	11.7001041789	507.2588370153	652.0528261193
-//686.8098464691	659.479292501	733.2753376981	732.1215825149	28.841169229	538.5126767765	706.8066929417
 
+	add({640.9781717713,	637.2495010125,	703.6938589917,	702.1543575967,	62.3666995343,	553.1765769709,	674.3398688067});
+	add({627.9347561185,	618.1189569002,	698.6610404241,	692.1932441164,	30.8815054636,	533.5492211871,	660.7297390312});
+	add({636.4218713701,	635.9965950936,	690.5556037588,	692.6233558482,	50.2664598524,	555.0510588274,	666.5653963326});
+	add({555.370219104,	552.3890972204,	602.160919343,	600.8069145759,	47.74667258,	488.5225376985,	578.0695143056});
+	add({485.7698777464,	480.2777204075,	523.8394439875,	520.7363702204,	18.7849387817,	431.1992687942,	500.5856968857});
 
-
+/*
 	std::vector<real> T_in_flux({
 			227.7,	315.7,	504.7,	367.9249,	557.72247,		586.2404895029,634.5223014119,686.8098464691,
 			523.3696119556});
@@ -81,17 +103,17 @@ int main(int ac, char** av) {
 	std::vector<real> T_out_head({
 			250.8,	355.7,	538.0,	0,		568.710121826855,	620.5250819196,674.4981102261,732.1215825149,
 			566.3465735021});
-	
+
 	std::vector<real> T_in_pipe({152.9,
 			203.6,	415.1,	370.1631,	456.99214314841,	482.1696683249,507.2588370153,538.5126767765,
 			454.1317974646});
 	std::vector<real> T_out_pipe({
 			229.3,	332.6,	512.8,	366.0912,	542.033367685513,	601.3546277796,652.0528261193,706.8066929417,
 			552.5905878072});
-
-
+*/
+	
 	const char* prob_names[] = {
-		"opt2_run1",		// 0
+/*		"opt2_run1",		// 0
 		"opt2_run2",		// 1
 		"opt2_run3",		// 2
 		"opt2_all_ins_1",	// 3
@@ -99,7 +121,12 @@ int main(int ac, char** av) {
 		"opt2_07_02_run_2",	// 5
 		"opt2_07_02_run_3",	// 6
 		"opt2_07_02_run_4",	// 7
-		"opt2_07_02_run_5"	// 8
+		"opt2_07_02_run_5"	// 8*/
+		"opt2_07_09_run_1",	// 0
+		"opt2_07_09_run_2",	// 1
+		"opt2_07_09_run_3",	// 2
+		"opt2_07_09_run_4",	// 3
+		"opt2_07_09_run_5",	// 4
 	};
 
 	// convert to kelvin
@@ -131,11 +158,11 @@ int main(int ac, char** av) {
 
 
 	// lists
-	auto xd = make_array_1<real,1>({0, w_1, pipe, w_1, w_irrad, w_1, pipe, w_1});
+	auto xd = math::make_array_1<real,1>({0, w_1, pipe, w_1, w_irrad, w_1, pipe, w_1});
 
-	auto yd = make_array_1<real,1>({0, 1e-2, 5e-2});
+	auto yd = math::make_array_1<real,1>({0, 1e-2, 5e-2});
 
-	auto zd = make_array_1<real,1>({0, l_1, pipe, l_3*0.5, l_3*0.5, pipe, l_1});
+	auto zd = math::make_array_1<real,1>({0, l_1, pipe, l_3*0.5, l_3*0.5, pipe, l_1});
 
 	real nom_size = 5e-4;
 
@@ -182,25 +209,25 @@ int main(int ac, char** av) {
 	   });
 	   */
 	patch_v_bou_edge_vec_type T_irr_xm({
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(1)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(2)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
+			std::make_shared<boundary_array>(math::make_ones<real,1>({nz->get(1)})->multiply_self(T_flux_avg)),
+			std::make_shared<boundary_array>(math::make_ones<real,1>({nz->get(2)})->multiply_self(T_flux_avg)),
+			std::make_shared<boundary_array>(math::make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg)),
+			std::make_shared<boundary_array>(math::make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
 			});
 
 	patch_v_bou_edge_vec_type T_irr_xp({
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(1)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(1)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(2)})->multiply_self(T_flux_avg)),
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
+			std::make_shared<boundary_array>(math::make_ones<real,1>({nz->get(1)})->multiply_self(T_flux_avg)),
+			std::make_shared<boundary_array>(math::make_ones<real,1>({nz->get(1)})->multiply_self(T_flux_avg)),
+			std::make_shared<boundary_array>(math::make_ones<real,1>({nz->get(2)})->multiply_self(T_flux_avg)),
+			std::make_shared<boundary_array>(math::make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
 			});
 
 	patch_v_bou_edge_vec_type T_irr_zm({
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
+			std::make_shared<boundary_array>(math::make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
 			});
 
 	patch_v_bou_edge_vec_type T_irr_zp({
-			std::make_shared<boundary_array>(make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
+			std::make_shared<boundary_array>(math::make_ones<real,1>({nz->get(3)})->multiply_self(T_flux_avg))
 			});
 	//nx = [10, 10, 10, 50, 10, 10, 10];
 	//ny = [50, 50];
@@ -297,7 +324,7 @@ int main(int ac, char** av) {
 
 	//==============================================================
 
-	auto prob = std::make_shared<Prob>(prob_names[run_index], X, n, 1E5, 1E5);
+	auto prob = std::make_shared<Prob>(prob_names[run_index], X, n, 3E3, 3E3);
 
 	prob->create_equation("T", 10.0, 1.5, 1.5);
 	prob->create_equation("s", 10.0, 1.5, 1.5);
@@ -518,9 +545,15 @@ int main(int ac, char** av) {
 
 	//solve_with_source(prob);
 	//solve_source(prob);
-	solve_temp(prob);
+	//
+	
+	std::stringstream ss;
+	ss << "_" << scale;
 
-	prob->value_stats("T");
+	solve_temp(prob, ss.str());
+
+
+	//prob->value_stats("T");
 
 };
 

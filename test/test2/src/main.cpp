@@ -9,25 +9,25 @@
 void solve_source(std::shared_ptr<Prob> prob) {
 	//prob->solve2(1e-4, 1e-2, True);
 
-	prob->write_binary("s");
-	prob->write("s");
+	//prob->write_binary("s");
+	//prob->write("s");
 
 	prob->solve("s", 1e-4, 0, 0);
 
-	prob->write_binary("s");
-	prob->write("s");
+	//prob->write_binary("s");
+	//prob->write("s");
 
 }
 void solve_temp(std::shared_ptr<Prob> prob) {
 	//prob->solve2(1e-4, 1e-2, True);
 
-	prob->write_binary("T");
-	prob->write("T");
+	//prob->write_binary("T");
+	//prob->write("T");
 	
 	prob->solve("T", 1e-4, 0, 0);
 
-	prob->write_binary("T");
-	prob->write("T");
+	//prob->write_binary("T");
+	//prob->write("T");
 
 }
 void solve_with_source(std::shared_ptr<Prob> prob) {
@@ -35,7 +35,7 @@ void solve_with_source(std::shared_ptr<Prob> prob) {
 
 	prob->solve("s", 1e-4, 0, 0);
 
-	prob->write_binary("s");
+	//prob->write_binary("s");
 
 	prob->value_add("s", -1.0);
 	prob->value_normalize("s");
@@ -43,7 +43,7 @@ void solve_with_source(std::shared_ptr<Prob> prob) {
 
 	prob->solve2("T", 1e-4, 1e-6);
 
-	prob->write_binary("T");
+	//prob->write_binary("T");
 	prob->write("T");
 }
 
@@ -59,13 +59,13 @@ int main(int ac, char** av) {
 	coor_type x;
 	cell_count_type N;
 
-	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0}));
-	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0}));
-	x.push_back(make_array_1<real,1>({0.0}));
+	x.push_back(math::make_array_1<real,1>({0.0, 1.0, 2.0}));
+	x.push_back(math::make_array_1<real,1>({0.0, 1.0, 2.0}));
+	x.push_back(math::make_array_1<real,1>({0.0}));
 
-	N.push_back(make_array_1<size_t,1>({n+0,n+0}));
-	N.push_back(make_array_1<size_t,1>({n+2,n+2}));
-	N.push_back(make_array_1<size_t,1>({n+4,n+4}));
+	N.push_back(math::make_array_1<size_t,1>({n+0,n+0}));
+	N.push_back(math::make_array_1<size_t,1>({n+2,n+2}));
+	N.push_back(math::make_array_1<size_t,1>({n+4,n+4}));
 	
 	
 	auto prob = std::make_shared<Prob>("test", x, N, 1E3, 1E2);

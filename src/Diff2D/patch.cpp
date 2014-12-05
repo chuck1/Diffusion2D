@@ -17,7 +17,7 @@ Patch::Patch(
 		Patch_Group_s group,
 		std::string name,
 		int normal,
-		multivec<2,size_t> indices,
+		math::multivec<2,size_t> indices,
 		coor_type x,
 		cell_count_type nx,
 		patch_v_bou_type v_bou):
@@ -57,14 +57,14 @@ Patch::Patch(
 		std::reverse(indices_[y_.i].begin(), indices_[y_.i].end());
 	}
 
-	npatch_ = make_array_1<size_t,1>({NX,NY});
+	npatch_ = math::make_array_1<size_t,1>({NX,NY});
 
 	//faces_ = faces;
 
 }
 void		Patch::create_faces() {
 	// alloc faces array
-	faces_ = make_zeros<Face_s,2>(npatch_->ravel());
+	faces_ = math::make_zeros<Face_s,2>(npatch_->ravel());
 
 	size_t NX = npatch_->get(0);
 	size_t NY = npatch_->get(1);
@@ -99,7 +99,7 @@ void		Patch::create_faces() {
 				}*/
 
 			// extends are global coordinate associated with local begin and end
-			auto ext = make_uninit<real,2>({2,2});
+			auto ext = math::make_uninit<real,2>({2,2});
 			ext->get(0,0) = coor_[x_.i]->get(I);
 			ext->get(0,1) = coor_[x_.i]->get(M);
 			ext->get(1,0) = coor_[y_.i]->get(J);
@@ -128,7 +128,7 @@ void		Patch::create_faces() {
 			numx = nx_[x_.i]->get(std::min(I,M));
 			numy = nx_[y_.i]->get(std::min(J,N));
 
-			auto numarr = make_array_1<size_t,1>({numx, numy});
+			auto numarr = math::make_array_1<size_t,1>({numx, numy});
 
 			//print "I,J",I,J
 
@@ -346,7 +346,7 @@ void		Patch::write_binary(std::string ename) {
 	std::ofstream ofs;
 	ofs.open(filename, std::ofstream::trunc);
 	if(!ofs.is_open()) {
-		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "file stream not open" << std::endl;
+		LOG(lg, info, warning) << "file stream not open";
 		return;
 	}
 

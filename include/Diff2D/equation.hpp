@@ -34,7 +34,7 @@ class Equation {
 
 		Equation(std::string name, Face_s face, Equation_Prob_s equ_prob);
 
-		array<real,3>						grad();
+		math::array<real,3>					grad();
 		real							grad_mag();
 		real							min();
 		real							max();
@@ -47,8 +47,8 @@ class Equation {
 		Face_s							face_;
 		Equation_Prob_s						equ_prob_;
 		
-		array<real,2>						s_;
-		array<real,2>						v_;
+		math::array<real,2>						s_;
+		math::array<real,2>						v_;
 
 		unsigned int						flag_;
 		equ_v_bou_type						v_bou_;

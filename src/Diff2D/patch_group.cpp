@@ -35,12 +35,12 @@ Patch_Group::Patch_Group(
 	name_ = name;
 	v_0_ = v_0;
 
-	v_0_history_["T"] = make_zeros<real,1>({prob->it_max_outer_});
-	v_0_history_["s"] = make_zeros<real,1>({prob->it_max_outer_});
+	v_0_history_["T"] = math::make_zeros<real,1>({prob->it_max_outer_});
+	v_0_history_["s"] = math::make_zeros<real,1>({prob->it_max_outer_});
 
 
-	S_["T"] = make_ones<real,1>({prob->it_max_outer_})->multiply_self(S["T"]);
-	S_["s"] = make_ones<real,1>({prob->it_max_outer_})->multiply_self(S["s"]);
+	S_["T"] = math::make_ones<real,1>({prob->it_max_outer_})->multiply_self(S["T"]);
+	S_["s"] = math::make_ones<real,1>({prob->it_max_outer_})->multiply_self(S["s"]);
 
 
 
@@ -57,7 +57,7 @@ Patch_s			Patch_Group::create_patch(
 
 	//print 'T_0',T_0
 
-	multivec<2,size_t> indices({indicesx,indicesy,indicesz});
+	math::multivec<2,size_t> indices({indicesx,indicesy,indicesz});
 
 
 	auto prob = prob_.lock();
@@ -114,7 +114,7 @@ void			Patch_Group::get_value_of_interest(std::string const & ename, real& targe
 				} catch(point_not_found&) {
 					continue;
 				} catch(...) {
-					BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "unknwon error occured" << GAL_LOG_ENDLINE;
+					//BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "unknwon error occured" << GAL_LOG_ENDLINE;
 					abort();
 				}
 			}
@@ -141,8 +141,8 @@ real			Patch_Group::reset_s(size_t it, std::string ename) {
 
 	auto prob = prob_.lock();
 
-	array<real,1>& v_0_hist = v_0_history_[ename];
-	array<real,1>& S = S_[ename];
+	math::array<real,1>& v_0_hist = v_0_history_[ename];
+	math::array<real,1>& S = S_[ename];
 	assert(v_0_hist);
 	assert(S);
 
@@ -252,7 +252,7 @@ std::vector< Face_s >		Patch_Group::faces() {
 void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 
 	if(!ofs.is_open()) {
-		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "file stream not open" << std::endl;
+		//BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "file stream not open" << std::endl;
 		return;
 	}
 
@@ -283,8 +283,8 @@ void				Patch_Group::write(std::string equ_name, std::ofstream& ofs) {
 	int n = x.size();
 
 
-	BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info)
-		<< "writing " << n << " points" << std::endl;
+	//BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info)
+	//	<< "writing " << n << " points" << std::endl;
 
 
 	ofs << "((" << name << " point " << n << ")\n";

@@ -38,7 +38,7 @@ void			Conn::printinfo() {
 	   print inspect.getsource(li_)
 	   print inspect.getsource(lj_)*/
 }
-void			Conn::send(std::string name, array<real,1> v) {
+void			Conn::send(std::string name, math::array<real,1> v) {
 	if(parallel_) {
 		assert(0);
 		//conns_[name].send(v);
@@ -46,10 +46,10 @@ void			Conn::send(std::string name, array<real,1> v) {
 		equs_[name] = v;
 	}
 }
-array<real,1>		Conn::recv(std::string name) {
+math::array<real,1>		Conn::recv(std::string name) {
 	size_t n = face_->n_->get(pl_.i);
 	
-	array<real,1> v;
+	math::array<real,1> v;
 
 	if(parallel_) {
 		//v = conns_[name].recv();
@@ -59,7 +59,7 @@ array<real,1>		Conn::recv(std::string name) {
 	v = twin_->equs_[name];
 	if(v) return v;
 	
-	return make_zeros<real,1>({n});
+	return math::make_zeros<real,1>({n});
 }
 
 

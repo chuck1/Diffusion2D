@@ -15,8 +15,8 @@
 
 Prob::Prob(
 		std::string name,
-		std::vector< array<real,1> > x,
-		std::vector< array<size_t,1> > nx,
+		std::vector< math::array<real,1> > x,
+		std::vector< math::array<size_t,1> > nx,
 		int it_max_inner,
 		int it_max_outer):
 	it_max_inner_(it_max_inner),
@@ -81,7 +81,7 @@ real			Prob::grad_min(std::string const & equ_name) const {
 	return v;
 }
 // value manipulation
-void			Prob::value_add(std::string const & equ_name, array<real,2> const & v) {
+void			Prob::value_add(std::string const & equ_name, math::array<real,2> const & v) {
 	for(auto f : faces()) {
 		auto equ = f->equs_[equ_name];
 		equ->v_->add_self(v);
@@ -162,7 +162,7 @@ int				Prob::solve_serial(std::string name, real cond_inner, size_t it_outer, re
 	real cond_grad_inner = -1E-9;
 
 	/** @todo move this to class variable to avoid excess alloc!*/
-	auto R = make_zeros<real,1>({it_max_inner_});
+	auto R = math::make_zeros<real,1>({it_max_inner_});
 
 	real nR = 0;
 
@@ -178,11 +178,11 @@ int				Prob::solve_serial(std::string name, real cond_inner, size_t it_outer, re
 		}
 
 		IF(std::isnan(nR)) {
-			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "nan" << GAL_LOG_ENDLINE;
+			//LOG(gal::log::lg, info, critical) << "nan" << GAL_LOG_ENDLINE;
 			throw 0;
 		}
 		IF(std::isinf(nR)) {
-			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", critical) << "nan" << GAL_LOG_ENDLINE;
+			//LOG(gal::log::lg, info, critical) << "nan" << GAL_LOG_ENDLINE;
 			throw 0;
 		}
 		
@@ -191,23 +191,23 @@ int				Prob::solve_serial(std::string name, real cond_inner, size_t it_outer, re
 		real grad = R->fda_1_back(it, 1.0);
 		real grad2 = R->fda_2_back(it, 1.0);
 		
-		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info) << std::scientific
+		LOG(lg, info, info) << std::scientific
 			<< std::setw(4) << name
 			<< std::setw(6) << it_outer
 			<< std::setw(16) << R_outer
 			<< std::setw(6) << it
 			<< std::setw(16) << nR
 			<< std::setw(16) << grad
-			<< std::setw(16) << grad2
-			<< std::endl;
+			<< std::setw(16) << grad2;
+			
 		
 		
 		if((grad <= 0) && (grad > cond_grad_inner)) {
-			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info) << "break inner because residual gradient < " << std::scientific << cond_grad_inner << std::endl;
+			LOG(lg, info, info) << "break inner because residual gradient < " << std::scientific << cond_grad_inner;
 			break;
 		}
 		if(nR < cond_inner) {
-			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info) << "break inner because residual < " << std::scientific << cond_inner << std::endl;
+			LOG(lg, info, info) << "break inner because residual < " << std::scientific << cond_inner;
 			break;
 		}
 	}
@@ -234,17 +234,16 @@ int				Prob::solve_outer_group(
 		// solve inner ========================
 		solve(ename, cond_inner, it_outer, R_outer);
 
-		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info)
+		LOG(lg, info, info)
 			<< std::setw(6) << it_outer
-			<< std::setw(16) << R_outer
-			<< std::endl;
+			<< std::setw(16) << R_outer;
 
 		if(std::isnan(R_outer)) {
 			throw 0;//raise ValueError('nan')
 		}
 
 		if(R_outer < cond_outer) {
-			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info) << "break outer because residual < " << std::scientific << cond_outer << std::endl;
+			//LOG(gal::log::lg, info, info) << "break outer because residual < " << std::scientific << cond_outer << std::endl;
 			
 			// callback good break
 			// fill S with final value
@@ -263,7 +262,7 @@ int				Prob::solve_outer_group(
 			break;
 		}
 		if(R_outer > cond_upper_outer) {
-			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info) << "kill because outer residual > " << std::scientific << cond_upper_outer << std::endl;
+			//LOG(gal::log::lg, info, info) << "kill because outer residual > " << std::scientific << cond_upper_outer << std::endl;
 			throw 0;
 		}
 	}
@@ -291,11 +290,11 @@ void			Prob::solve2(std::string ename, real cond_outer, real cond_inner) {
 		}
 		
 		if(R3 < cond_outer) {
-			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info) << "break loop 3 because residual < " << std::scientific << cond_outer << std::endl;
+			LOG(lg, info, info) << "break loop 3 because residual < " << std::scientific << cond_outer;
 			break;
 		}
 		if(it3 == (it3_stop-1)) {
-			BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info) << "break loop 3 because it3 == " << std::scientific << it3_stop << std::endl;
+			LOG(lg, info, info) << "break loop 3 because it3 == " << std::scientific << it3_stop;
 			break;
 		}
 		it3++;
@@ -343,17 +342,17 @@ void			Prob::value_stats(std::string const & name) const {
 		print_row(16, ("'" + g->name_ + "'"), target, value, error);
 	}
 }
-void			Prob::write(std::string equ_name) {
+void			Prob::write(std::string equ_name, std::string filename_post) {
 
 	/*if(not os.path.exists(directory)) {
 	  os.makedirs(directory)
 	  }*/
 
 	std::ofstream ofs;
-	ofs.open("prof_" + name_ + "_" + equ_name + ".prof", std::ofstream::trunc);
+	ofs.open("prof_" + name_ + "_" + equ_name + filename_post + ".prof", std::ofstream::trunc);
 
 	if(!ofs.is_open()) {
-		BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", warning) << "file stream not open" << GAL_LOG_ENDLINE;
+		LOG(lg, info, warning) << "file stream not open";
 		return;
 	}
 
@@ -390,8 +389,8 @@ void			Prob::write(std::string equ_name) {
 	int n = x.size();
 
 
-	BOOST_LOG_CHANNEL_SEV(gal::log::lg, "Diff2D", info)
-		<< "writing " << n << " points" << std::endl;
+	LOG(lg, info, info)
+		<< "writing " << n << " points";
 
 
 	ofs << "((" << name << " point " << n << ")\n";

@@ -38,15 +38,15 @@ struct Term {
 
 struct grid_return_type {
 	grid_return_type(
-			array<real,2> x,
-			array<real,2> y,
-			array<real,2> z,
-			array<real,2> w):
+			math::array<real,2> x,
+			math::array<real,2> y,
+			math::array<real,2> z,
+			math::array<real,2> w):
 		X({x,y,z}),
 		W(w)
 	{}
-	array<real,2>	X[3];
-	array<real,2>	W;
+	math::array<real,2>	X[3];
+	math::array<real,2>	W;
 };
 
 //typedef std::tuple< std::vector<real>, std::vector<real>, std::vector<real>, std::vector<real> >		grid_tup;
@@ -57,7 +57,7 @@ struct grid_return_type {
  */
 class Face: public LocalCoor, public std::enable_shared_from_this<Face> {
 	public:
-		Face(Patch_s patch, int normal, array<real,2> const & ext, real pos_z, array<size_t,1> n);
+		Face(Patch_s patch, int normal, math::array<real,2> const & ext, real pos_z, math::array<size_t,1> n);
 
 		Equation_s		create_equ(std::string name, Equation_Prob_s equ_prob);
 		int			get_loc_pos_par_index(Face_s nbr);
@@ -89,12 +89,12 @@ class Face: public LocalCoor, public std::enable_shared_from_this<Face> {
 	public:
 
 		Patch_s						patch_;
-		array<real,2>					ext_;
+		math::array<real,2>					ext_;
 		std::vector< std::vector<Conn_s> >		conns_;
 		real						pos_z_;
-		array<size_t,1>					n_;
-		array<real,3>					d_;
-		array<real,1>					l_;
+		math::array<size_t,1>					n_;
+		math::array<real,3>					d_;
+		math::array<real,1>					l_;
 		std::map< std::string, Equation_s >		equs_;
 
 		//std::map<std::string, array<real,1>[2][2]>	v_bou_;

@@ -31,7 +31,7 @@ class Prob: public std::enable_shared_from_this<Prob> {
 		real				grad_max(std::string const & equ_name) const;
 		real				grad_min(std::string const & equ_name) const;
 		void				value_add(std::string const & equ_name, real const & v);
-		void				value_add(std::string const & equ_name, array<real,2> const & v);
+		void				value_add(std::string const & equ_name, math::array<real,2> const & v);
 		void				value_normalize(std::string const & equ_name);
 		void				value_clamp_per_group(std::string const & name, real a, real const & b);
 		void				copy_value_to_source(std::string equ_name_from, std::string equ_name_to);
@@ -65,7 +65,7 @@ class Prob: public std::enable_shared_from_this<Prob> {
 
 		void				save();
 
-		void				write(std::string equ_name);
+		void				write(std::string equ_name, std::string filename_post = std::string());
 		void				write_binary(std::string equ_name);
 
 		void				connection_info() const;
@@ -77,8 +77,8 @@ class Prob: public std::enable_shared_from_this<Prob> {
 
 		std::string					name_;
 
-		std::vector< array<real,1> >			x_;
-		std::vector< array<size_t,1> >			nx_;
+		std::vector< math::array<real,1> >			x_;
+		std::vector< math::array<size_t,1> >			nx_;
 
 		std::map<std::string, Equation_Prob_s>		equs_;
 

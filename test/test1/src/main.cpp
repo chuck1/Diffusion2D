@@ -63,13 +63,13 @@ int main(int ac, char** av) {
 	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));
 	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0, 3.0}));*/
 	
-	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0}));
-	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0}));
-	x.push_back(make_array_1<real,1>({0.0, 1.0, 2.0}));
+	x.push_back(math::make_array_1<real,1>({0.0, 1.0, 2.0}));
+	x.push_back(math::make_array_1<real,1>({0.0, 1.0, 2.0}));
+	x.push_back(math::make_array_1<real,1>({0.0, 1.0, 2.0}));
 
-	N.push_back(make_array_1<size_t,1>({n+0,n+0}));
-	N.push_back(make_array_1<size_t,1>({n+2,n+2}));
-	N.push_back(make_array_1<size_t,1>({n+4,n+4}));
+	N.push_back(math::make_array_1<size_t,1>({n+0,n+0}));
+	N.push_back(math::make_array_1<size_t,1>({n+2,n+2}));
+	N.push_back(math::make_array_1<size_t,1>({n+4,n+4}));
 	
 	
 	auto prob = std::make_shared<Prob>("test", x, N, 1000, 1000);

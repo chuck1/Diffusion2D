@@ -21,13 +21,13 @@ struct boundary_single: boundary {
 };
 
 struct boundary_array: boundary {
-	boundary_array(array<real,1> v): v_(v) {}
+	boundary_array(math::array<real,1> v): v_(v) {}
 
 	virtual void		eval(std::shared_ptr<Equation> const & equ, std::vector<int> const & ind, std::vector<int> const & indn, unsigned int p) {
 		equ->v_->get(indn[0],indn[1]) = 2.0 * v_->get(ind[p]) - equ->v_->get(ind);
 	}
 
-	array<real,1>	v_;
+	math::array<real,1>	v_;
 };
 
 struct boundary_insulated: boundary {

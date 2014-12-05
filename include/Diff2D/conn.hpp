@@ -34,8 +34,8 @@ class Conn {
 		Conn(Face_s face, void* conns);
 		void					refresh();
 		void					printinfo();
-		void					send(std::string name, array<real,1> v);
-		array<real,1>				recv(std::string name);
+		void					send(std::string name, math::array<real,1> v);
+		math::array<real,1>				recv(std::string name);
 
 		IS					pl_;
 		IS					ol_;
@@ -49,7 +49,7 @@ class Conn {
 		Conn_s					twin_;
 		void*					conns_;
 		bool					parallel_;
-		std::map<std::string, array<real,1> >	equs_;
+		std::map<std::string, math::array<real,1> >	equs_;
 };
 
 

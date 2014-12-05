@@ -28,7 +28,7 @@ int main(int ac, char** av) {
 
 	// data
 	
-	std::string prob_name = "option_1_solar";
+	std::string prob_name = "option_2_solar";
 
 	// solve
 
@@ -49,11 +49,11 @@ int main(int ac, char** av) {
 
 
 	// lists
-	auto xd = make_array_1<real,1>({0, w_1, pipe, w_1, w_irrad, w_1, pipe, w_1});
+	auto xd = math::make_array_1<real,1>({0, w_1, pipe, w_1, w_irrad, w_1, pipe, w_1});
 
-	auto yd = make_array_1<real,1>({0, 1e-2, 5e-2});
+	auto yd = math::make_array_1<real,1>({0, 1e-2, 5e-2});
 
-	auto zd = make_array_1<real,1>({0, l_1, pipe, l_3*0.5, l_3*0.5, pipe, l_1});
+	auto zd = math::make_array_1<real,1>({0, l_1, pipe, l_3*0.5, l_3*0.5, pipe, l_1});
 
 	real nom_size = 5e-4;
 

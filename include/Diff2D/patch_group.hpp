@@ -53,8 +53,8 @@ class Patch_Group: public std::enable_shared_from_this<Patch_Group> {
 		std::map<std::string, real>		v_0_;
 		point					v_0_point_;
 		unsigned int				flag_;
-		std::map<std::string, array<real,1> >	v_0_history_;
-		std::map<std::string, array<real,1> >	S_;
+		std::map<std::string, math::array<real,1> >	v_0_history_;
+		std::map<std::string, math::array<real,1> >	S_;
 };
 
 

@@ -19,15 +19,15 @@ class Patch: public LocalCoor, public std::enable_shared_from_this<Patch> {
 				Patch_Group_s group,
 				std::string name,
 				int normal,
-				multivec<2,size_t> indices,
-				std::vector< array<real,1> > x,
-				std::vector< array<size_t,1> > nx,
+				math::multivec<2,size_t> indices,
+				std::vector< math::array<real,1> > x,
+				std::vector< math::array<size_t,1> > nx,
 				patch_v_bou_type v_bou);
 		
 
 		//void		create_equ(std::string name, real v0, patch_v_bou_edge_vec_type v_bou, real k, real al);
 
-		void		set_v_bou(std::string equ_name, std::vector< array<real,1> > v_bou);
+		void		set_v_bou(std::string equ_name, std::vector< math::array<real,1> > v_bou);
 
 		/** @name value inspection and manipulation
 		 * @{
@@ -52,11 +52,11 @@ class Patch: public LocalCoor, public std::enable_shared_from_this<Patch> {
 		cell_count_type				nx_;
 		patch_v_bou_type			v_bou_;
 
-		multivec<2,size_t>			indices_;
+		math::multivec<2,size_t>			indices_;
 		
-		array<size_t,1>				npatch_;
+		math::array<size_t,1>				npatch_;
 		
-		array<Face_s,2>				faces_;
+		math::array<Face_s,2>				faces_;
 };
 
 #endif

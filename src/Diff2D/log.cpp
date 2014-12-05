@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <Galaxy-Log/log.hpp>
+#include <gal/log/log.hpp>
 
 #include <Diff2D/log.hpp>
 
